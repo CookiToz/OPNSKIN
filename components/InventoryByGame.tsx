@@ -54,7 +54,19 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
         </h2>
       </div>
       {isLoading ? (
-        <div className="text-opnskin-primary text-xl font-rajdhani animate-pulse py-16">{t('inventory.loading', "Chargement de l'inventaire…")}</div>
+        <div className="flex flex-col items-center justify-center py-16 space-y-6">
+          <div className="text-opnskin-primary text-xl font-rajdhani animate-pulse">
+            {t('inventory.loading', "Chargement de l'inventaire…")}
+          </div>
+          {onBack && (
+            <button 
+              onClick={onBack} 
+              className="btn-opnskin-secondary flex items-center gap-2"
+            >
+              ← {t('inventory.back_to_games', 'Retour aux jeux')}
+            </button>
+          )}
+        </div>
       ) : isError ? (
         <div className="flex flex-col items-center justify-center py-16 space-y-6">
           <div className="text-red-500 text-lg font-bold text-center">
