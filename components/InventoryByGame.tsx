@@ -74,7 +74,7 @@ const getWeaponCategory = (name: string): string => {
   for (const [key, value] of Object.entries(weaponTypes)) {
     if (name.includes(key)) return value;
   }
-  return 'weapon';
+  return 'Arme';
 };
 
 export default function InventoryByGame({ game, onBack }: InventoryByGameProps) {
@@ -234,12 +234,14 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
                       {t(`inventory.${rarity}`)}
                     </Badge>
                   )}
+                  {item.marketPrice !== undefined && (
+                    <Badge className="absolute top-2 left-2 z-20 bg-opnskin-primary/20 text-opnskin-primary border-opnskin-primary/30 text-xs font-mono font-bold">
+                      {item.marketPrice} €
+                    </Badge>
+                  )}
                   <div className="absolute bottom-0 left-0 right-0 p-2 z-20">
                     <div className="flex justify-between items-center">
-                      <span className="text-xs text-opnskin-text-secondary">{t(`inventory.${weaponCategory}`)}</span>
-                      {item.marketPrice !== undefined && (
-                        <span className="font-mono text-opnskin-accent font-bold text-sm">{item.marketPrice} €</span>
-                      )}
+                      <span className="text-xs text-opnskin-text-secondary">{weaponCategory}</span>
                     </div>
                     <h3 className="font-satoshi-bold text-sm truncate text-opnskin-text-primary">{item.name}</h3>
                     {weaponWear && (
@@ -343,7 +345,7 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
                       <span className="text-opnskin-text-secondary">
                         {t('inventory.category', 'Catégorie:')}
                       </span>
-                      <span className="text-opnskin-text-primary">{t(`inventory.${getWeaponCategory(selectedItem.name)}`)}</span>
+                      <span className="text-opnskin-text-primary">{getWeaponCategory(selectedItem.name)}</span>
                     </div>
                     {getWeaponWear(selectedItem.name) && (
                       <div className="flex justify-between">
