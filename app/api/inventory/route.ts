@@ -130,11 +130,27 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Non connecté à Steam' }, { status: 401 });
   }
 
-  // Récupère la devise demandée dans l'URL, sinon EUR par défaut
+  // Récupère la devise et l'appid demandés dans l'URL
   const { searchParams } = new URL(req.url);
   const currency = (searchParams.get('currency') as Currency) || 'EUR';
+  const appid = searchParams.get('appid') || '730'; // 730 = CS2 par défaut
 
-  const url = `https://steamcommunity.com/inventory/${steamId}/730/2?l=english&count=1000`;
+  // Mapping des appids vers les jeux
+  const gameConfigs = {
+    '730': { name: 'CS2', contextid: '2' },
+    '570': { name: 'Dota2', contextid: '2' },
+    '252490': { name: 'Rust', contextid: '2' },
+    '440': { name: 'TF2', contextid: '2' },
+  };
+
+  const gameConfig = gameConfigs[appid as keyof typeof gameConfigs];
+  if (!gameConfig) {
+    return NextResponse.json({ error: 'Jeu non supporté' }, { status: 400 });
+  }
+
+  const url = `https://steamcommunity.com/inventory/${steamId}/${appid}/${gameConfig.contextid}?l=english&count=1000`;
+
+  console.log(`[INVENTORY] Fetching ${gameConfig.name} inventory for SteamID: ${steamId}`);
 
   try {
     const response = await fetch(url, {
@@ -152,22 +168,41 @@ export async function GET(req: NextRequest) {
         'Pragma': 'no-cache'
       }
     });
+
+    if (!response.ok) {
+      console.error(`[INVENTORY] Steam API error for ${gameConfig.name}:`, response.status, response.statusText);
+      return NextResponse.json({ error: `Inventaire ${gameConfig.name} non disponible` }, { status: response.status });
+    }
+
     const data = await response.json();
 
     if (!data || !data.assets || !data.descriptions) {
-      return NextResponse.json({ error: 'Inventaire non disponible' }, { status: 500 });
+      console.warn(`[INVENTORY] No data for ${gameConfig.name} inventory`);
+      return NextResponse.json({ items: [], game: gameConfig.name });
     }
 
-    // Blacklist des types à exclure (on laisse les stickers)
-    const EXCLUDED_TYPES = [
+    // Blacklist des types à exclure (spécifique par jeu)
+    const EXCLUDED_TYPES = appid === '730' ? [
       'Graffiti',
-      //'Sticker',
       'Patch',
       'Music Kit',
       'Collectible',
       'Gift',
       'Coupon',
-    ];
+    ] : appid === '570' ? [
+      'Treasure',
+      'Bundle',
+      'Gift',
+      'Coupon',
+    ] : appid === '252490' ? [
+      'Blueprint',
+      'Gift',
+      'Coupon',
+    ] : appid === '440' ? [
+      'Gift',
+      'Coupon',
+      'Tool',
+    ] : [];
 
     // On ne garde que les items tradables, marketables, et non exclus
     const filteredAssets = data.assets.filter((asset: any) => {

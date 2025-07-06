@@ -190,23 +190,29 @@ export function Header() {
             ) : userError ? (
               <div className="text-red-500">Erreur de connexion</div>
             ) : user && user.loggedIn ? (
-              <div className="relative">
-                <img
-                  src={user.avatar}
-                  alt="Avatar"
-                  className="w-9 h-9 rounded-full cursor-pointer border border-opnskin-bg-secondary hover:border-opnskin-primary/40 transition-colors"
-                  onClick={() => setShowUserMenu(!showUserMenu)}
-                />
-                {showUserMenu && (
-                  <div className="absolute right-0 mt-2 bg-opnskin-bg-card/95 border border-opnskin-bg-secondary rounded-md shadow-xl z-50 w-40">
-                    <button
-                      className="w-full flex items-center px-4 py-2 text-sm text-opnskin-text-primary hover:bg-opnskin-primary/10 transition-colors"
-                      onClick={handleLogout}
-                    >
-                      <LogOut className="w-4 h-4 mr-2" /> {t('header.logout')}
-                    </button>
-                  </div>
-                )}
+              <div className="relative flex items-center gap-3">
+                <div className="flex flex-col items-end">
+                  <span className="text-sm font-medium text-opnskin-text-primary">{user.name}</span>
+                  <span className="text-xs text-opnskin-text-secondary">Steam ID: {user.steamId}</span>
+                </div>
+                <div className="relative">
+                  <img
+                    src={user.avatar || '/icons8-steam-128.png'}
+                    alt="Avatar"
+                    className="w-9 h-9 rounded-full cursor-pointer border border-opnskin-bg-secondary hover:border-opnskin-primary/40 transition-colors"
+                    onClick={() => setShowUserMenu(!showUserMenu)}
+                  />
+                  {showUserMenu && (
+                    <div className="absolute right-0 mt-2 bg-opnskin-bg-card/95 border border-opnskin-bg-secondary rounded-md shadow-xl z-50 w-40">
+                      <button
+                        className="w-full flex items-center px-4 py-2 text-sm text-opnskin-text-primary hover:bg-opnskin-primary/10 transition-colors"
+                        onClick={handleLogout}
+                      >
+                        <LogOut className="w-4 h-4 mr-2" /> {t('header.logout')}
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
             ) : (
               <Button
