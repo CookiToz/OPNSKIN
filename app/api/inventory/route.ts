@@ -169,16 +169,47 @@ export async function GET(req: NextRequest) {
       }
     });
 
+    console.log(`[INVENTORY] Response status for ${gameConfig.name}:`, response.status, response.statusText);
+
     if (!response.ok) {
       console.error(`[INVENTORY] Steam API error for ${gameConfig.name}:`, response.status, response.statusText);
-      return NextResponse.json({ error: `Inventaire ${gameConfig.name} non disponible` }, { status: response.status });
+      
+      // Gestion spécifique des erreurs Steam
+      if (response.status === 403) {
+        return NextResponse.json({ 
+          error: `Inventaire ${gameConfig.name} privé ou non accessible. Vérifiez que votre profil Steam est public.`,
+          game: gameConfig.name 
+        }, { status: 403 });
+      }
+      
+      if (response.status === 404) {
+        return NextResponse.json({ 
+          error: `Aucun inventaire ${gameConfig.name} trouvé pour ce compte Steam.`,
+          game: gameConfig.name 
+        }, { status: 404 });
+      }
+      
+      return NextResponse.json({ 
+        error: `Erreur Steam (${response.status}): ${response.statusText}`,
+        game: gameConfig.name 
+      }, { status: response.status });
     }
 
     const data = await response.json();
+    console.log(`[INVENTORY] Data received for ${gameConfig.name}:`, {
+      hasAssets: !!data?.assets,
+      hasDescriptions: !!data?.descriptions,
+      assetsCount: data?.assets?.length || 0,
+      descriptionsCount: data?.descriptions?.length || 0
+    });
 
     if (!data || !data.assets || !data.descriptions) {
       console.warn(`[INVENTORY] No data for ${gameConfig.name} inventory`);
-      return NextResponse.json({ items: [], game: gameConfig.name });
+      return NextResponse.json({ 
+        items: [], 
+        game: gameConfig.name,
+        message: `Aucun inventaire ${gameConfig.name} disponible`
+      });
     }
 
     // Blacklist des types à exclure (spécifique par jeu)

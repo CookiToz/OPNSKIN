@@ -193,7 +193,6 @@ export function Header() {
               <div className="relative flex items-center gap-3">
                 <div className="flex flex-col items-end">
                   <span className="text-sm font-medium text-opnskin-text-primary">{user.name}</span>
-                  <span className="text-xs text-opnskin-text-secondary">Steam ID: {user.steamId}</span>
                 </div>
                 <div className="relative">
                   <img

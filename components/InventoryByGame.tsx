@@ -54,9 +54,29 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
         </h2>
       </div>
       {isLoading ? (
-        <div className="text-opnskin-primary text-xl font-rajdhani animate-pulse py-16">{t('inventory.loading', 'Chargement de l’inventaire…')}</div>
+        <div className="text-opnskin-primary text-xl font-rajdhani animate-pulse py-16">{t('inventory.loading', "Chargement de l'inventaire…")}</div>
       ) : isError ? (
-        <div className="text-red-500 text-lg font-bold py-16">{errorMsg || t('inventory.error_loading', 'Erreur lors du chargement de l’inventaire')}</div>
+        <div className="flex flex-col items-center justify-center py-16 space-y-6">
+          <div className="text-red-500 text-lg font-bold text-center">
+            {errorMsg || t('inventory.error_loading', "Erreur lors du chargement de l'inventaire")}
+          </div>
+          <div className="text-opnskin-text-secondary text-sm text-center max-w-md">
+            {errorMsg?.includes('privé') && (
+              <p>Votre inventaire Steam est privé. Allez dans les paramètres de votre profil Steam et rendez votre inventaire public.</p>
+            )}
+            {errorMsg?.includes('404') && (
+              <p>Vous n'avez pas d'inventaire pour ce jeu ou votre profil Steam n'est pas accessible.</p>
+            )}
+          </div>
+          {onBack && (
+            <button 
+              onClick={onBack} 
+              className="btn-opnskin-secondary flex items-center gap-2"
+            >
+              ← {t('inventory.back_to_games', 'Retour aux jeux')}
+            </button>
+          )}
+        </div>
       ) : items.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 space-y-6">
           <div className="text-opnskin-text-secondary text-lg font-rajdhani text-center">
