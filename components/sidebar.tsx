@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
@@ -9,7 +9,7 @@ import { Store, Package, ListOrdered, Wallet, History, User, Settings, ChevronRi
 import { OPNSKINLogo } from "@/components/kalpix-logo"
 import { useTranslation } from 'next-i18next'
 
-export function Sidebar() {
+function SidebarContent() {
   const pathname = usePathname()
   const [expanded, setExpanded] = useState(true)
   const [mounted, setMounted] = useState(false)
@@ -195,4 +195,26 @@ export function Sidebar() {
       </div>
     </div>
   )
+}
+
+export function Sidebar() {
+  return (
+    <Suspense fallback={
+      <div className="h-screen bg-opnskin-bg-primary w-64 flex flex-col">
+        <div className="sidebar-logo-container px-4 flex items-center justify-between" style={{ height: 80, minHeight: 80, maxHeight: 80 }}>
+          <div className="flex items-center gap-2">
+            <div className="h-10 w-10 bg-opnskin-primary/20 rounded animate-pulse"></div>
+            <div className="h-6 w-24 bg-opnskin-text-secondary/20 rounded animate-pulse"></div>
+          </div>
+        </div>
+        <div className="flex-1 py-4 px-2 space-y-2">
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="h-10 bg-opnskin-bg-secondary/20 rounded animate-pulse"></div>
+          ))}
+        </div>
+      </div>
+    }>
+      <SidebarContent />
+    </Suspense>
+  );
 }
