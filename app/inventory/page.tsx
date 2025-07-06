@@ -331,6 +331,16 @@ export default function Inventory() {
     );
   }
 
+  // Si aucun jeu n'est sélectionné, afficher la sélection de jeu
+  if (!selectedGame) {
+    return (
+      <div className="w-full h-full flex flex-col">
+        <InventoryGameSelect selectedGame={null} onSelect={setSelectedGame} context="inventory" />
+      </div>
+    );
+  }
+
+  // Si il y a une erreur et qu'un jeu est sélectionné, afficher l'erreur
   if (error) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -342,30 +352,28 @@ export default function Inventory() {
             <Button onClick={fetchInventory} className="btn-opnskin">
               {t('inventory.retry')}
             </Button>
-            {selectedGame && (
-              <Button 
-                onClick={() => {
-                  setSelectedGame(null);
-                  setError(null);
-                }} 
-                className="btn-opnskin-secondary"
-              >
-                ← {t('inventory.back_to_games', 'Retour aux jeux')}
-              </Button>
-            )}
+            <Button 
+              onClick={() => {
+                setSelectedGame(null);
+                setError(null);
+                setInventory([]);
+                setFilteredInventory([]);
+                setLoading(false);
+              }} 
+              className="btn-opnskin-secondary"
+            >
+              ← {t('inventory.back_to_games', 'Retour aux jeux')}
+            </Button>
           </div>
         </div>
       </div>
     );
   }
 
+  // Afficher l'inventaire du jeu sélectionné
   return (
     <div className="w-full h-full flex flex-col">
-      {!selectedGame ? (
-        <InventoryGameSelect selectedGame={null} onSelect={setSelectedGame} context="inventory" />
-      ) : (
-        <InventoryByGame game={selectedGame} onBack={() => setSelectedGame(null)} />
-      )}
+      <InventoryByGame game={selectedGame} onBack={() => setSelectedGame(null)} />
     </div>
   );
 } 
