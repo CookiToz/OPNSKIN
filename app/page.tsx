@@ -313,7 +313,9 @@ export default function Home() {
                         <div className="flex justify-between items-center mb-2">
                           <span className="text-xs text-opnskin-text-secondary">{skin.weapon}</span>
                           <span className="font-mono text-opnskin-accent font-bold text-sm">
-                            {cryptoIcons[currency] && <img src={cryptoIcons[currency]!} alt={currency} className="inline w-4 h-4 mr-1 align-middle" />}
+                            {cryptoIcons[currency] && currency !== 'EUR' && currency !== 'USD' && (
+                              <img src={cryptoIcons[currency]!} alt={currency} className="inline w-4 h-4 mr-1 align-middle" />
+                            )}
                             {formatPrice(skin.price, currency, {
                               ETH: cryptoRates.ETH,
                               BTC: cryptoRates.BTC,
@@ -361,7 +363,9 @@ export default function Home() {
                         <div className="flex justify-between items-center mb-2">
                           <span className="text-xs text-opnskin-text-secondary">{t('home.arc_warden')}</span>
                           <span className="font-mono text-opnskin-accent font-bold text-sm">
-                            {cryptoIcons[currency] && <img src={cryptoIcons[currency]!} alt={currency} className="inline w-4 h-4 mr-1 align-middle" />}
+                            {cryptoIcons[currency] && currency !== 'EUR' && currency !== 'USD' && (
+                              <img src={cryptoIcons[currency]!} alt={currency} className="inline w-4 h-4 mr-1 align-middle" />
+                            )}
                             {formatPrice(45.99, currency, {
                               ETH: cryptoRates.ETH,
                               BTC: cryptoRates.BTC,
@@ -409,7 +413,9 @@ export default function Home() {
                         <div className="flex justify-between items-center mb-2">
                           <span className="text-xs text-opnskin-text-secondary">{t('home.ak47')}</span>
                           <span className="font-mono text-opnskin-accent font-bold text-sm">
-                            {cryptoIcons[currency] && <img src={cryptoIcons[currency]!} alt={currency} className="inline w-4 h-4 mr-1 align-middle" />}
+                            {cryptoIcons[currency] && currency !== 'EUR' && currency !== 'USD' && (
+                              <img src={cryptoIcons[currency]!} alt={currency} className="inline w-4 h-4 mr-1 align-middle" />
+                            )}
                             {formatPrice(12.99, currency, {
                               ETH: cryptoRates.ETH,
                               BTC: cryptoRates.BTC,
@@ -457,7 +463,9 @@ export default function Home() {
                         <div className="flex justify-between items-center mb-2">
                           <span className="text-xs text-opnskin-text-secondary">{t('home.scattergun')}</span>
                           <span className="font-mono text-opnskin-accent font-bold text-sm">
-                            {cryptoIcons[currency] && <img src={cryptoIcons[currency]!} alt={currency} className="inline w-4 h-4 mr-1 align-middle" />}
+                            {cryptoIcons[currency] && currency !== 'EUR' && currency !== 'USD' && (
+                              <img src={cryptoIcons[currency]!} alt={currency} className="inline w-4 h-4 mr-1 align-middle" />
+                            )}
                             {formatPrice(8.99, currency, {
                               ETH: cryptoRates.ETH,
                               BTC: cryptoRates.BTC,

@@ -70,19 +70,27 @@ const cryptoCurrencies = ['ETH', 'BTC', 'SOL', 'XRP', 'LTC', 'TRX'] as const;
 type CryptoCurrency = typeof cryptoCurrencies[number];
 
 export function formatPrice(amount: number, currency: Currency, cryptoRates?: Record<string, CryptoRate>): string {
-  // All internal prices are in USD
+  // All internal prices are in EUR
   let converted = amount;
   let symbol = currencySymbols[currency] || '';
-  if (currency === 'USD') {
+  
+  if (currency === 'EUR') {
     converted = amount;
-  } else if (['EUR', 'GBP', 'RUB', 'CNY'].includes(currency)) {
-    // For fiat, you can add logic for other fiat rates if needed
-    // For now, fallback to USD
-    converted = amount;
+  } else if (currency === 'USD') {
+    // Convert EUR to USD (approximate rate)
+    converted = amount * 1.08;
+  } else if (['GBP', 'RUB', 'CNY'].includes(currency)) {
+    // For other fiat currencies, use approximate rates
+    if (currency === 'GBP') converted = amount * 0.85;
+    else if (currency === 'RUB') converted = amount * 95;
+    else if (currency === 'CNY') converted = amount * 7.8;
   } else if (cryptoRates && cryptoRates[currency]) {
+    // For crypto, convert EUR to USD first, then to crypto
+    const usdAmount = amount * 1.08; // EUR to USD
     const rate = cryptoRates[currency].usd;
-    converted = rate > 0 ? amount / rate : 0;
+    converted = rate > 0 ? usdAmount / rate : 0;
   }
+  
   if (currency === 'ETH') return `Ξ${converted.toFixed(6)}`;
   if (currency === 'BTC') return `₿${converted.toFixed(6)}`;
   if (currency === 'SOL') return `◎${converted.toFixed(4)}`;
@@ -90,6 +98,7 @@ export function formatPrice(amount: number, currency: Currency, cryptoRates?: Re
   if (currency === 'LTC') return `Ł${converted.toFixed(4)}`;
   if (currency === 'TRX') return `TRX${converted.toFixed(2)}`;
   if (currency === 'USD') return `$${converted.toFixed(2)}`;
+  if (currency === 'EUR') return `€${converted.toFixed(2)}`;
   return `${converted.toFixed(2)} ${symbol}`;
 }
 
