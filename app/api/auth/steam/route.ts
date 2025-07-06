@@ -2,10 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(req: NextRequest) {
   try {
-    // URL temporaire qui existe - à remplacer par votre vraie URL
-    const baseUrl = 'https://nextjs.org';
+    // Récupération du domaine depuis les headers de la requête
+    const host = req.headers.get('host');
+    const protocol = req.headers.get('x-forwarded-proto') || 'https';
+    const baseUrl = `${protocol}://${host}`;
 
-    console.log('[STEAM AUTH] Using temporary base URL:', baseUrl);
+    console.log('[STEAM AUTH] Using base URL:', baseUrl);
 
     // Construction de l'URL Steam OpenID selon la documentation officielle
     const steamLoginUrl = new URL("https://steamcommunity.com/openid/login");

@@ -27,19 +27,24 @@ export async function GET(req: NextRequest) {
     const steamId = steamIdMatch[1];
     console.log('[STEAM OPENID] Successfully extracted SteamID:', steamId);
 
-    // Redirection vers localhost après authentification réussie
-    const response = NextResponse.redirect('http://localhost:3000');
+    // Récupération du domaine depuis les headers de la requête
+    const host = req.headers.get('host');
+    const protocol = req.headers.get('x-forwarded-proto') || 'https';
+    const baseUrl = `${protocol}://${host}`;
 
-    // Configuration du cookie pour localhost
+    // Redirection vers le domaine Vercel après authentification réussie
+    const response = NextResponse.redirect(`${baseUrl}/`);
+
+    // Configuration du cookie pour le domaine Vercel
     response.cookies.set('steamid', steamId, {
       httpOnly: true,
-      secure: false, // false pour localhost HTTP
+      secure: true, // true pour HTTPS en production
       sameSite: 'lax',
       path: '/',
       maxAge: 60 * 60 * 24 * 7, // 7 jours
     });
 
-    console.log('[STEAM OPENID] Authentication successful, redirecting to localhost');
+    console.log('[STEAM OPENID] Authentication successful, redirecting to:', baseUrl);
     return response;
 
   } catch (error) {
