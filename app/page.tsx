@@ -14,6 +14,7 @@ import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext
 import FeeProgressionChart from '@/components/FeeProgressionChart';
 import { formatPrice } from '@/lib/utils';
 import { useCurrencyStore, useCryptoRatesStore } from '@/hooks/use-currency-store';
+import { useCryptoRates } from '@/hooks/use-crypto-rates';
 import { cryptoIcons } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 import Image from 'next/image';
@@ -30,6 +31,9 @@ export default function Home() {
   const { t, ready } = useTranslation('common');
   const { currency } = useCurrencyStore();
   const cryptoRates = useCryptoRatesStore();
+  
+  // Utiliser le hook pour mettre à jour les taux crypto toutes les 30 secondes
+  useCryptoRates();
 
   if (!ready) return null; // ou un loader si tu préfères
 
@@ -48,7 +52,11 @@ export default function Home() {
   const [steamStatus, setSteamStatus] = useState<null | { loggedIn: boolean }>(undefined);
 
   useEffect(() => {
-    fetch('/api/me').then(res => res.json()).then(setSteamStatus);
+    fetch('/api/me').then(res => res.json()).then((data) => {
+      if (data && typeof data === 'object' && 'loggedIn' in data) {
+        setSteamStatus(data);
+      }
+    });
   }, []);
 
   // Fonction pour sélectionner le prochain skin en évitant les AK consécutifs
@@ -292,26 +300,36 @@ export default function Home() {
                         <img
                         src={skin.image}
                         alt={skin.name}
-                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                          className="w-full h-full object-contain p-2 transition-transform duration-500 group-hover:scale-105"
                         />
-                        <Badge className="absolute top-3 right-3 z-20 bg-opnskin-accent/10 text-opnskin-accent border-opnskin-accent/30">
+                        <Badge className="absolute top-2 right-2 z-20 bg-opnskin-accent/10 text-opnskin-accent border-opnskin-accent/30 text-xs">
                         {t('home.badge_mythic')}
                         </Badge>
-                        <div className="absolute bottom-0 left-0 right-0 p-3 z-20">
-                          <div className="flex justify-between items-center">
-                          <span className="text-sm text-opnskin-text-secondary">{skin.weapon}</span>
-                          {cryptoIcons[currency] && <img src={cryptoIcons[currency]!} alt={currency} className="inline w-5 h-5 mr-1 align-middle" />}
-                          <span className="font-mono text-opnskin-accent font-bold">{formatPrice(skin.price, currency, cryptoRates)}</span>
-                          </div>
-                        <h3 className="font-satoshi-bold text-lg truncate text-opnskin-text-primary">{skin.name}</h3>
+                        <div className="absolute bottom-0 left-0 right-0 p-2 z-20">
+                          <h3 className="font-satoshi-bold text-sm truncate text-opnskin-text-primary mb-1">{skin.name}</h3>
                         </div>
                       </div>
-                      <CardContent className="p-4">
-                        <div className="flex justify-between items-center">
-                          <Button size="sm" className="btn-opnskin-secondary">
+                      <CardContent className="p-3">
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-xs text-opnskin-text-secondary">{skin.weapon}</span>
+                          <span className="font-mono text-opnskin-accent font-bold text-sm">
+                            {cryptoIcons[currency] && <img src={cryptoIcons[currency]!} alt={currency} className="inline w-4 h-4 mr-1 align-middle" />}
+                            {formatPrice(skin.price, currency, {
+                              ETH: cryptoRates.ETH,
+                              BTC: cryptoRates.BTC,
+                              SOL: cryptoRates.SOL,
+                              XRP: cryptoRates.XRP,
+                              LTC: cryptoRates.LTC,
+                              TRX: cryptoRates.TRX,
+                              GMC: cryptoRates.GMC,
+                            })}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center gap-2">
+                          <Button size="sm" className="btn-opnskin-secondary flex-1 text-xs">
                           {t('home.buy')}
                           </Button>
-                          <Button size="sm" variant="outline" className="border-opnskin-primary/30 text-opnskin-primary hover:bg-opnskin-primary/10">
+                          <Button size="sm" variant="outline" className="border-opnskin-primary/30 text-opnskin-primary hover:bg-opnskin-primary/10 text-xs">
                           {t('home.details')}
                           </Button>
                         </div>
@@ -322,7 +340,7 @@ export default function Home() {
               </TabsContent>
 
               <TabsContent value="dota2" className="mt-6">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 w-full max-w-6xl mx-auto px-4">
                   {Array.from({ length: 4 }).map((_, i) => (
                     <Card key={i} className="bg-opnskin-bg-card border-opnskin-bg-secondary card-hover overflow-hidden group">
                       <div className="aspect-square relative overflow-hidden">
@@ -330,26 +348,36 @@ export default function Home() {
                         <img
                           src={`/placeholder.svg?height=300&width=300&text=Dota+Skin+${i + 1}`}
                           alt={`Dota Skin ${i + 1}`}
-                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                          className="w-full h-full object-contain p-2 transition-transform duration-500 group-hover:scale-105"
                         />
-                        <Badge className="absolute top-3 right-3 z-20 bg-opnskin-accent/10 text-opnskin-accent border-opnskin-accent/30">
+                        <Badge className="absolute top-2 right-2 z-20 bg-opnskin-accent/10 text-opnskin-accent border-opnskin-accent/30 text-xs">
                         {t('home.badge_mythic')}
                         </Badge>
-                        <div className="absolute bottom-0 left-0 right-0 p-3 z-20">
-                          <div className="flex justify-between items-center">
-                          <span className="text-sm text-opnskin-text-secondary">{t('home.arc_warden')}</span>
-                          {cryptoIcons[currency] && <img src={cryptoIcons[currency]!} alt={currency} className="inline w-5 h-5 mr-1 align-middle" />}
-                          <span className="font-mono text-opnskin-accent font-bold">{formatPrice(45.99, currency, cryptoRates)}</span>
-                          </div>
-                        <h3 className="font-satoshi-bold text-lg truncate text-opnskin-text-primary">{t('home.fractal_horns')}</h3>
+                        <div className="absolute bottom-0 left-0 right-0 p-2 z-20">
+                          <h3 className="font-satoshi-bold text-sm truncate text-opnskin-text-primary mb-1">{t('home.fractal_horns')}</h3>
                         </div>
                       </div>
-                      <CardContent className="p-4">
-                        <div className="flex justify-between items-center">
-                          <Button size="sm" className="btn-opnskin-secondary">
+                      <CardContent className="p-3">
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-xs text-opnskin-text-secondary">{t('home.arc_warden')}</span>
+                          <span className="font-mono text-opnskin-accent font-bold text-sm">
+                            {cryptoIcons[currency] && <img src={cryptoIcons[currency]!} alt={currency} className="inline w-4 h-4 mr-1 align-middle" />}
+                            {formatPrice(45.99, currency, {
+                              ETH: cryptoRates.ETH,
+                              BTC: cryptoRates.BTC,
+                              SOL: cryptoRates.SOL,
+                              XRP: cryptoRates.XRP,
+                              LTC: cryptoRates.LTC,
+                              TRX: cryptoRates.TRX,
+                              GMC: cryptoRates.GMC,
+                            })}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center gap-2">
+                          <Button size="sm" className="btn-opnskin-secondary flex-1 text-xs">
                           {t('home.buy')}
                           </Button>
-                          <Button size="sm" variant="outline" className="border-opnskin-primary/30 text-opnskin-primary hover:bg-opnskin-primary/10">
+                          <Button size="sm" variant="outline" className="border-opnskin-primary/30 text-opnskin-primary hover:bg-opnskin-primary/10 text-xs">
                           {t('home.details')}
                           </Button>
                         </div>
@@ -360,7 +388,7 @@ export default function Home() {
               </TabsContent>
 
               <TabsContent value="rust" className="mt-6">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 w-full max-w-6xl mx-auto px-4">
                   {Array.from({ length: 4 }).map((_, i) => (
                     <Card key={i} className="bg-opnskin-bg-card border-opnskin-bg-secondary card-hover overflow-hidden group">
                       <div className="aspect-square relative overflow-hidden">
@@ -368,26 +396,36 @@ export default function Home() {
                         <img
                           src={`/placeholder.svg?height=300&width=300&text=Rust+Skin+${i + 1}`}
                           alt={`Rust Skin ${i + 1}`}
-                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                          className="w-full h-full object-contain p-2 transition-transform duration-500 group-hover:scale-105"
                         />
-                        <Badge className="absolute top-3 right-3 z-20 bg-opnskin-accent/10 text-opnskin-accent border-opnskin-accent/30">
+                        <Badge className="absolute top-2 right-2 z-20 bg-opnskin-accent/10 text-opnskin-accent border-opnskin-accent/30 text-xs">
                         {t('home.badge_epic')}
                         </Badge>
-                        <div className="absolute bottom-0 left-0 right-0 p-3 z-20">
-                          <div className="flex justify-between items-center">
-                          <span className="text-sm text-opnskin-text-secondary">{t('home.ak47')}</span>
-                          {cryptoIcons[currency] && <img src={cryptoIcons[currency]!} alt={currency} className="inline w-5 h-5 mr-1 align-middle" />}
-                          <span className="font-mono text-opnskin-accent font-bold">{formatPrice(12.99, currency, cryptoRates)}</span>
-                          </div>
-                        <h3 className="font-satoshi-bold text-lg truncate text-opnskin-text-primary">{t('home.golden_ak')}</h3>
+                        <div className="absolute bottom-0 left-0 right-0 p-2 z-20">
+                          <h3 className="font-satoshi-bold text-sm truncate text-opnskin-text-primary mb-1">{t('home.golden_ak')}</h3>
                         </div>
                       </div>
-                      <CardContent className="p-4">
-                        <div className="flex justify-between items-center">
-                          <Button size="sm" className="btn-opnskin-secondary">
+                      <CardContent className="p-3">
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-xs text-opnskin-text-secondary">{t('home.ak47')}</span>
+                          <span className="font-mono text-opnskin-accent font-bold text-sm">
+                            {cryptoIcons[currency] && <img src={cryptoIcons[currency]!} alt={currency} className="inline w-4 h-4 mr-1 align-middle" />}
+                            {formatPrice(12.99, currency, {
+                              ETH: cryptoRates.ETH,
+                              BTC: cryptoRates.BTC,
+                              SOL: cryptoRates.SOL,
+                              XRP: cryptoRates.XRP,
+                              LTC: cryptoRates.LTC,
+                              TRX: cryptoRates.TRX,
+                              GMC: cryptoRates.GMC,
+                            })}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center gap-2">
+                          <Button size="sm" className="btn-opnskin-secondary flex-1 text-xs">
                           {t('home.buy')}
                           </Button>
-                          <Button size="sm" variant="outline" className="border-opnskin-primary/30 text-opnskin-primary hover:bg-opnskin-primary/10">
+                          <Button size="sm" variant="outline" className="border-opnskin-primary/30 text-opnskin-primary hover:bg-opnskin-primary/10 text-xs">
                           {t('home.details')}
                           </Button>
                         </div>
@@ -398,7 +436,7 @@ export default function Home() {
               </TabsContent>
 
               <TabsContent value="tf2" className="mt-6">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 w-full max-w-6xl mx-auto px-4">
                   {Array.from({ length: 4 }).map((_, i) => (
                     <Card key={i} className="bg-opnskin-bg-card border-opnskin-bg-secondary card-hover overflow-hidden group">
                       <div className="aspect-square relative overflow-hidden">
@@ -406,26 +444,36 @@ export default function Home() {
                         <img
                           src={`/placeholder.svg?height=300&width=300&text=TF2+Skin+${i + 1}`}
                           alt={`TF2 Skin ${i + 1}`}
-                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                          className="w-full h-full object-contain p-2 transition-transform duration-500 group-hover:scale-105"
                         />
-                        <Badge className="absolute top-3 right-3 z-20 bg-opnskin-accent/10 text-opnskin-accent border-opnskin-accent/30">
+                        <Badge className="absolute top-2 right-2 z-20 bg-opnskin-accent/10 text-opnskin-accent border-opnskin-accent/30 text-xs">
                         {t('home.badge_unique')}
                         </Badge>
-                        <div className="absolute bottom-0 left-0 right-0 p-3 z-20">
-                          <div className="flex justify-between items-center">
-                          <span className="text-sm text-opnskin-text-secondary">{t('home.scattergun')}</span>
-                          {cryptoIcons[currency] && <img src={cryptoIcons[currency]!} alt={currency} className="inline w-5 h-5 mr-1 align-middle" />}
-                          <span className="font-mono text-opnskin-accent font-bold">{formatPrice(8.99, currency, cryptoRates)}</span>
-                          </div>
-                          <h3 className="font-satoshi-bold text-lg truncate text-opnskin-text-primary">{t('home.strange_scattergun')}</h3>
+                        <div className="absolute bottom-0 left-0 right-0 p-2 z-20">
+                          <h3 className="font-satoshi-bold text-sm truncate text-opnskin-text-primary mb-1">{t('home.strange_scattergun')}</h3>
                         </div>
                       </div>
-                      <CardContent className="p-4">
-                        <div className="flex justify-between items-center">
-                          <Button size="sm" className="btn-opnskin-secondary">
+                      <CardContent className="p-3">
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-xs text-opnskin-text-secondary">{t('home.scattergun')}</span>
+                          <span className="font-mono text-opnskin-accent font-bold text-sm">
+                            {cryptoIcons[currency] && <img src={cryptoIcons[currency]!} alt={currency} className="inline w-4 h-4 mr-1 align-middle" />}
+                            {formatPrice(8.99, currency, {
+                              ETH: cryptoRates.ETH,
+                              BTC: cryptoRates.BTC,
+                              SOL: cryptoRates.SOL,
+                              XRP: cryptoRates.XRP,
+                              LTC: cryptoRates.LTC,
+                              TRX: cryptoRates.TRX,
+                              GMC: cryptoRates.GMC,
+                            })}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center gap-2">
+                          <Button size="sm" className="btn-opnskin-secondary flex-1 text-xs">
                           {t('home.buy')}
                           </Button>
-                          <Button size="sm" variant="outline" className="border-opnskin-primary/30 text-opnskin-primary hover:bg-opnskin-primary/10">
+                          <Button size="sm" variant="outline" className="border-opnskin-primary/30 text-opnskin-primary hover:bg-opnskin-primary/10 text-xs">
                           {t('home.details')}
                           </Button>
                         </div>
@@ -452,7 +500,7 @@ export default function Home() {
             <p className="text-lg text-white/70 mb-8">
               {t('home.community_subtitle')}
             </p>
-            {steamStatus === undefined ? null : steamStatus.loggedIn ? (
+            {steamStatus === undefined ? null : steamStatus?.loggedIn ? (
               <div className="inline-flex items-center gap-2 justify-center">
                 <span className="font-bold text-opnskin-accent">{t('home.connected')}</span>
                 <span className="inline-block w-3 h-3 rounded-full" style={{ background: '#0CE49B', boxShadow: '0 0 8px #0CE49B88' }}></span>

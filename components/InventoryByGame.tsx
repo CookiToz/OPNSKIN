@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+'use client';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -10,6 +11,10 @@ import { useInventory } from "@/components/InventoryProvider";
 import { useFloat } from "@/components/FloatProvider";
 import { motion, AnimatePresence } from "framer-motion";
 import { RefreshCw, Tag, ExternalLink } from 'lucide-react';
+import { useCurrencyStore } from '@/hooks/use-currency-store';
+import { useCryptoRatesStore } from '@/hooks/use-currency-store';
+import { useCryptoRates } from '@/hooks/use-crypto-rates';
+import { formatPrice } from '@/lib/utils';
 
 export type GameType = {
   key: string;
@@ -85,6 +90,23 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
   const [sellDialogOpen, setSellDialogOpen] = useState(false);
   const [sellPrice, setSellPrice] = useState('');
   const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
+  
+  const currency = useCurrencyStore((s) => s.currency);
+  const cryptoRates = useCryptoRatesStore((s) => s);
+  const cryptoIcons: Record<string, string> = {
+    EUR: '/crypto/eur.svg',
+    USD: '/crypto/usd.svg',
+    BTC: '/crypto/btc.svg',
+    ETH: '/crypto/eth.svg',
+    SOL: '/crypto/sol.svg',
+    XRP: '/crypto/xrp.svg',
+    LTC: '/crypto/ltc.svg',
+    TRX: '/crypto/trx.svg',
+    GMC: '/crypto/gmc.svg',
+  };
+  
+  // Utiliser le hook pour mettre à jour les taux crypto toutes les 30 secondes
+  useCryptoRates();
 
   const handleBack = () => {
     localStorage.removeItem('opnskin-inventory-game');
@@ -247,7 +269,16 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
                   <div className="flex justify-between items-center mb-2">
                     {item.marketPrice !== undefined && (
                       <span className="font-mono text-opnskin-accent font-bold text-sm">
-                        {item.marketPrice} €
+                        {cryptoIcons[currency] && <img src={cryptoIcons[currency]!} alt={currency} className="inline w-4 h-4 mr-1 align-middle" />}
+                        {formatPrice(item.marketPrice, currency, {
+                          ETH: cryptoRates.ETH,
+                          BTC: cryptoRates.BTC,
+                          SOL: cryptoRates.SOL,
+                          XRP: cryptoRates.XRP,
+                          LTC: cryptoRates.LTC,
+                          TRX: cryptoRates.TRX,
+                          GMC: cryptoRates.GMC,
+                        })}
                       </span>
                     )}
                   </div>
@@ -290,13 +321,25 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
               <div>
                 <h3 className="font-satoshi-bold text-opnskin-text-primary">{selectedItem?.name}</h3>
                 <p className="text-opnskin-text-secondary text-sm">
-                  {t('inventory.market_price', 'Prix du marché: {{price}} €', { price: selectedItem?.marketPrice || 'N/A' })}
+                  {t('inventory.market_price', 'Prix du marché: {{price}}', { 
+                    price: selectedItem?.marketPrice !== undefined 
+                      ? formatPrice(selectedItem.marketPrice, currency, {
+                          ETH: cryptoRates.ETH,
+                          BTC: cryptoRates.BTC,
+                          SOL: cryptoRates.SOL,
+                          XRP: cryptoRates.XRP,
+                          LTC: cryptoRates.LTC,
+                          TRX: cryptoRates.TRX,
+                          GMC: cryptoRates.GMC,
+                        })
+                      : 'N/A'
+                  })}
                 </p>
               </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="sell-price" className="text-opnskin-text-primary">
-                {t('inventory.sell_price', 'Prix de vente (€)')}
+                {t('inventory.sell_price', 'Prix de vente')}
               </Label>
               <Input
                 id="sell-price"
@@ -359,9 +402,19 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
                     {selectedItem.marketPrice !== undefined && (
                       <div className="flex justify-between">
                         <span className="text-opnskin-text-secondary">
-                          {t('inventory.market_price', 'Prix du marché: {{price}} €', { price: selectedItem.marketPrice })}
+                          {t('inventory.market_price', 'Prix du marché:')}
                         </span>
-                        <span className="text-opnskin-accent font-mono font-bold">{selectedItem.marketPrice} €</span>
+                        <span className="text-opnskin-accent font-mono font-bold">
+                          {formatPrice(selectedItem.marketPrice, currency, {
+                            ETH: cryptoRates.ETH,
+                            BTC: cryptoRates.BTC,
+                            SOL: cryptoRates.SOL,
+                            XRP: cryptoRates.XRP,
+                            LTC: cryptoRates.LTC,
+                            TRX: cryptoRates.TRX,
+                            GMC: cryptoRates.GMC,
+                          })}
+                        </span>
                       </div>
                     )}
                     {selectedItem.rarityCode && rarityKeyMap[selectedItem.rarityCode] && (
