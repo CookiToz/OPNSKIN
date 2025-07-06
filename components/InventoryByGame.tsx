@@ -2,11 +2,14 @@ import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { useTranslation } from 'next-i18next';
 import { useInventory } from "@/components/InventoryProvider";
 import { useFloat } from "@/components/FloatProvider";
 import { motion, AnimatePresence } from "framer-motion";
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw, Tag, ExternalLink } from 'lucide-react';
 
 export type GameType = {
   key: string;
@@ -68,15 +71,10 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
   const { t } = useTranslation('common');
   const [hasRequestedLoad, setHasRequestedLoad] = useState(false);
   const { items, isLoading, isError, errorMsg, refetch } = useInventory(hasRequestedLoad ? (game?.appid ? String(game.appid) : undefined) : undefined);
-  const [selectedFloatId, setSelectedFloatId] = useState<string | null>(null);
-  const [floatTimeout, setFloatTimeout] = useState<NodeJS.Timeout | null>(null);
-
-  const handleShowFloat = (itemId: string) => {
-    setSelectedFloatId(itemId);
-    if (floatTimeout) clearTimeout(floatTimeout);
-    const timeout = setTimeout(() => setSelectedFloatId(null), 5000);
-    setFloatTimeout(timeout);
-  };
+  const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
+  const [sellDialogOpen, setSellDialogOpen] = useState(false);
+  const [sellPrice, setSellPrice] = useState('');
+  const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
 
   const handleBack = () => {
     localStorage.removeItem('opnskin-inventory-game');
@@ -87,6 +85,30 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
     setHasRequestedLoad(true);
     refetch();
   };
+
+  const handleSell = (item: InventoryItem) => {
+    setSelectedItem(item);
+    setSellPrice(item.marketPrice ? item.marketPrice.toString() : '');
+    setSellDialogOpen(true);
+  };
+
+  const handleSellConfirm = () => {
+    // TODO: Implémenter la logique de vente
+    console.log('Vendre', selectedItem?.name, 'pour', sellPrice, '€');
+    setSellDialogOpen(false);
+    setSelectedItem(null);
+    setSellPrice('');
+  };
+
+  const handleDetails = (item: InventoryItem) => {
+    setSelectedItem(item);
+    setDetailsDialogOpen(true);
+  };
+
+  // Filtrer les skins de faible valeur (< 0.02€)
+  const filteredItems = items.filter(item => 
+    item.marketPrice === undefined || item.marketPrice >= 0.02
+  );
 
   return (
     <div className="flex flex-col items-center py-8 min-h-[60vh]">
@@ -161,7 +183,7 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
             )}
           </div>
         </div>
-      ) : items.length === 0 ? (
+      ) : filteredItems.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 space-y-6">
           <div className="text-opnskin-text-secondary text-lg font-rajdhani text-center">
             {t('inventory.empty_game', 'L\'inventaire {{gameName}} est vide', { gameName: t(`marketplace.game_${game.key}`, game.name) })}
@@ -182,9 +204,8 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
           </div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full max-w-7xl">
-          {items.map(item => {
-            const floatState = selectedFloatId === item.id ? useFloat(item.id) : null;
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 w-full max-w-7xl">
+          {filteredItems.map(item => {
             const rarity = item.rarityCode ? rarityMap[item.rarityCode] : null;
             const weaponCategory = getWeaponCategory(item.name);
             
@@ -195,67 +216,185 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
                   <img
                     src={item.icon}
                     alt={item.name}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    className="w-full h-full object-contain p-2 transition-transform duration-500 group-hover:scale-105"
                   />
                   {rarity && (
-                    <Badge className="absolute top-3 right-3 z-20 bg-opnskin-accent/10 text-opnskin-accent border-opnskin-accent/30">
+                    <Badge className="absolute top-2 right-2 z-20 bg-opnskin-accent/10 text-opnskin-accent border-opnskin-accent/30 text-xs">
                       {rarity.name}
                     </Badge>
                   )}
-                  <div className="absolute bottom-0 left-0 right-0 p-3 z-20">
+                  <div className="absolute bottom-0 left-0 right-0 p-2 z-20">
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-opnskin-text-secondary">{weaponCategory}</span>
+                      <span className="text-xs text-opnskin-text-secondary">{weaponCategory}</span>
                       {item.marketPrice !== undefined && (
-                        <span className="font-mono text-opnskin-accent font-bold">{item.marketPrice} €</span>
+                        <span className="font-mono text-opnskin-accent font-bold text-sm">{item.marketPrice} €</span>
                       )}
                     </div>
-                    <h3 className="font-satoshi-bold text-lg truncate text-opnskin-text-primary">{item.name}</h3>
+                    <h3 className="font-satoshi-bold text-sm truncate text-opnskin-text-primary">{item.name}</h3>
                   </div>
                 </div>
-                <CardContent className="p-4">
-                  <div className="flex justify-between items-center">
-                    {selectedFloatId === item.id && floatState ? (
-                      <AnimatePresence>
-                        {selectedFloatId === item.id && (floatState.isLoading || floatState.isError || floatState.float !== null) && (
-                          <motion.div
-                            key={item.id + "-float"}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: 10 }}
-                            transition={{ duration: 0.35 }}
-                            className="flex-1"
-                          >
-                            {floatState.isLoading ? (
-                              <span className="text-opnskin-primary animate-pulse">Chargement du float…</span>
-                            ) : floatState.isError ? (
-                              <span className="text-red-500">Erreur : {floatState.errorMsg || 'Impossible de récupérer le float'}</span>
-                            ) : floatState.float !== null ? (
-                              <span className="text-opnskin-accent font-mono">Float : {floatState.float}</span>
-                            ) : null}
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    ) : (
-                      <Button 
-                        size="sm" 
-                        className="btn-opnskin-secondary flex-1" 
-                        onClick={() => handleShowFloat(item.id)}
-                      >
-                        Voir le float
-                      </Button>
-                    )}
+                <CardContent className="p-3">
+                  <div className="flex justify-between items-center gap-2">
+                    <Button 
+                      size="sm" 
+                      className="btn-opnskin-secondary flex-1 text-xs" 
+                      onClick={() => handleSell(item)}
+                    >
+                      <Tag className="w-3 h-3 mr-1" />
+                      Vendre
+                    </Button>
                     <Button 
                       size="sm" 
                       variant="outline" 
-                      className="border-opnskin-primary/30 text-opnskin-primary hover:bg-opnskin-primary/10 ml-2"
+                      className="border-opnskin-primary/30 text-opnskin-primary hover:bg-opnskin-primary/10 text-xs"
+                      onClick={() => handleDetails(item)}
                     >
-                      Détails
+                      <ExternalLink className="w-3 h-3" />
                     </Button>
                   </div>
                 </CardContent>
               </Card>
             );
           })}
+        </div>
+      )}
+
+      {/* Modal de vente */}
+      <Dialog open={sellDialogOpen} onOpenChange={setSellDialogOpen}>
+        <DialogContent className="bg-opnskin-bg-card border-opnskin-bg-secondary">
+          <DialogHeader>
+            <DialogTitle className="text-opnskin-text-primary">Vendre {selectedItem?.name}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="flex items-center gap-4">
+              <img src={selectedItem?.icon} alt={selectedItem?.name} className="w-16 h-16 object-contain" />
+              <div>
+                <h3 className="font-satoshi-bold text-opnskin-text-primary">{selectedItem?.name}</h3>
+                <p className="text-opnskin-text-secondary text-sm">
+                  Prix du marché: {selectedItem?.marketPrice} €
+                </p>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="sell-price" className="text-opnskin-text-primary">Prix de vente (€)</Label>
+              <Input
+                id="sell-price"
+                type="number"
+                step="0.01"
+                min="0"
+                value={sellPrice}
+                onChange={(e) => setSellPrice(e.target.value)}
+                placeholder="Entrez votre prix"
+                className="bg-opnskin-bg-secondary border-opnskin-bg-secondary text-opnskin-text-primary"
+              />
+            </div>
+            <div className="flex gap-2">
+              <Button onClick={handleSellConfirm} className="btn-opnskin flex-1">
+                Confirmer la vente
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={() => setSellDialogOpen(false)}
+                className="border-opnskin-primary/30 text-opnskin-primary hover:bg-opnskin-primary/10"
+              >
+                Annuler
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal de détails */}
+      <Dialog open={detailsDialogOpen} onOpenChange={setDetailsDialogOpen}>
+        <DialogContent className="bg-opnskin-bg-card border-opnskin-bg-secondary max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-opnskin-text-primary">Détails du skin</DialogTitle>
+          </DialogHeader>
+          {selectedItem && (
+            <div className="space-y-6">
+              <div className="flex items-start gap-6">
+                <img src={selectedItem.icon} alt={selectedItem.name} className="w-32 h-32 object-contain" />
+                <div className="flex-1">
+                  <h3 className="font-satoshi-bold text-xl text-opnskin-text-primary mb-2">{selectedItem.name}</h3>
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <span className="text-opnskin-text-secondary">Catégorie:</span>
+                      <span className="text-opnskin-text-primary">{getWeaponCategory(selectedItem.name)}</span>
+                    </div>
+                    {selectedItem.marketPrice !== undefined && (
+                      <div className="flex justify-between">
+                        <span className="text-opnskin-text-secondary">Prix du marché:</span>
+                        <span className="text-opnskin-accent font-mono font-bold">{selectedItem.marketPrice} €</span>
+                      </div>
+                    )}
+                    {selectedItem.rarityCode && rarityMap[selectedItem.rarityCode] && (
+                      <div className="flex justify-between">
+                        <span className="text-opnskin-text-secondary">Rareté:</span>
+                        <Badge className={rarityMap[selectedItem.rarityCode].bgColor}>
+                          {rarityMap[selectedItem.rarityCode].name}
+                        </Badge>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+              
+              {/* Section Float */}
+              <div className="border-t border-opnskin-bg-secondary pt-4">
+                <h4 className="font-satoshi-bold text-lg text-opnskin-text-primary mb-3">Informations Float</h4>
+                <SkinFloatDetails itemId={selectedItem.id} />
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
+
+// Composant pour afficher les détails du float
+function SkinFloatDetails({ itemId }: { itemId: string }) {
+  const floatState = useFloat(itemId);
+  const [showFloat, setShowFloat] = useState(false);
+
+  return (
+    <div className="space-y-3">
+      {!showFloat ? (
+        <Button 
+          onClick={() => setShowFloat(true)} 
+          className="btn-opnskin-secondary"
+        >
+          Charger les informations Float
+        </Button>
+      ) : (
+        <div className="space-y-2">
+          {floatState.isLoading ? (
+            <div className="text-opnskin-primary animate-pulse">Chargement des informations Float…</div>
+          ) : floatState.isError ? (
+            <div className="text-red-500">Erreur: {floatState.errorMsg || 'Impossible de récupérer les informations Float'}</div>
+          ) : floatState.float !== null ? (
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <span className="text-opnskin-text-secondary">Float:</span>
+                <span className="text-opnskin-accent font-mono font-bold">{floatState.float}</span>
+              </div>
+              {floatState.csfloatLink && (
+                <div className="flex justify-between">
+                  <span className="text-opnskin-text-secondary">Lien CSFloat:</span>
+                  <a 
+                    href={floatState.csfloatLink} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-opnskin-primary hover:text-opnskin-primary-hover underline"
+                  >
+                    Voir sur CSFloat
+                  </a>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="text-opnskin-text-secondary">Aucune information Float disponible</div>
+          )}
         </div>
       )}
     </div>
