@@ -204,13 +204,16 @@
     "list": "Annoncer",
     "remove": "Retirer",
     "modify": "Modifier",
-    "no_item_found": "Aucun item trouvé",
-    "no_item_description": "Aucun item ne correspond à votre recherche",
-    "listed": "Annoncé",
-    "price_unavailable": "Prix indisponible",
-    "choose_game": "Sélectionne ton jeu",
+    "empty_game": "L'inventaire {{gameName}} est vide",
+    "back_to_games": "Retour aux jeux",
+    "back": "Retour à la sélection du jeu",
+    "no_item_found": "Aucun item dans l'inventaire",
+    "error_loading": "Erreur lors du chargement de l'inventaire",
+    "selectGameTitle": "Choisis ton jeu",
     "badge": "INVENTAIRE",
-    "selectGameTitle": "Sélectionne ton jeu"
+    "not_logged_in_title": "Connecte-toi via Steam pour voir ton inventaire",
+    "not_logged_in_desc": "Tu dois être connecté via Steam pour accéder à ton inventaire.",
+    "login_button": "Se connecter via Steam"
   },
   "rarity": {
     "consumer": "Consommateur",

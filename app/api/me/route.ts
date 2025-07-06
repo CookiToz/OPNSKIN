@@ -32,6 +32,9 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ 
         loggedIn: true, 
         steamId,
+        name: `Steam User (${steamId})`,
+        avatar: `https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/default/${steamId.slice(-1)}.jpg`,
+        profileUrl: `https://steamcommunity.com/profiles/${steamId}`,
         error: 'Steam API not configured'
       });
     }

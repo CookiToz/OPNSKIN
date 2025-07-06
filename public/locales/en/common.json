@@ -204,13 +204,20 @@
     "list": "List",
     "remove": "Remove",
     "modify": "Edit",
-    "no_item_found": "No item found",
+    "no_item_found": "No items in inventory",
     "no_item_description": "No item matches your search",
     "listed": "Listed",
     "price_unavailable": "Price unavailable",
     "badge": "INVENTORY",
     "choose_game": "Select your game",
-    "selectGameTitle": "Select your game"
+    "selectGameTitle": "Choose your game",
+    "empty_game": "The {{gameName}} inventory is empty",
+    "back_to_games": "Back to games",
+    "back": "Back to game selection",
+    "error_loading": "Error loading inventory",
+    "not_logged_in_title": "Connect via Steam to see your inventory",
+    "not_logged_in_desc": "You must be connected via Steam to access your inventory.",
+    "login_button": "Connect via Steam"
   },
   "rarity": {
     "consumer": "Consumer",

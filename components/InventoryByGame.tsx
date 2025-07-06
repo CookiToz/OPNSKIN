@@ -58,7 +58,19 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
       ) : isError ? (
         <div className="text-red-500 text-lg font-bold py-16">{errorMsg || t('inventory.error_loading', 'Erreur lors du chargement de l’inventaire')}</div>
       ) : items.length === 0 ? (
-        <div className="text-opnskin-text-secondary text-lg font-rajdhani py-16">{t('inventory.no_item_found', 'Aucun item dans l’inventaire')}</div>
+        <div className="flex flex-col items-center justify-center py-16 space-y-6">
+          <div className="text-opnskin-text-secondary text-lg font-rajdhani text-center">
+            {t('inventory.empty_game', 'L\'inventaire {{gameName}} est vide', { gameName: t(`marketplace.game_${game.key}`, game.name) })}
+          </div>
+          {onBack && (
+            <button 
+              onClick={handleBack} 
+              className="btn-opnskin-secondary flex items-center gap-2"
+            >
+              ← {t('inventory.back_to_games', 'Retour aux jeux')}
+            </button>
+          )}
+        </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 w-full max-w-7xl">
           {items.map(item => {
