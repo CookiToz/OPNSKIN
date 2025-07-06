@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -53,7 +53,7 @@ const errorMessages = {
   }
 };
 
-export default function LoginPage() {
+function LoginContent() {
   const { t } = useTranslation('common');
   const searchParams = useSearchParams();
   const [isRedirecting, setIsRedirecting] = useState(false);
@@ -152,5 +152,33 @@ export default function LoginPage() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-opnskin-bg-primary via-opnskin-bg-secondary to-opnskin-bg-primary p-4">
+        <Card className="w-full max-w-md bg-opnskin-bg-card/95 border-opnskin-bg-secondary backdrop-blur-sm">
+          <CardHeader className="text-center">
+            <div className="mx-auto mb-4">
+              <img
+                src="/logo-OPNSKIN.png"
+                alt="OPNSKIN"
+                className="h-12 w-auto"
+              />
+            </div>
+            <CardTitle className="text-2xl font-bold font-rajdhani text-opnskin-text-primary">
+              Chargement...
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="text-center">
+            <RefreshCw className="h-8 w-8 animate-spin mx-auto text-opnskin-text-secondary" />
+          </CardContent>
+        </Card>
+      </div>
+    }>
+      <LoginContent />
+    </Suspense>
   );
 } 
