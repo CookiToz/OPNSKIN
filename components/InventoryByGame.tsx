@@ -31,15 +31,25 @@ type InventoryByGameProps = {
   onBack?: () => void;
 };
 
-// Mapping des codes de rareté vers les noms et couleurs
-const rarityMap: Record<string, { name: string; color: string; bgColor: string }> = {
-  'Rarity_Common_Weapon': { name: 'Consommateur', color: '#B0C3D9', bgColor: 'bg-[#B0C3D9]/10' },
-  'Rarity_Uncommon_Weapon': { name: 'Industriel', color: '#5E98D9', bgColor: 'bg-[#5E98D9]/10' },
-  'Rarity_Rare_Weapon': { name: 'Militaire', color: '#4B69FF', bgColor: 'bg-[#4B69FF]/10' },
-  'Rarity_Mythical_Weapon': { name: 'Restreint', color: '#8847FF', bgColor: 'bg-[#8847FF]/10' },
-  'Rarity_Legendary_Weapon': { name: 'Classé', color: '#D32CE6', bgColor: 'bg-[#D32CE6]/10' },
-  'Rarity_Ancient_Weapon': { name: 'Secret', color: '#EB4B4B', bgColor: 'bg-[#EB4B4B]/10' },
-  'Rarity_Immortal_Weapon': { name: 'Extraordinaire', color: '#FFD700', bgColor: 'bg-[#FFD700]/10' },
+// Mapping des codes de rareté vers les clés de traduction
+const rarityKeyMap: Record<string, string> = {
+  'Rarity_Common_Weapon': 'rarity_consumer',
+  'Rarity_Uncommon_Weapon': 'rarity_industrial',
+  'Rarity_Rare_Weapon': 'rarity_milspec',
+  'Rarity_Mythical_Weapon': 'rarity_restricted',
+  'Rarity_Legendary_Weapon': 'rarity_classified',
+  'Rarity_Ancient_Weapon': 'rarity_covert',
+  'Rarity_Immortal_Weapon': 'rarity_exceedingly_rare',
+};
+
+// Fonction pour extraire l'état de l'arme du nom
+const getWeaponWear = (name: string): string => {
+  if (name.includes('Factory New')) return 'wear_factory_new';
+  if (name.includes('Minimal Wear')) return 'wear_minimal_wear';
+  if (name.includes('Field-Tested')) return 'wear_field_tested';
+  if (name.includes('Well-Worn')) return 'wear_well_worn';
+  if (name.includes('Battle-Scarred')) return 'wear_battle_scarred';
+  return '';
 };
 
 // Fonction pour extraire la catégorie d'arme du nom
@@ -64,7 +74,7 @@ const getWeaponCategory = (name: string): string => {
   for (const [key, value] of Object.entries(weaponTypes)) {
     if (name.includes(key)) return value;
   }
-  return 'Arme';
+  return 'weapon';
 };
 
 export default function InventoryByGame({ game, onBack }: InventoryByGameProps) {
@@ -206,8 +216,9 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 w-full max-w-7xl">
           {filteredItems.map(item => {
-            const rarity = item.rarityCode ? rarityMap[item.rarityCode] : null;
+            const rarity = item.rarityCode ? rarityKeyMap[item.rarityCode] : null;
             const weaponCategory = getWeaponCategory(item.name);
+            const weaponWear = getWeaponWear(item.name);
             
             return (
               <Card key={item.id} className="bg-opnskin-bg-card border-opnskin-bg-secondary card-hover overflow-hidden group">
@@ -220,17 +231,22 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
                   />
                   {rarity && (
                     <Badge className="absolute top-2 right-2 z-20 bg-opnskin-accent/10 text-opnskin-accent border-opnskin-accent/30 text-xs">
-                      {rarity.name}
+                      {t(`inventory.${rarity}`)}
                     </Badge>
                   )}
                   <div className="absolute bottom-0 left-0 right-0 p-2 z-20">
                     <div className="flex justify-between items-center">
-                      <span className="text-xs text-opnskin-text-secondary">{weaponCategory}</span>
+                      <span className="text-xs text-opnskin-text-secondary">{t(`inventory.${weaponCategory}`)}</span>
                       {item.marketPrice !== undefined && (
                         <span className="font-mono text-opnskin-accent font-bold text-sm">{item.marketPrice} €</span>
                       )}
                     </div>
                     <h3 className="font-satoshi-bold text-sm truncate text-opnskin-text-primary">{item.name}</h3>
+                    {weaponWear && (
+                      <p className="text-xs text-opnskin-text-secondary italic">
+                        {t(`inventory.${weaponWear}`)}
+                      </p>
+                    )}
                   </div>
                 </div>
                 <CardContent className="p-3">
@@ -327,8 +343,18 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
                       <span className="text-opnskin-text-secondary">
                         {t('inventory.category', 'Catégorie:')}
                       </span>
-                      <span className="text-opnskin-text-primary">{getWeaponCategory(selectedItem.name)}</span>
+                      <span className="text-opnskin-text-primary">{t(`inventory.${getWeaponCategory(selectedItem.name)}`)}</span>
                     </div>
+                    {getWeaponWear(selectedItem.name) && (
+                      <div className="flex justify-between">
+                        <span className="text-opnskin-text-secondary">
+                          {t('inventory.wear', 'État:')}
+                        </span>
+                        <span className="text-opnskin-text-primary italic">
+                          {t(`inventory.${getWeaponWear(selectedItem.name)}`)}
+                        </span>
+                      </div>
+                    )}
                     {selectedItem.marketPrice !== undefined && (
                       <div className="flex justify-between">
                         <span className="text-opnskin-text-secondary">
@@ -337,13 +363,13 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
                         <span className="text-opnskin-accent font-mono font-bold">{selectedItem.marketPrice} €</span>
                       </div>
                     )}
-                    {selectedItem.rarityCode && rarityMap[selectedItem.rarityCode] && (
+                    {selectedItem.rarityCode && rarityKeyMap[selectedItem.rarityCode] && (
                       <div className="flex justify-between">
                         <span className="text-opnskin-text-secondary">
                           {t('inventory.rarity', 'Rareté:')}
                         </span>
-                        <Badge className={rarityMap[selectedItem.rarityCode].bgColor}>
-                          {rarityMap[selectedItem.rarityCode].name}
+                        <Badge className="bg-opnskin-accent/10 text-opnskin-accent border-opnskin-accent/30 text-xs">
+                          {t(`inventory.${rarityKeyMap[selectedItem.rarityCode]}`)}
                         </Badge>
                       </div>
                     )}

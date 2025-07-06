@@ -235,7 +235,20 @@
     "view_on_csfloat": "Ver en CSFloat",
     "no_float_info": "No hay información Float disponible",
     "weapon": "Arma",
-    "details": "Detalles"
+    "details": "Detalles",
+    "rarity_consumer": "Grado Consumidor",
+    "rarity_industrial": "Grado Industrial",
+    "rarity_milspec": "Grado Mil-Spec",
+    "rarity_restricted": "Restringido",
+    "rarity_classified": "Clasificado",
+    "rarity_covert": "Secreto",
+    "rarity_exceedingly_rare": "Extraordinariamente Raro",
+    "wear_factory_new": "Nuevo de Fábrica",
+    "wear_minimal_wear": "Desgaste Mínimo",
+    "wear_field_tested": "Probado en Campo",
+    "wear_well_worn": "Bien Desgastado",
+    "wear_battle_scarred": "Marcado por la Batalla",
+    "wear": "Desgaste:"
   },
   "rarity": {
     "consumer": "Consumidor",

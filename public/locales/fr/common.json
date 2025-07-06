@@ -235,7 +235,20 @@
     "view_on_csfloat": "Voir sur CSFloat",
     "no_float_info": "Aucune information Float disponible",
     "weapon": "Arme",
-    "details": "Détails"
+    "details": "Détails",
+    "rarity_consumer": "Consommateur",
+    "rarity_industrial": "Industriel",
+    "rarity_milspec": "Militaire",
+    "rarity_restricted": "Restreint",
+    "rarity_classified": "Classé",
+    "rarity_covert": "Secret",
+    "rarity_exceedingly_rare": "Extraordinaire",
+    "wear_factory_new": "Neuf de fabrique",
+    "wear_minimal_wear": "Marqué par les combats",
+    "wear_field_tested": "Testé sur le terrain",
+    "wear_well_worn": "Bien usé",
+    "wear_battle_scarred": "Marqué par les batailles",
+    "wear": "État:"
   },
   "rarity": {
     "consumer": "Consommateur",

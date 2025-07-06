@@ -236,7 +236,20 @@
     "view_on_csfloat": "在CSFloat上查看",
     "no_float_info": "没有可用的Float信息",
     "weapon": "武器",
-    "details": "详情"
+    "details": "详情",
+    "rarity_consumer": "消费级",
+    "rarity_industrial": "工业级",
+    "rarity_milspec": "军规级",
+    "rarity_restricted": "受限级",
+    "rarity_classified": "保密级",
+    "rarity_covert": "隐秘级",
+    "rarity_exceedingly_rare": "极其罕见",
+    "wear_factory_new": "崭新出厂",
+    "wear_minimal_wear": "略有磨损",
+    "wear_field_tested": "久经沙场",
+    "wear_well_worn": "破损不堪",
+    "wear_battle_scarred": "战痕累累",
+    "wear": "磨损:"
   },
   "rarity": {
     "consumer": "普通",

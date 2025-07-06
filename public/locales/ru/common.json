@@ -226,7 +226,20 @@
     "view_on_csfloat": "Посмотреть на CSFloat",
     "no_float_info": "Информация о Float недоступна",
     "weapon": "Оружие",
-    "details": "Детали"
+    "details": "Детали",
+    "rarity_consumer": "Потребительский",
+    "rarity_industrial": "Промышленный",
+    "rarity_milspec": "Военный",
+    "rarity_restricted": "Ограниченный",
+    "rarity_classified": "Классифицированный",
+    "rarity_covert": "Секретный",
+    "rarity_exceedingly_rare": "Исключительно редкий",
+    "wear_factory_new": "С завода",
+    "wear_minimal_wear": "Минимальный износ",
+    "wear_field_tested": "Полевые испытания",
+    "wear_well_worn": "Хорошо изношенный",
+    "wear_battle_scarred": "Закаленный в боях",
+    "wear": "Износ:"
   },
   "rarity": {
     "consumer": "Потребительский",
