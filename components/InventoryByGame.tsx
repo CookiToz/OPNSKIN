@@ -214,7 +214,7 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
           </div>
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 w-full max-w-7xl">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 w-full max-w-6xl mx-auto px-4">
           {filteredItems.map(item => {
             const rarity = item.rarityCode ? rarityKeyMap[item.rarityCode] : null;
             const weaponCategory = getWeaponCategory(item.name);
@@ -234,11 +234,6 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
                       {t(`inventory.${rarity}`)}
                     </Badge>
                   )}
-                  {item.marketPrice !== undefined && (
-                    <Badge className="absolute top-2 left-2 z-20 bg-opnskin-primary/20 text-opnskin-primary border-opnskin-primary/30 text-xs font-mono font-bold">
-                      {item.marketPrice} €
-                    </Badge>
-                  )}
                   <div className="absolute bottom-0 left-0 right-0 p-2 z-20">
                     <h3 className="font-satoshi-bold text-sm truncate text-opnskin-text-primary mb-1">{item.name}</h3>
                     {weaponWear && (
@@ -249,6 +244,13 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
                   </div>
                 </div>
                 <CardContent className="p-3">
+                  <div className="flex justify-between items-center mb-2">
+                    {item.marketPrice !== undefined && (
+                      <span className="font-mono text-opnskin-accent font-bold text-sm">
+                        {item.marketPrice} €
+                      </span>
+                    )}
+                  </div>
                   <div className="flex justify-between items-center gap-2">
                     <Button 
                       size="sm" 
