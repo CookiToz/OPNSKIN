@@ -54,8 +54,9 @@ export default function SkinCarousel() {
         {skins.map((skin, idx) => {
           // Simuler un assetId unique par skin pour l'exemple
           const assetId = `skin-${idx}`;
-          // Le hook n'est appelé que si l'item est sélectionné
-          const floatState = selectedFloatIdx === idx ? useFloat(assetId) : null;
+          // Toujours appeler le hook, mais gérer l'affichage conditionnellement
+          const floatState = useFloat(assetId);
+          
           return (
             <CarouselItem key={idx} className="p-2">
               <Card className="group overflow-hidden shadow-lg transition-transform duration-300 hover:scale-105">
@@ -69,19 +70,17 @@ export default function SkinCarousel() {
                 <CardContent className="p-4 flex flex-col items-center">
                   <h3 className="font-bold text-lg text-center mb-1 truncate w-full" title={skin.name}>{skin.name}</h3>
                   {cryptoIcons[currency] && <img src={cryptoIcons[currency]!} alt={currency} className="inline w-5 h-5 mr-1 align-middle" />}
-                  {cryptoRates[currency] ? (
-                    <span className="font-mono text-opnskin-accent font-bold text-xl mb-2">{formatPrice(skin.price, currency, cryptoRates)}</span>
-                  ) : (
-                    <span>Loading...</span>
-                  )}
-                  {selectedFloatIdx === idx && floatState ? (
+                  <span className="font-mono text-opnskin-accent font-bold text-xl mb-2">{formatPrice(skin.price, currency, cryptoRates as any)}</span>
+                  {selectedFloatIdx === idx ? (
                     floatState.isLoading ? (
                       <span className="text-opnskin-primary animate-pulse mt-2">Chargement du float…</span>
                     ) : floatState.isError ? (
                       <span className="text-red-500 mt-2">Erreur : {floatState.errorMsg || 'Impossible de récupérer le float'}</span>
                     ) : floatState.float !== null ? (
                       <span className="text-opnskin-accent font-mono mt-2">Float : {floatState.float}</span>
-                    ) : null
+                    ) : (
+                      <span className="text-opnskin-text-secondary mt-2">Aucun float disponible</span>
+                    )
                   ) : (
                     <Button size="sm" className="btn-opnskin-secondary mt-2" onClick={() => setSelectedFloatIdx(idx)}>
                       Voir le float
