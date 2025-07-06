@@ -241,7 +241,7 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
                       onClick={() => handleSell(item)}
                     >
                       <Tag className="w-3 h-3 mr-1" />
-                      Vendre
+                      {t('inventory.sell', 'Vendre')}
                     </Button>
                     <Button 
                       size="sm" 
@@ -263,7 +263,9 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
       <Dialog open={sellDialogOpen} onOpenChange={setSellDialogOpen}>
         <DialogContent className="bg-opnskin-bg-card border-opnskin-bg-secondary">
           <DialogHeader>
-            <DialogTitle className="text-opnskin-text-primary">Vendre {selectedItem?.name}</DialogTitle>
+            <DialogTitle className="text-opnskin-text-primary">
+              {t('inventory.sell_skin', 'Vendre {{skinName}}', { skinName: selectedItem?.name })}
+            </DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div className="flex items-center gap-4">
@@ -271,12 +273,14 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
               <div>
                 <h3 className="font-satoshi-bold text-opnskin-text-primary">{selectedItem?.name}</h3>
                 <p className="text-opnskin-text-secondary text-sm">
-                  Prix du marché: {selectedItem?.marketPrice} €
+                  {t('inventory.market_price', 'Prix du marché: {{price}} €', { price: selectedItem?.marketPrice || 'N/A' })}
                 </p>
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="sell-price" className="text-opnskin-text-primary">Prix de vente (€)</Label>
+              <Label htmlFor="sell-price" className="text-opnskin-text-primary">
+                {t('inventory.sell_price', 'Prix de vente (€)')}
+              </Label>
               <Input
                 id="sell-price"
                 type="number"
@@ -284,20 +288,20 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
                 min="0"
                 value={sellPrice}
                 onChange={(e) => setSellPrice(e.target.value)}
-                placeholder="Entrez votre prix"
+                placeholder={t('inventory.enter_price', 'Entrez votre prix')}
                 className="bg-opnskin-bg-secondary border-opnskin-bg-secondary text-opnskin-text-primary"
               />
             </div>
             <div className="flex gap-2">
               <Button onClick={handleSellConfirm} className="btn-opnskin flex-1">
-                Confirmer la vente
+                {t('inventory.confirm_sale', 'Confirmer la vente')}
               </Button>
               <Button 
                 variant="outline" 
                 onClick={() => setSellDialogOpen(false)}
                 className="border-opnskin-primary/30 text-opnskin-primary hover:bg-opnskin-primary/10"
               >
-                Annuler
+                {t('inventory.cancel', 'Annuler')}
               </Button>
             </div>
           </div>
@@ -308,7 +312,9 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
       <Dialog open={detailsDialogOpen} onOpenChange={setDetailsDialogOpen}>
         <DialogContent className="bg-opnskin-bg-card border-opnskin-bg-secondary max-w-2xl">
           <DialogHeader>
-            <DialogTitle className="text-opnskin-text-primary">Détails du skin</DialogTitle>
+            <DialogTitle className="text-opnskin-text-primary">
+              {t('inventory.skin_details', 'Détails du skin')}
+            </DialogTitle>
           </DialogHeader>
           {selectedItem && (
             <div className="space-y-6">
@@ -318,18 +324,24 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
                   <h3 className="font-satoshi-bold text-xl text-opnskin-text-primary mb-2">{selectedItem.name}</h3>
                   <div className="space-y-2">
                     <div className="flex justify-between">
-                      <span className="text-opnskin-text-secondary">Catégorie:</span>
+                      <span className="text-opnskin-text-secondary">
+                        {t('inventory.category', 'Catégorie:')}
+                      </span>
                       <span className="text-opnskin-text-primary">{getWeaponCategory(selectedItem.name)}</span>
                     </div>
                     {selectedItem.marketPrice !== undefined && (
                       <div className="flex justify-between">
-                        <span className="text-opnskin-text-secondary">Prix du marché:</span>
+                        <span className="text-opnskin-text-secondary">
+                          {t('inventory.market_price', 'Prix du marché: {{price}} €', { price: selectedItem.marketPrice })}
+                        </span>
                         <span className="text-opnskin-accent font-mono font-bold">{selectedItem.marketPrice} €</span>
                       </div>
                     )}
                     {selectedItem.rarityCode && rarityMap[selectedItem.rarityCode] && (
                       <div className="flex justify-between">
-                        <span className="text-opnskin-text-secondary">Rareté:</span>
+                        <span className="text-opnskin-text-secondary">
+                          {t('inventory.rarity', 'Rareté:')}
+                        </span>
                         <Badge className={rarityMap[selectedItem.rarityCode].bgColor}>
                           {rarityMap[selectedItem.rarityCode].name}
                         </Badge>
@@ -341,7 +353,9 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
               
               {/* Section Float */}
               <div className="border-t border-opnskin-bg-secondary pt-4">
-                <h4 className="font-satoshi-bold text-lg text-opnskin-text-primary mb-3">Informations Float</h4>
+                <h4 className="font-satoshi-bold text-lg text-opnskin-text-primary mb-3">
+                  {t('inventory.float_info', 'Informations Float')}
+                </h4>
                 <SkinFloatDetails itemId={selectedItem.id} />
               </div>
             </div>
@@ -354,6 +368,7 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
 
 // Composant pour afficher les détails du float
 function SkinFloatDetails({ itemId }: { itemId: string }) {
+  const { t } = useTranslation('common');
   const floatState = useFloat(itemId);
   const [showFloat, setShowFloat] = useState(false);
 
@@ -364,36 +379,46 @@ function SkinFloatDetails({ itemId }: { itemId: string }) {
           onClick={() => setShowFloat(true)} 
           className="btn-opnskin-secondary"
         >
-          Charger les informations Float
+          {t('inventory.load_float_info', 'Charger les informations Float')}
         </Button>
       ) : (
         <div className="space-y-2">
           {floatState.isLoading ? (
-            <div className="text-opnskin-primary animate-pulse">Chargement des informations Float…</div>
+            <div className="text-opnskin-primary animate-pulse">
+              {t('inventory.loading_float', 'Chargement des informations Float…')}
+            </div>
           ) : floatState.isError ? (
-            <div className="text-red-500">Erreur: {floatState.errorMsg || 'Impossible de récupérer les informations Float'}</div>
-          ) : floatState.float !== null ? (
+            <div className="text-red-500">
+              {t('inventory.float_error', 'Erreur: {{error}}', { error: floatState.errorMsg || 'Impossible de récupérer les informations Float' })}
+            </div>
+          ) : floatState.data?.float !== null ? (
             <div className="space-y-2">
               <div className="flex justify-between">
-                <span className="text-opnskin-text-secondary">Float:</span>
-                <span className="text-opnskin-accent font-mono font-bold">{floatState.float}</span>
+                <span className="text-opnskin-text-secondary">
+                  {t('inventory.float_value', 'Float:')}
+                </span>
+                <span className="text-opnskin-accent font-mono font-bold">{floatState.data?.float}</span>
               </div>
-              {floatState.csfloatLink && (
+              {floatState.data?.csfloatLink && (
                 <div className="flex justify-between">
-                  <span className="text-opnskin-text-secondary">Lien CSFloat:</span>
+                  <span className="text-opnskin-text-secondary">
+                    {t('inventory.csfloat_link', 'Lien CSFloat:')}
+                  </span>
                   <a 
-                    href={floatState.csfloatLink} 
+                    href={floatState.data.csfloatLink} 
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="text-opnskin-primary hover:text-opnskin-primary-hover underline"
                   >
-                    Voir sur CSFloat
+                    {t('inventory.view_on_csfloat', 'Voir sur CSFloat')}
                   </a>
                 </div>
               )}
             </div>
           ) : (
-            <div className="text-opnskin-text-secondary">Aucune information Float disponible</div>
+            <div className="text-opnskin-text-secondary">
+              {t('inventory.no_float_info', 'Aucune information Float disponible')}
+            </div>
           )}
         </div>
       )}
