@@ -338,9 +338,22 @@ export default function Inventory() {
           <Package className="h-16 w-16 text-red-400/30 mx-auto mb-4" />
           <h2 className="text-2xl font-bold mb-2 font-satoshi-bold text-opnskin-text-primary">{t('inventory.error_title')}</h2>
           <p className="text-opnskin-text-secondary mb-4">{error}</p>
-          <Button onClick={fetchInventory} className="btn-opnskin">
-            {t('inventory.retry')}
-          </Button>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button onClick={fetchInventory} className="btn-opnskin">
+              {t('inventory.retry')}
+            </Button>
+            {selectedGame && (
+              <Button 
+                onClick={() => {
+                  setSelectedGame(null);
+                  setError(null);
+                }} 
+                className="btn-opnskin-secondary"
+              >
+                ← {t('inventory.back_to_games', 'Retour aux jeux')}
+              </Button>
+            )}
+          </div>
         </div>
       </div>
     );
