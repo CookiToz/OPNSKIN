@@ -217,7 +217,9 @@
     "error_loading": "Error loading inventory",
     "not_logged_in_title": "Connect via Steam to see your inventory",
     "not_logged_in_desc": "You must be connected via Steam to access your inventory.",
-    "login_button": "Connect via Steam"
+    "login_button": "Connect via Steam",
+    "click_to_load": "Click \"Refresh\" to load the {{gameName}} inventory",
+    "load_inventory": "Load inventory"
   },
   "rarity": {
     "consumer": "Consumer",

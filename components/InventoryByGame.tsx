@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { useTranslation } from 'next-i18next';
 import { useInventory } from "@/components/InventoryProvider";
 import { useFloat } from "@/components/FloatProvider";
 import { motion, AnimatePresence } from "framer-motion";
+import { RefreshCw } from 'lucide-react';
 
 export type GameType = {
   key: string;
@@ -27,7 +29,8 @@ type InventoryByGameProps = {
 
 export default function InventoryByGame({ game, onBack }: InventoryByGameProps) {
   const { t } = useTranslation('common');
-  const { items, isLoading, isError, errorMsg } = useInventory(game?.appid ? String(game.appid) : undefined);
+  const [hasRequestedLoad, setHasRequestedLoad] = useState(false);
+  const { items, isLoading, isError, errorMsg, refetch } = useInventory(hasRequestedLoad ? (game?.appid ? String(game.appid) : undefined) : undefined);
   const [selectedFloatId, setSelectedFloatId] = useState<string | null>(null);
   const [floatTimeout, setFloatTimeout] = useState<NodeJS.Timeout | null>(null);
 
@@ -43,6 +46,11 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
     if (onBack) onBack();
   };
 
+  const handleRefreshInventory = () => {
+    setHasRequestedLoad(true);
+    refetch();
+  };
+
   return (
     <div className="flex flex-col items-center py-8 min-h-[60vh]">
       <div className="flex items-center gap-4 mb-8">
@@ -52,8 +60,30 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
         <h2 className="text-3xl md:text-4xl font-bold font-rajdhani tracking-tight text-opnskin-primary drop-shadow-lg">
           {t('inventory.title', 'Inventaire')} {t(`marketplace.game_${game.key}`, game.name)}
         </h2>
+        <Button 
+          onClick={handleRefreshInventory}
+          disabled={isLoading}
+          className="btn-opnskin-secondary flex items-center gap-2"
+        >
+          <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+          {t('inventory.refresh', 'Actualiser')}
+        </Button>
       </div>
-      {isLoading ? (
+
+      {!hasRequestedLoad ? (
+        <div className="flex flex-col items-center justify-center py-16 space-y-6">
+          <div className="text-opnskin-text-secondary text-lg font-rajdhani text-center">
+            {t('inventory.click_to_load', 'Cliquez sur "Actualiser" pour charger l\'inventaire {{gameName}}', { gameName: t(`marketplace.game_${game.key}`, game.name) })}
+          </div>
+          <Button 
+            onClick={handleRefreshInventory}
+            className="btn-opnskin flex items-center gap-2"
+          >
+            <RefreshCw className="w-4 h-4" />
+            {t('inventory.load_inventory', 'Charger l\'inventaire')}
+          </Button>
+        </div>
+      ) : isLoading ? (
         <div className="flex flex-col items-center justify-center py-16 space-y-6">
           <div className="text-opnskin-primary text-xl font-rajdhani animate-pulse">
             {t('inventory.loading', "Chargement de l'inventaire…")}
@@ -80,28 +110,39 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
               <p>Vous n'avez pas d'inventaire pour ce jeu ou votre profil Steam n'est pas accessible.</p>
             )}
           </div>
-          {onBack && (
-            <button 
-              onClick={onBack} 
-              className="btn-opnskin-secondary flex items-center gap-2"
-            >
-              ← {t('inventory.back_to_games', 'Retour aux jeux')}
-            </button>
-          )}
+          <div className="flex flex-col sm:flex-row gap-4">
+            <Button onClick={handleRefreshInventory} className="btn-opnskin">
+              {t('inventory.retry')}
+            </Button>
+            {onBack && (
+              <button 
+                onClick={onBack} 
+                className="btn-opnskin-secondary flex items-center gap-2"
+              >
+                ← {t('inventory.back_to_games', 'Retour aux jeux')}
+              </button>
+            )}
+          </div>
         </div>
       ) : items.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 space-y-6">
           <div className="text-opnskin-text-secondary text-lg font-rajdhani text-center">
             {t('inventory.empty_game', 'L\'inventaire {{gameName}} est vide', { gameName: t(`marketplace.game_${game.key}`, game.name) })}
           </div>
-          {onBack && (
-            <button 
-              onClick={handleBack} 
-              className="btn-opnskin-secondary flex items-center gap-2"
-            >
-              ← {t('inventory.back_to_games', 'Retour aux jeux')}
-            </button>
-          )}
+          <div className="flex flex-col sm:flex-row gap-4">
+            <Button onClick={handleRefreshInventory} className="btn-opnskin-secondary">
+              <RefreshCw className="w-4 h-4 mr-2" />
+              {t('inventory.refresh', 'Actualiser')}
+            </Button>
+            {onBack && (
+              <button 
+                onClick={onBack} 
+                className="btn-opnskin-secondary flex items-center gap-2"
+              >
+                ← {t('inventory.back_to_games', 'Retour aux jeux')}
+              </button>
+            )}
+          </div>
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 w-full max-w-7xl">

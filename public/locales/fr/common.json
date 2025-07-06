@@ -209,6 +209,8 @@
     "back": "Retour à la sélection du jeu",
     "no_item_found": "Aucun item dans l'inventaire",
     "error_loading": "Erreur lors du chargement de l'inventaire",
+    "click_to_load": "Cliquez sur \"Actualiser\" pour charger l'inventaire {{gameName}}",
+    "load_inventory": "Charger l'inventaire",
     "selectGameTitle": "Choisis ton jeu",
     "badge": "INVENTAIRE",
     "not_logged_in_title": "Connecte-toi via Steam pour voir ton inventaire",
