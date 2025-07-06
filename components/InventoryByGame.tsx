@@ -214,7 +214,7 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
           </div>
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 w-full max-w-7xl">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 w-full max-w-7xl">
           {filteredItems.map(item => {
             const rarity = item.rarityCode ? rarityKeyMap[item.rarityCode] : null;
             const weaponCategory = getWeaponCategory(item.name);
@@ -240,10 +240,7 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
                     </Badge>
                   )}
                   <div className="absolute bottom-0 left-0 right-0 p-2 z-20">
-                    <div className="flex justify-between items-center">
-                      <span className="text-xs text-opnskin-text-secondary">{weaponCategory}</span>
-                    </div>
-                    <h3 className="font-satoshi-bold text-sm truncate text-opnskin-text-primary">{item.name}</h3>
+                    <h3 className="font-satoshi-bold text-sm truncate text-opnskin-text-primary mb-1">{item.name}</h3>
                     {weaponWear && (
                       <p className="text-xs text-opnskin-text-secondary italic">
                         {t(`inventory.${weaponWear}`)}
