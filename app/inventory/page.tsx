@@ -15,6 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import InventoryGameSelect from '@/components/InventoryGameSelect';
 import InventoryByGame from '@/components/InventoryByGame';
+import { useUser } from '@/components/UserProvider';
 import Image from 'next/image';
 
 type InventoryItem = {
@@ -150,24 +151,18 @@ export default function Inventory() {
   const FLOAT_CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
   const [loadingFloatId, setLoadingFloatId] = useState<string | null>(null);
   const cryptoRates = useCryptoRatesStore();
-  const [notLoggedIn, setNotLoggedIn] = useState(false);
   const [selectedGame, setSelectedGame] = useState<null | typeof GAMES[number]>(null);
+  const { user, isLoading: userLoading, isError: userError } = useUser();
 
   const fetchInventory = async () => {
     try {
       setLoading(true);
       setError(null);
-      setNotLoggedIn(false);
       
       // Utiliser l'appid du jeu sélectionné
       const appid = selectedGame?.appid || 730; // CS2 par défaut
       const response = await fetch(`/api/inventory?currency=${currency}&appid=${appid}`);
       
-      if (response.status === 401) {
-        setNotLoggedIn(true);
-        setLoading(false);
-        return;
-      }
       if (!response.ok) {
         throw new Error('Erreur lors du chargement de l\'inventaire');
       }
@@ -302,7 +297,8 @@ export default function Inventory() {
     }
   };
 
-  if (notLoggedIn) {
+  // Vérifier si l'utilisateur n'est pas connecté
+  if (!userLoading && (!user || !user.loggedIn)) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -322,7 +318,8 @@ export default function Inventory() {
     );
   }
 
-  if (loading) {
+  // Chargement du profil utilisateur
+  if (userLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
