@@ -158,7 +158,11 @@ export default function Inventory() {
       setLoading(true);
       setError(null);
       setNotLoggedIn(false);
-      const response = await fetch(`/api/inventory?currency=${currency}`);
+      
+      // Utiliser l'appid du jeu sélectionné
+      const appid = selectedGame?.appid || 730; // CS2 par défaut
+      const response = await fetch(`/api/inventory?currency=${currency}&appid=${appid}`);
+      
       if (response.status === 401) {
         setNotLoggedIn(true);
         setLoading(false);
@@ -240,6 +244,13 @@ export default function Inventory() {
   useEffect(() => {
     applyFilters();
   }, [search, sort, inventory]);
+
+  // Recharger l'inventaire quand le jeu change
+  useEffect(() => {
+    if (selectedGame) {
+      fetchInventory();
+    }
+  }, [selectedGame, currency]);
 
   const toggleItemSelection = (itemId: string) => {
     setSelectedItems(prev =>

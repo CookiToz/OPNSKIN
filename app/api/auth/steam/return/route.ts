@@ -8,6 +8,17 @@ export async function GET(req: NextRequest) {
     // Log des paramètres pour debug
     console.log('[STEAM OPENID] Received params:', Object.fromEntries(searchParams.entries()));
 
+    // Vérification si l'utilisateur est déjà connecté
+    const existingSteamId = req.cookies.get('steamid')?.value;
+    if (existingSteamId) {
+      console.log('[STEAM OPENID] User already logged in with SteamID:', existingSteamId);
+      // Redirection vers la page d'accueil si déjà connecté
+      const host = req.headers.get('host');
+      const protocol = req.headers.get('x-forwarded-proto') || 'https';
+      const baseUrl = `${protocol}://${host}`;
+      return NextResponse.redirect(`${baseUrl}/`);
+    }
+
     // Extraction directe du SteamID depuis openid.claimed_id selon la documentation Steam
     const claimedId = searchParams.get('openid.claimed_id');
     
