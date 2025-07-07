@@ -5,7 +5,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { Store, Package, ListOrdered, Wallet, History, User, Settings, ChevronRight, Home, Globe, ChevronDown } from "lucide-react"
+import { Store, Package, ListOrdered, Wallet, History, User, Settings, ChevronRight, Home, Globe, ChevronDown, Phone } from "lucide-react"
 import { OPNSKINLogo } from "@/components/kalpix-logo"
 import { useTranslation } from 'next-i18next'
 
@@ -62,6 +62,11 @@ function SidebarContent() {
       name: t('sidebar.profile'),
       href: "/profile",
       icon: User,
+    },
+    {
+      name: t('sidebar.assistance', 'Assistance'),
+      href: "/assistance",
+      icon: Phone,
     },
   ]
 
