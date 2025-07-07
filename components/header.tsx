@@ -21,6 +21,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { usePathname } from 'next/navigation';
 
 export function Header() {
   const { t } = useTranslation('common');
@@ -50,6 +51,7 @@ export function Header() {
   const cryptoRates = typeof rawCryptoRates === 'object' && rawCryptoRates !== null ? rawCryptoRates : { ETH: 0, GMC: 0, BTC: 0, SOL: 0, XRP: 0, LTC: 0, TRX: 0 };
   const searchQuery = useSearchStore((state) => state.searchQuery);
   const setSearchQuery = useSearchStore((state) => state.setSearchQuery);
+  const pathname = usePathname();
 
   const handleLogout = () => {
     fetch('/api/logout').then(() => {
@@ -66,16 +68,18 @@ export function Header() {
       <header className="sticky top-0 z-50 w-full bg-opnskin-bg-primary/80 shadow-[0_2px_8px_rgba(40,124,250,0.04)]">
         <div className="flex items-center justify-between px-4" style={{ height: 80, minHeight: 80, maxHeight: 80 }}>
           <div className="flex-1 flex items-center space-x-4">
-            <div className="relative w-96">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-opnskin-text-secondary" />
-              <Input
-                type="search"
-                placeholder={t('header.search_placeholder')}
-                className="w-full pl-10 bg-opnskin-bg-secondary/50 border-opnskin-bg-secondary text-opnskin-text-secondary focus:border-opnskin-primary focus:bg-opnskin-bg-secondary"
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-              />
-            </div>
+            {(pathname.startsWith('/inventory') || pathname.startsWith('/marketplace')) && (
+              <div className="relative w-96">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-opnskin-text-secondary" />
+                <Input
+                  type="search"
+                  placeholder={t('header.search_placeholder')}
+                  className="w-full pl-10 bg-opnskin-bg-secondary/50 border-opnskin-bg-secondary text-opnskin-text-secondary focus:border-opnskin-primary focus:bg-opnskin-bg-secondary"
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                />
+              </div>
+            )}
             <Select value={currency} onValueChange={setCurrency}>
               <SelectTrigger className="w-24 ml-4 bg-opnskin-bg-secondary border-opnskin-primary/30 text-opnskin-accent font-bold">
                 <SelectValue />
