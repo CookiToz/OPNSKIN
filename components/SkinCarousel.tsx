@@ -4,7 +4,7 @@ import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useEffect, useRef, useState } from "react";
-import { useCurrencyStore, useCryptoRatesStore } from '@/hooks/use-currency-store';
+import { useCurrencyStore } from '@/hooks/use-currency-store';
 import { formatPrice } from '@/lib/utils';
 import { cryptoIcons } from '@/lib/utils';
 import { useFloat } from "@/components/FloatProvider";
@@ -35,7 +35,6 @@ const skins = [
 export default function SkinCarousel() {
   const carouselRef = useRef<any>(null);
   const currency = useCurrencyStore((state) => state.currency);
-  const cryptoRates = useCryptoRatesStore();
   const [selectedFloatIdx, setSelectedFloatIdx] = useState<number | null>(null);
 
   // Défilement automatique
@@ -70,7 +69,7 @@ export default function SkinCarousel() {
                 <CardContent className="p-4 flex flex-col items-center">
                   <h3 className="font-bold text-lg text-center mb-1 truncate w-full" title={skin.name}>{skin.name}</h3>
                   {cryptoIcons[currency] && <img src={cryptoIcons[currency]!} alt={currency} className="inline w-5 h-5 mr-1 align-middle" />}
-                  <span className="font-mono text-opnskin-accent font-bold text-xl mb-2">{formatPrice(skin.price, currency, cryptoRates as any)}</span>
+                  <span className="font-mono text-opnskin-accent font-bold text-xl mb-2">{formatPrice(skin.price, currency)}</span>
                   {selectedFloatIdx === idx ? (
                     floatState.isLoading ? (
                       <span className="text-opnskin-primary animate-pulse mt-2">Chargement du float…</span>

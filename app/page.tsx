@@ -14,7 +14,6 @@ import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext
 import FeeProgressionChart from '@/components/FeeProgressionChart';
 import { formatPrice } from '@/lib/utils';
 import { useCurrencyStore, useCryptoRatesStore } from '@/hooks/use-currency-store';
-import { useCryptoRates } from '@/hooks/use-crypto-rates';
 import { cryptoIcons } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 import Image from 'next/image';
@@ -33,7 +32,7 @@ export default function Home() {
   const cryptoRates = useCryptoRatesStore();
   
   // Utiliser le hook pour mettre à jour les taux crypto toutes les 30 secondes
-  useCryptoRates();
+  // useCryptoRates();
 
   if (!ready) return null; // ou un loader si tu préfères
 

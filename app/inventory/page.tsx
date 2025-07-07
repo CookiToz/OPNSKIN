@@ -10,7 +10,6 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { useUser } from '@/components/UserProvider';
 import { useCurrencyStore } from '@/hooks/use-currency-store';
-import { useCryptoRates } from '@/hooks/use-crypto-rates';
 import InventoryGameSelect from '@/components/InventoryGameSelect';
 import InventoryByGame from '@/components/InventoryByGame';
 

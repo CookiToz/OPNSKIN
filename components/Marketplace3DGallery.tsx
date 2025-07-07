@@ -3,7 +3,7 @@
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, Stage, Html, useGLTF } from "@react-three/drei";
 import { Suspense } from "react";
-import { useCurrencyStore, useCryptoRatesStore, CryptoRate } from '@/hooks/use-currency-store';
+import { useCurrencyStore } from '@/hooks/use-currency-store';
 import { formatPrice } from '@/lib/utils';
 import { cryptoIcons } from '@/lib/utils';
 
@@ -42,13 +42,8 @@ function SkinModel({ url, color }: { url: string; color: string }) {
   );
 }
 
-function hasCryptoRate(rates: any, currency: string) {
-  return rates && Object.prototype.hasOwnProperty.call(rates, currency) && rates[currency] && typeof rates[currency] === 'object' && 'usd' in rates[currency];
-}
-
 export default function Marketplace3DGallery() {
   const currency = useCurrencyStore((state) => state.currency);
-  const cryptoRates = useCryptoRatesStore();
 
   return (
     <div className="w-full h-[420px] md:h-[520px] relative rounded-xl overflow-visible bg-black/80 border border-opnskin-primary/20 shadow-2xl">
@@ -64,13 +59,9 @@ export default function Marketplace3DGallery() {
                 <Html center distanceFactor={8} zIndexRange={[100, 0]}>
                   <div className="text-center mt-2">
                     {cryptoIcons[currency] && <img src={cryptoIcons[currency]!} alt={currency} className="inline w-5 h-5 mr-1 align-middle" />}
-                    {hasCryptoRate(cryptoRates, currency) ? (
-                      <div className="font-mono text-opnskin-accent text-sm font-bold drop-shadow-[0_0_4px_#00fff7]">
-                        {formatPrice(skin.price, currency, cryptoRates as unknown as Record<string, any>)}
-                      </div>
-                    ) : (
-                      <span>Loading...</span>
-                    )}
+                    <div className="font-mono text-opnskin-accent text-sm font-bold drop-shadow-[0_0_4px_#00fff7]">
+                      {formatPrice(skin.price, currency)}
+                    </div>
                     <div className="text-xs text-white font-bold drop-shadow-[0_0_4px_#00fff7]">
                       {skin.name}
                     </div>

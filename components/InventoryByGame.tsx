@@ -14,7 +14,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { RefreshCw, Tag, ExternalLink, Filter, X } from 'lucide-react';
 import { useCurrencyStore } from '@/hooks/use-currency-store';
 import { useCryptoRatesStore } from '@/hooks/use-currency-store';
-import { useCryptoRates } from '@/hooks/use-crypto-rates';
 import { formatPrice } from '@/lib/utils';
 import { useSearchStore } from '@/hooks/use-search-store';
 
@@ -114,9 +113,6 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
     GMC: '/crypto/gmc.svg',
   };
   
-  // Utiliser le hook pour mettre à jour les taux crypto toutes les 30 secondes
-  useCryptoRates();
-
   const searchQuery = useSearchStore((state) => state.searchQuery);
 
   const handleBack = () => {

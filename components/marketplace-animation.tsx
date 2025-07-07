@@ -1,7 +1,7 @@
 "use client"
 
 import { motion, AnimatePresence } from "framer-motion"
-import { useCurrencyStore, useCryptoRatesStore } from '@/hooks/use-currency-store';
+import { useCurrencyStore } from '@/hooks/use-currency-store';
 import { formatPrice } from '@/lib/utils';
 import { cryptoIcons } from '@/lib/utils';
 import { RepeatType } from "framer-motion"
@@ -19,7 +19,6 @@ const SKINS = [
 
 export function MarketplaceAnimation() {
   const currency = useCurrencyStore((state) => state.currency);
-  const cryptoRates = useCryptoRatesStore();
 
   // Animation parameters
   const floatTransition = {
