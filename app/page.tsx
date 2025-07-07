@@ -34,9 +34,7 @@ export default function Home() {
   // Utiliser le hook pour mettre à jour les taux crypto toutes les 30 secondes
   // useCryptoRates();
 
-  if (!ready) return null; // ou un loader si tu préfères
-
-  // Tableau des images de skins pour le fond animé (modifiable)
+  // Hooks toujours au niveau racine
   const skinImages = [
     '/Wildlotus.png',
     '/awp-asiimov.png',
@@ -47,8 +45,19 @@ export default function Home() {
   ];
   const [bgIndex, setBgIndex] = useState(0); // Index du skin affiché
   const timeoutRef = useRef<NodeJS.Timeout|null>(null);
-
   const [steamStatus, setSteamStatus] = useState<null | { loggedIn: boolean }>(undefined);
+
+  // Fonction pour sélectionner le prochain skin en évitant les AK consécutifs
+  const getNextSkinIndex = (currentIndex: number): number => {
+    const currentSkin = skinImages[currentIndex];
+    const isCurrentAK = currentSkin.includes('ak47');
+    let nextIndex = (currentIndex + 1) % skinImages.length;
+    let nextSkin = skinImages[nextIndex];
+    if (isCurrentAK && nextSkin.includes('ak47')) {
+      nextIndex = (nextIndex + 1) % skinImages.length;
+    }
+    return nextIndex;
+  };
 
   useEffect(() => {
     fetch('/api/me').then(res => res.json()).then((data) => {
@@ -58,33 +67,16 @@ export default function Home() {
     });
   }, []);
 
-  // Fonction pour sélectionner le prochain skin en évitant les AK consécutifs
-  const getNextSkinIndex = (currentIndex: number): number => {
-    const currentSkin = skinImages[currentIndex];
-    const isCurrentAK = currentSkin.includes('ak47');
-    
-    // Essayer le prochain index
-    let nextIndex = (currentIndex + 1) % skinImages.length;
-    let nextSkin = skinImages[nextIndex];
-    
-    // Si le prochain est aussi un AK, chercher le suivant
-    if (isCurrentAK && nextSkin.includes('ak47')) {
-      nextIndex = (nextIndex + 1) % skinImages.length;
-    }
-    
-    return nextIndex;
-  };
-
-  // Logique de transition simplifiée
   useEffect(() => {
     timeoutRef.current = setTimeout(() => {
       setBgIndex(getNextSkinIndex(bgIndex));
-    }, 5000); // Durée d'affichage
-
+    }, 5000);
     return () => {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
     };
   }, [bgIndex, skinImages.length]);
+
+  if (!ready) return null; // ou un loader si tu préfères
 
   return (
     <div className="relative min-h-screen">
