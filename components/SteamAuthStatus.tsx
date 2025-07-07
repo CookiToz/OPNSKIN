@@ -28,7 +28,8 @@ export default function SteamAuthStatus() {
           setIsRedirecting(true);
           window.location.href = '/api/auth/steam';
         }}
-        className="btn-opnskin-secondary flex items-center gap-2"
+        className="bg-kalpix-blue hover:bg-kalpix-blue/80 rounded-full p-2 flex items-center justify-center shadow focus:outline-none focus:ring-2 focus:ring-kalpix-blue/60 transition-all w-10 h-10"
+        aria-label="Se connecter avec Steam"
         disabled={isRedirecting}
       >
         <img
@@ -36,7 +37,6 @@ export default function SteamAuthStatus() {
           alt="Steam"
           className="w-6 h-6 object-contain"
         />
-        {isRedirecting ? 'Redirection…' : 'Connecter Steam'}
       </button>
     );
   }
