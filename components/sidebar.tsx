@@ -124,40 +124,38 @@ function SidebarContent() {
                 {expanded && <span>{item.name}</span>}
               </Link>
             ))}
-            {expanded && (
-              <div className="relative">
-                <button
-                  className={cn(
-                    "nav-item w-full text-left",
-                    showLangs ? "nav-item-active" : "nav-item-inactive"
-                  )}
-                  onClick={() => setShowLangs(v => !v)}
-                  aria-expanded={showLangs}
-                >
-                  <Globe className="h-5 w-5" />
-                  <span>{t('sidebar.language')}</span>
-                  <ChevronDown className={cn("w-4 h-4 ml-auto transition-transform", showLangs && "rotate-180")}/>
-                </button>
-                {showLangs && (
-                  <div className="flex flex-col gap-1 mt-1 ml-2">
-                    {languages.map(lang => (
-                      <button
-                        key={lang.code}
-                        onClick={() => { i18n.changeLanguage(lang.code); setShowLangs(false); }}
-                        className={cn(
-                          "nav-item w-full text-left pl-10",
-                          currentLang === lang.code ? "nav-item-active" : "nav-item-inactive"
-                        )}
-                        aria-current={currentLang === lang.code ? "true" : undefined}
-                      >
-                        <span className="text-lg">{lang.flag}</span>
-                        <span className="text-sm font-medium">{lang.label}</span>
-                      </button>
-                    ))}
-                  </div>
+            <div className="relative">
+              <button
+                className={cn(
+                  "nav-item w-full text-left flex items-center gap-2",
+                  showLangs ? "nav-item-active" : "nav-item-inactive"
                 )}
-              </div>
-            )}
+                onClick={() => setShowLangs(v => !v)}
+                aria-expanded={showLangs}
+              >
+                <Globe className="h-5 w-5" />
+                {expanded && <span>{t('sidebar.language')}</span>}
+                <ChevronDown className={cn("w-4 h-4 ml-auto transition-transform", showLangs && "rotate-180", !expanded && "hidden")}/>
+              </button>
+              {showLangs && (
+                <div className="flex flex-col gap-1 mt-1 ml-2">
+                  {languages.map(lang => (
+                    <button
+                      key={lang.code}
+                      onClick={() => { i18n.changeLanguage(lang.code); setShowLangs(false); }}
+                      className={cn(
+                        "nav-item w-full text-left pl-10",
+                        currentLang === lang.code ? "nav-item-active" : "nav-item-inactive"
+                      )}
+                      aria-current={currentLang === lang.code ? "true" : undefined}
+                    >
+                      <span className="text-lg">{lang.flag}</span>
+                      <span className="text-sm font-medium">{lang.label}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </nav>
         </div>
       </div>
