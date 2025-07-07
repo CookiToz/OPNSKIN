@@ -103,7 +103,16 @@ function SidebarContent() {
               aria-current={pathname === item.href ? "page" : undefined}
             >
               <item.icon className="h-5 w-5" />
-              {expanded && <span>{item.name}</span>}
+              <span
+                className={cn(
+                  "inline-block transition-all duration-300",
+                  expanded
+                    ? "opacity-100 translate-x-0 ml-2"
+                    : "opacity-0 -translate-x-2 w-0 overflow-hidden"
+                )}
+              >
+                {item.name}
+              </span>
             </Link>
           ))}
         </nav>
@@ -121,7 +130,16 @@ function SidebarContent() {
                 aria-current={pathname === item.href ? "page" : undefined}
               >
                 <item.icon className="h-5 w-5" />
-                {expanded && <span>{item.name}</span>}
+                <span
+                  className={cn(
+                    "inline-block transition-all duration-300",
+                    expanded
+                      ? "opacity-100 translate-x-0 ml-2"
+                      : "opacity-0 -translate-x-2 w-0 overflow-hidden"
+                  )}
+                >
+                  {item.name}
+                </span>
               </Link>
             ))}
             <div className="relative">
@@ -134,7 +152,16 @@ function SidebarContent() {
                 aria-expanded={showLangs}
               >
                 <Globe className="h-5 w-5" />
-                {expanded && <span>{t('sidebar.language')}</span>}
+                <span
+                  className={cn(
+                    "inline-block transition-all duration-300",
+                    expanded
+                      ? "opacity-100 translate-x-0 ml-2"
+                      : "opacity-0 -translate-x-2 w-0 overflow-hidden"
+                  )}
+                >
+                  {t('sidebar.language')}
+                </span>
                 <ChevronDown className={cn("w-4 h-4 ml-auto transition-transform", showLangs && "rotate-180", !expanded && "hidden")}/>
               </button>
               {showLangs && (
