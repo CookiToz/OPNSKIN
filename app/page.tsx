@@ -45,7 +45,7 @@ export default function Home() {
   ];
   const [bgIndex, setBgIndex] = useState(0); // Index du skin affiché
   const timeoutRef = useRef<NodeJS.Timeout|null>(null);
-  const [steamStatus, setSteamStatus] = useState<null | { loggedIn: boolean }>(null);
+  const [steamStatus, setSteamStatus] = useState<null | { loggedIn: boolean }>(undefined);
 
   // Fonction pour sélectionner le prochain skin en évitant les AK consécutifs
   const getNextSkinIndex = (currentIndex: number): number => {
@@ -81,19 +81,19 @@ export default function Home() {
   return (
     <div className="relative min-h-screen">
       {/* HERO SECTION avec fond animé */}
-      <section className="relative flex flex-col justify-center items-center h-[60vh] min-h-[400px] w-full overflow-hidden bg-transparent pt-6 md:pt-0">
+      <section className="relative flex flex-col justify-center items-center h-[60vh] min-h-[400px] w-full overflow-hidden bg-transparent">
         {/* Fond animé, seulement dans la hero section */}
-        <div className="absolute inset-0 w-full h-full pointer-events-none select-none overflow-hidden z-0 flex justify-center items-end md:items-center">
+        <div className="absolute inset-0 w-full h-full pointer-events-none select-none overflow-hidden z-0">
           <div
             className="skin-bg-container"
             style={{
-              width: 'min(90vw, 320px)',
-              height: 'min(40vw, 160px)',
+              width: 420,
+              height: 240,
               aspectRatio: 1.75,
-              position: 'relative',
-              left: 'unset',
-              top: 'unset',
-              transform: 'none',
+              position: 'absolute',
+              left: '78%',
+              top: '58%',
+              transform: 'translate(-50%, -50%) scale(1.5)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -113,7 +113,7 @@ export default function Home() {
                 aspectRatio: 1.75,
                 objectFit: 'contain',
                 background: 'transparent',
-                position: 'relative',
+                position: 'absolute',
                 left: 0,
                 top: 0,
               }}
@@ -122,17 +122,17 @@ export default function Home() {
           </div>
         </div>
         {/* Contenu Hero */}
-        <div className="relative z-10 flex flex-col items-center lg:items-start justify-center h-full w-full px-2 md:px-4">
-            <Badge className="mb-3 md:mb-4 px-3 md:px-4 py-1 w-fit bg-opnskin-primary/10 text-opnskin-primary border-opnskin-primary/30 text-xs md:text-base">
+        <div className="relative z-10 flex flex-col items-center lg:items-start justify-center h-full w-full px-4 md:px-4">
+            <Badge className="mb-4 px-4 py-1 w-fit bg-opnskin-primary/10 text-opnskin-primary border-opnskin-primary/30 text-xs md:text-base">
             {t('home.hero_badge')}
             </Badge>
-          <h1 className="text-xl sm:text-2xl md:text-4xl lg:text-6xl font-bold mb-3 md:mb-6 font-satoshi-bold text-center lg:text-left w-full lg:w-auto leading-tight md:leading-tight">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-6xl font-bold mb-4 md:mb-6 font-satoshi-bold text-center lg:text-left w-full lg:w-auto leading-tight md:leading-tight">
             {t('home.hero_title_1')} <span className="neon-text">{t('home.hero_title_skins')}</span> {t('home.hero_title_2')} <span className="neon-text">{t('home.hero_title_opportunities')}</span>
           </h1>
-          <p className="text-sm sm:text-base md:text-lg text-opnskin-text-secondary mb-5 md:mb-8 max-w-xs sm:max-w-xl md:max-w-2xl text-center lg:text-left w-full lg:w-auto">
+          <p className="text-base sm:text-lg text-opnskin-text-secondary mb-6 md:mb-8 max-w-xl md:max-w-2xl text-center lg:text-left w-full lg:w-auto">
             {t('home.hero_subtitle')}
           </p>
-          <div className="flex flex-col sm:flex-row gap-2 md:gap-4 w-full lg:w-auto justify-center lg:justify-start">
+          <div className="flex flex-col sm:flex-row gap-3 md:gap-4 w-full lg:w-auto justify-center lg:justify-start">
             <Link href="/marketplace">
               <Button size="lg" className="btn-opnskin flex items-center w-full sm:w-auto text-base md:text-lg py-3 md:py-4">
                 {t('home.hero_cta')}
@@ -145,9 +145,10 @@ export default function Home() {
         <style jsx global>{`
           @keyframes levitate {
             0% { transform: translateY(0px); }
-            50% { transform: translateY(-18px); }
+            50% { transform: translateY(-28px); }
             100% { transform: translateY(0px); }
           }
+          
           .animated-bg-skin {
             object-fit: contain;
             object-position: center;
@@ -158,13 +159,13 @@ export default function Home() {
         `}</style>
       </section>
 
-      <section className="py-6 md:py-16">
+      <section className="py-10 md:py-16">
         <div className="container px-2 md:px-4">
-          <h2 className="text-xl md:text-3xl font-bold mb-6 md:mb-12 text-center font-satoshi-bold">
+          <h2 className="text-2xl md:text-3xl font-bold mb-8 md:mb-12 text-center font-satoshi-bold">
             {t('home.why_title_1')} <span className="neon-text">OPNSKIN</span> {t('home.why_title_2')}
           </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
             <Card className="bg-opnskin-bg-card border-opnskin-bg-secondary card-hover">
               <CardContent className="p-6">
                 <div className="h-12 w-12 rounded-lg bg-opnskin-primary/20 flex items-center justify-center mb-4">
