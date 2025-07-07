@@ -76,11 +76,55 @@ export default function MobileLayout({ children }: { children: React.ReactNode }
           <div className="ml-2">
             <SteamAuthStatus />
           </div>
-          <DrawerTrigger asChild>
-            <button aria-label="Ouvrir le menu" className="p-2 rounded text-opnskin-primary focus:outline-none focus:ring-2 focus:ring-opnskin-primary ml-2">
-              <Menu className="h-7 w-7" />
-            </button>
-          </DrawerTrigger>
+          {/* Drawer menu latéral */}
+          <Drawer open={open} onOpenChange={setOpen}>
+            <DrawerTrigger asChild>
+              <button aria-label="Ouvrir le menu" className="p-2 rounded text-opnskin-primary focus:outline-none focus:ring-2 focus:ring-opnskin-primary ml-2">
+                <Menu className="h-7 w-7" />
+              </button>
+            </DrawerTrigger>
+            <DrawerContent className="!rounded-t-none !h-full !max-h-none !top-0 !bottom-0 !left-0 !right-0 !fixed !w-4/5">
+              <div className="flex items-center justify-between px-4 py-4 border-b border-opnskin-bg-secondary">
+                <Link href="/" className="flex items-center gap-2" onClick={() => setOpen(false)}>
+                  <OPNSKINLogo className="h-8 w-8 text-opnskin-primary" />
+                  <span className="font-satoshi-bold text-lg text-opnskin-text-primary">OPN<span className="text-opnskin-primary">SKIN</span></span>
+                </Link>
+                <button aria-label="Fermer le menu" className="p-2 rounded text-opnskin-primary" onClick={() => setOpen(false)}>
+                  <X className="h-7 w-7" />
+                </button>
+              </div>
+              <nav className="flex flex-col gap-2 px-4 py-6">
+                {navItems.map(item => (
+                  <Link key={item.href} href={item.href} onClick={() => setOpen(false)}
+                    className={`py-3 px-3 rounded text-base font-medium ${pathname === item.href ? 'bg-opnskin-primary/10 text-opnskin-primary' : 'text-opnskin-text-primary hover:bg-opnskin-bg-secondary/60'}`}
+                  >
+                    {item.name}
+                  </Link>
+                ))}
+                <div className="border-t border-opnskin-bg-secondary my-3" />
+                {accountItems.map(item => (
+                  <Link key={item.href} href={item.href} onClick={() => setOpen(false)}
+                    className={`py-3 px-3 rounded text-base font-medium ${pathname === item.href ? 'bg-opnskin-primary/10 text-opnskin-primary' : 'text-opnskin-text-primary hover:bg-opnskin-bg-secondary/60'}`}
+                  >
+                    {item.name}
+                  </Link>
+                ))}
+                <div className="border-t border-opnskin-bg-secondary my-3" />
+                <div className="flex flex-wrap gap-2">
+                  {languages.map(lang => (
+                    <button
+                      key={lang.code}
+                      onClick={() => { i18n.changeLanguage(lang.code); setOpen(false); }}
+                      className={`flex items-center gap-1 px-2 py-1 rounded text-sm ${currentLang === lang.code ? 'bg-opnskin-primary/20 text-opnskin-primary' : 'text-opnskin-text-primary hover:bg-opnskin-bg-secondary/60'}`}
+                    >
+                      <span>{lang.flag}</span>
+                      <span>{lang.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </nav>
+            </DrawerContent>
+          </Drawer>
         </div>
       </div>
       {/* Main content */}
