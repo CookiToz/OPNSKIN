@@ -45,7 +45,7 @@ export default function Home() {
   ];
   const [bgIndex, setBgIndex] = useState(0); // Index du skin affiché
   const timeoutRef = useRef<NodeJS.Timeout|null>(null);
-  const [steamStatus, setSteamStatus] = useState<null | { loggedIn: boolean }>(undefined);
+  const [steamStatus, setSteamStatus] = useState<null | { loggedIn: boolean }>(null);
 
   // Fonction pour sélectionner le prochain skin en évitant les AK consécutifs
   const getNextSkinIndex = (currentIndex: number): number => {
@@ -82,8 +82,8 @@ export default function Home() {
     <div className="relative min-h-screen">
       {/* HERO SECTION avec fond animé */}
       <section className="relative flex flex-col justify-center items-center h-[60vh] min-h-[400px] w-full overflow-hidden bg-transparent">
-        {/* Fond animé, seulement dans la hero section */}
-        <div className="absolute inset-0 w-full h-full pointer-events-none select-none overflow-hidden z-0">
+        {/* Fond animé, seulement sur desktop */}
+        <div className="absolute inset-0 w-full h-full pointer-events-none select-none overflow-hidden z-0 hidden md:block">
           <div
             className="skin-bg-container"
             style={{
@@ -139,6 +139,24 @@ export default function Home() {
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>
+          </div>
+          {/* Animation mobile : SOUS le texte, visible uniquement sur mobile */}
+          <div className="block md:hidden w-full flex justify-center mt-6">
+            <div className="skin-bg-container-mobile max-w-xs w-full flex items-center justify-center">
+              <img
+                src={skinImages[bgIndex]}
+                alt="Skin background current"
+                className="animated-bg-skin"
+                style={{
+                  width: '100%',
+                  height: 'auto',
+                  aspectRatio: 1.75,
+                  objectFit: 'contain',
+                  background: 'transparent',
+                }}
+                draggable="false"
+              />
+            </div>
           </div>
         </div>
         {/* Animations CSS globales */}
