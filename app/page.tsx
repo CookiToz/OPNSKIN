@@ -123,7 +123,7 @@ export default function Home() {
         </div>
         {/* Contenu Hero */}
         <div className="relative z-10 flex flex-col items-center lg:items-start justify-center h-full w-full px-4 md:px-4">
-            <Badge className="mb-4 px-4 py-1 w-fit bg-opnskin-primary/10 text-opnskin-primary border-opnskin-primary/30 text-xs md:text-base">
+            <Badge className="mb-4 px-4 py-1 w-fit bg-opnskin-primary/10 text-opnskin-primary border-opnskin-primary/30 text-xs md:text-base mt-6 md:mt-0">
             {t('home.hero_badge')}
             </Badge>
           <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-6xl font-bold mb-4 md:mb-6 font-satoshi-bold text-center lg:text-left w-full lg:w-auto leading-tight md:leading-tight">
