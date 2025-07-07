@@ -7,6 +7,7 @@ import { OPNSKINLogo } from '@/components/kalpix-logo';
 import { Menu, X } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useTranslation } from 'next-i18next';
+import SteamAuthStatus from '@/components/SteamAuthStatus';
 
 export default function MobileLayout({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
@@ -42,54 +43,42 @@ export default function MobileLayout({ children }: { children: React.ReactNode }
           <OPNSKINLogo className="h-8 w-8 text-opnskin-primary" />
           <span className="font-satoshi-bold text-lg text-opnskin-text-primary">OPN<span className="text-opnskin-primary">SKIN</span></span>
         </Link>
-        <Drawer open={open} onOpenChange={setOpen}>
-          <DrawerTrigger asChild>
-            <button aria-label="Ouvrir le menu" className="p-2 rounded text-opnskin-primary focus:outline-none focus:ring-2 focus:ring-opnskin-primary">
-              <Menu className="h-7 w-7" />
+        <div className="flex items-center gap-2">
+          {/* Sélecteur de langue rapide (icône globe ou flag) */}
+          <div className="relative">
+            <button
+              aria-label="Changer de langue"
+              className="p-2 rounded text-opnskin-primary focus:outline-none focus:ring-2 focus:ring-opnskin-primary"
+              onClick={() => setOpen(l => !l)}
+            >
+              <span className="text-xl">{languages.find(l => l.code === currentLang)?.flag || '🌐'}</span>
             </button>
-          </DrawerTrigger>
-          <DrawerContent className="!rounded-t-none !h-full !max-h-none !top-0 !bottom-0 !left-0 !right-0 !fixed !w-4/5">
-            <div className="flex items-center justify-between px-4 py-4 border-b border-opnskin-bg-secondary">
-              <Link href="/" className="flex items-center gap-2" onClick={() => setOpen(false)}>
-                <OPNSKINLogo className="h-8 w-8 text-opnskin-primary" />
-                <span className="font-satoshi-bold text-lg text-opnskin-text-primary">OPN<span className="text-opnskin-primary">SKIN</span></span>
-              </Link>
-              <button aria-label="Fermer le menu" className="p-2 rounded text-opnskin-primary" onClick={() => setOpen(false)}>
-                <X className="h-7 w-7" />
-              </button>
-            </div>
-            <nav className="flex flex-col gap-2 px-4 py-6">
-              {navItems.map(item => (
-                <Link key={item.href} href={item.href} onClick={() => setOpen(false)}
-                  className={`py-3 px-3 rounded text-base font-medium ${pathname === item.href ? 'bg-opnskin-primary/10 text-opnskin-primary' : 'text-opnskin-text-primary hover:bg-opnskin-bg-secondary/60'}`}
-                >
-                  {item.name}
-                </Link>
-              ))}
-              <div className="border-t border-opnskin-bg-secondary my-3" />
-              {accountItems.map(item => (
-                <Link key={item.href} href={item.href} onClick={() => setOpen(false)}
-                  className={`py-3 px-3 rounded text-base font-medium ${pathname === item.href ? 'bg-opnskin-primary/10 text-opnskin-primary' : 'text-opnskin-text-primary hover:bg-opnskin-bg-secondary/60'}`}
-                >
-                  {item.name}
-                </Link>
-              ))}
-              <div className="border-t border-opnskin-bg-secondary my-3" />
-              <div className="flex flex-wrap gap-2">
+            {/* Menu langues rapide (affiché si drawer fermé) */}
+            {!open && (
+              <div className="absolute right-0 mt-2 bg-opnskin-bg-card border border-opnskin-bg-secondary rounded shadow-lg z-50 flex flex-col min-w-[120px]">
                 {languages.map(lang => (
                   <button
                     key={lang.code}
                     onClick={() => { i18n.changeLanguage(lang.code); setOpen(false); }}
-                    className={`flex items-center gap-1 px-2 py-1 rounded text-sm ${currentLang === lang.code ? 'bg-opnskin-primary/20 text-opnskin-primary' : 'text-opnskin-text-primary hover:bg-opnskin-bg-secondary/60'}`}
+                    className={`flex items-center gap-2 px-3 py-2 text-sm ${currentLang === lang.code ? 'bg-opnskin-primary/20 text-opnskin-primary' : 'text-opnskin-text-primary hover:bg-opnskin-bg-secondary/60'}`}
                   >
                     <span>{lang.flag}</span>
                     <span>{lang.label}</span>
                   </button>
                 ))}
               </div>
-            </nav>
-          </DrawerContent>
-        </Drawer>
+            )}
+          </div>
+          {/* Auth Steam */}
+          <div className="ml-2">
+            <SteamAuthStatus />
+          </div>
+          <DrawerTrigger asChild>
+            <button aria-label="Ouvrir le menu" className="p-2 rounded text-opnskin-primary focus:outline-none focus:ring-2 focus:ring-opnskin-primary ml-2">
+              <Menu className="h-7 w-7" />
+            </button>
+          </DrawerTrigger>
+        </div>
       </div>
       {/* Main content */}
       <main className="flex-1 flex flex-col overflow-y-auto px-2 py-2 bg-opnskin-bg-primary">
