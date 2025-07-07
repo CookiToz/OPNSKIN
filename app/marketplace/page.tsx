@@ -160,7 +160,6 @@ export default function MarketplacePage() {
   const [selectedGame, setSelectedGame] = useState<string | null>(null);
   const [items] = useState(mockItems);
   const [filteredItems, setFilteredItems] = useState(mockItems);
-  const [search, setSearch] = useState('');
   const [sort, setSort] = useState('price_desc');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [rarity, setRarity] = useState('all');
@@ -171,6 +170,7 @@ export default function MarketplacePage() {
   const { items: cartItems, add } = useCartStore();
   const { toast } = useToast();
   const currency = useCurrencyStore((state) => state.currency);
+  const searchQuery = useSearchStore((state) => state.searchQuery);
 
   useEffect(() => {
     let result = [...items];
@@ -181,7 +181,7 @@ export default function MarketplacePage() {
     if (stattrak) result = result.filter(i => i.stattrak);
     result = result.filter(i => i.price >= priceRange[0] && i.price <= priceRange[1]);
     result = result.filter(i => i.float >= floatRange[0] && i.float <= floatRange[1]);
-    if (search.trim()) result = result.filter(i => i.name.toLowerCase().includes(search.toLowerCase()));
+    if (searchQuery.trim()) result = result.filter(i => i.name.toLowerCase().includes(searchQuery.toLowerCase()));
     switch (sort) {
       case 'price_asc': result.sort((a, b) => a.price - b.price); break;
       case 'price_desc': result.sort((a, b) => b.price - a.price); break;
@@ -189,7 +189,7 @@ export default function MarketplacePage() {
       case 'float_desc': result.sort((a, b) => b.float - a.float); break;
     }
     setFilteredItems(result);
-  }, [items, selectedGame, selectedCategory, rarity, exterior, stattrak, priceRange, floatRange, search, sort]);
+  }, [items, selectedGame, selectedCategory, rarity, exterior, stattrak, priceRange, floatRange, searchQuery, sort]);
 
   if (!selectedGame) {
     return <MarketplaceGameSelect onSelect={setSelectedGame} />;
