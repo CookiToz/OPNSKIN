@@ -45,7 +45,7 @@ export default function Home() {
   ];
   const [bgIndex, setBgIndex] = useState(0); // Index du skin affiché
   const timeoutRef = useRef<NodeJS.Timeout|null>(null);
-  const [steamStatus, setSteamStatus] = useState<null | { loggedIn: boolean }>(undefined);
+  const [steamStatus, setSteamStatus] = useState<null | { loggedIn: boolean }>(null);
 
   // Fonction pour sélectionner le prochain skin en évitant les AK consécutifs
   const getNextSkinIndex = (currentIndex: number): number => {
@@ -81,19 +81,19 @@ export default function Home() {
   return (
     <div className="relative min-h-screen">
       {/* HERO SECTION avec fond animé */}
-      <section className="relative flex flex-col justify-center items-center h-[60vh] min-h-[400px] w-full overflow-hidden bg-transparent">
+      <section className="relative flex flex-col justify-center items-center h-[60vh] min-h-[400px] w-full overflow-hidden bg-transparent pt-6 md:pt-0">
         {/* Fond animé, seulement dans la hero section */}
-        <div className="absolute inset-0 w-full h-full pointer-events-none select-none overflow-hidden z-0">
+        <div className="absolute inset-0 w-full h-full pointer-events-none select-none overflow-hidden z-0 flex justify-center items-end md:items-center">
           <div
             className="skin-bg-container"
             style={{
-              width: 420,
-              height: 240,
+              width: 'min(90vw, 320px)',
+              height: 'min(40vw, 160px)',
               aspectRatio: 1.75,
-              position: 'absolute',
-              left: '78%',
-              top: '58%',
-              transform: 'translate(-50%, -50%) scale(1.5)',
+              position: 'relative',
+              left: 'unset',
+              top: 'unset',
+              transform: 'none',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -113,7 +113,7 @@ export default function Home() {
                 aspectRatio: 1.75,
                 objectFit: 'contain',
                 background: 'transparent',
-                position: 'absolute',
+                position: 'relative',
                 left: 0,
                 top: 0,
               }}
@@ -122,19 +122,19 @@ export default function Home() {
           </div>
         </div>
         {/* Contenu Hero */}
-        <div className="relative z-10 flex flex-col items-center lg:items-start justify-center h-full w-full px-4">
-            <Badge className="mb-4 px-4 py-1 w-fit bg-opnskin-primary/10 text-opnskin-primary border-opnskin-primary/30">
+        <div className="relative z-10 flex flex-col items-center lg:items-start justify-center h-full w-full px-2 md:px-4">
+            <Badge className="mb-3 md:mb-4 px-3 md:px-4 py-1 w-fit bg-opnskin-primary/10 text-opnskin-primary border-opnskin-primary/30 text-xs md:text-base">
             {t('home.hero_badge')}
             </Badge>
-          <h1 className="text-4xl md:text-6xl font-bold mb-6 font-satoshi-bold text-center lg:text-left w-full lg:w-auto">
+          <h1 className="text-xl sm:text-2xl md:text-4xl lg:text-6xl font-bold mb-3 md:mb-6 font-satoshi-bold text-center lg:text-left w-full lg:w-auto leading-tight md:leading-tight">
             {t('home.hero_title_1')} <span className="neon-text">{t('home.hero_title_skins')}</span> {t('home.hero_title_2')} <span className="neon-text">{t('home.hero_title_opportunities')}</span>
           </h1>
-          <p className="text-lg text-opnskin-text-secondary mb-8 max-w-2xl text-center lg:text-left w-full lg:w-auto">
+          <p className="text-sm sm:text-base md:text-lg text-opnskin-text-secondary mb-5 md:mb-8 max-w-xs sm:max-w-xl md:max-w-2xl text-center lg:text-left w-full lg:w-auto">
             {t('home.hero_subtitle')}
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-auto justify-center lg:justify-start">
+          <div className="flex flex-col sm:flex-row gap-2 md:gap-4 w-full lg:w-auto justify-center lg:justify-start">
             <Link href="/marketplace">
-              <Button size="lg" className="btn-opnskin flex items-center">
+              <Button size="lg" className="btn-opnskin flex items-center w-full sm:w-auto text-base md:text-lg py-3 md:py-4">
                 {t('home.hero_cta')}
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
@@ -145,10 +145,9 @@ export default function Home() {
         <style jsx global>{`
           @keyframes levitate {
             0% { transform: translateY(0px); }
-            50% { transform: translateY(-28px); }
+            50% { transform: translateY(-18px); }
             100% { transform: translateY(0px); }
           }
-          
           .animated-bg-skin {
             object-fit: contain;
             object-position: center;
@@ -159,13 +158,13 @@ export default function Home() {
         `}</style>
       </section>
 
-      <section className="py-16">
-        <div className="container px-4">
-          <h2 className="text-3xl font-bold mb-12 text-center font-satoshi-bold">
+      <section className="py-6 md:py-16">
+        <div className="container px-2 md:px-4">
+          <h2 className="text-xl md:text-3xl font-bold mb-6 md:mb-12 text-center font-satoshi-bold">
             {t('home.why_title_1')} <span className="neon-text">OPNSKIN</span> {t('home.why_title_2')}
           </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
             <Card className="bg-opnskin-bg-card border-opnskin-bg-secondary card-hover">
               <CardContent className="p-6">
                 <div className="h-12 w-12 rounded-lg bg-opnskin-primary/20 flex items-center justify-center mb-4">
@@ -217,16 +216,16 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="py-16">
-        <div className="container px-4">
+      <section className="py-10 md:py-16">
+        <div className="container px-2 md:px-4">
           {/* Titre Skins populaires */}
-          <div className="flex flex-col md:flex-row justify-between items-center mb-8">
-            <h2 className="text-3xl font-bold font-satoshi-bold mb-4 md:mb-0">
+          <div className="flex flex-col md:flex-row justify-between items-center mb-6 md:mb-8">
+            <h2 className="text-2xl md:text-3xl font-bold font-satoshi-bold mb-4 md:mb-0">
               {t('home.popular_title_1')} <span className="neon-text">{t('home.popular_title_2')}</span>
             </h2>
           </div>
             <Tabs defaultValue="cs2" className="w-full md:w-auto">
-              <TabsList className="bg-opnskin-bg-secondary border border-opnskin-bg-secondary">
+              <TabsList className="bg-opnskin-bg-secondary border border-opnskin-bg-secondary flex flex-wrap md:flex-nowrap">
                 <TabsTrigger
                   value="cs2"
                   className="data-[state=active]:bg-opnskin-primary/20 data-[state=active]:text-opnskin-primary"
@@ -253,8 +252,8 @@ export default function Home() {
                 </TabsTrigger>
               </TabsList>
 
-              <TabsContent value="cs2" className="mt-6">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full max-w-6xl mx-auto px-4">
+              <TabsContent value="cs2" className="mt-4 md:mt-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 w-full max-w-6xl mx-auto px-0 md:px-4">
                   {[
                     {
                       name: t('home.skin_fire_serpent'),
@@ -491,16 +490,16 @@ export default function Home() {
 
       <FeeProgressionChart />
 
-      <section className="py-16 bg-gradient-to-b from-black/50 to-black">
-        <div className="container px-4">
+      <section className="py-10 md:py-16 bg-gradient-to-b from-black/50 to-black">
+        <div className="container px-2 md:px-4">
           <div className="max-w-3xl mx-auto text-center">
-            <Badge variant="neon" className="mb-4 px-4 py-1">
+            <Badge variant="neon" className="mb-4 px-4 py-1 text-xs md:text-base">
               {t('home.community_badge')}
             </Badge>
-            <h2 className="text-3xl md:text-4xl font-bold mb-6 font-rajdhani">
+            <h2 className="text-2xl md:text-4xl font-bold mb-4 md:mb-6 font-rajdhani">
               {t('home.community_professional_title')}
             </h2>
-            <p className="text-lg text-white/70 mb-8">
+            <p className="text-base md:text-lg text-white/70 mb-6 md:mb-8">
               {t('home.community_subtitle')}
             </p>
             {steamStatus === undefined ? null : steamStatus?.loggedIn ? (
