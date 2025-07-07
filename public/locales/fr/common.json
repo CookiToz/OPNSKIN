@@ -10,7 +10,8 @@
     "language": "Langue",
     "level": "Niveau",
     "xp": "XP",
-    "coming_soon": "Bientôt disponible"
+    "coming_soon": "Bientôt disponible",
+    "assistance": "Assistance"
   },
   "header": {
     "search_placeholder": "Rechercher un skin, une arme...",
@@ -76,7 +77,16 @@
     "footer_privacy": "Politique de confidentialité",
     "footer_mentions": "Mentions légales",
     "footer_cookies": "Cookies",
-    "footer_copyright": "© 2025 OPNSKIN. Tous droits réservés."
+    "footer_copyright": "© 2025 OPNSKIN. Tous droits réservés.",
+    "skin_fire_serpent": "AK-47 | Fire Serpent (Neuf d'usine)",
+    "skin_neon_rider": "AK-47 | Neon Rider (Peu usée)",
+    "skin_howl": "M4A4 | Howl (Testée sur le terrain)",
+    "skin_asiimov": "AWP | Asiimov (Très abîmée)",
+    "weapon_ak47": "AK-47",
+    "weapon_m4a4": "M4A4",
+    "weapon_awp": "AWP",
+    "badge_rare": "Rare",
+    "go_to_marketplace": "Voir sur la marketplace"
   },
   "marketplace": {
     "choose_universe": "Choisis ton univers",

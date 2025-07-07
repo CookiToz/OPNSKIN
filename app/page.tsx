@@ -262,47 +262,51 @@ export default function Home() {
               </TabsList>
 
               <TabsContent value="cs2" className="mt-6">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {[
-                  {
-                    name: "AK-47 | Fire Serpent (Factory New)",
-                    price: 1899.99,
-                    image: "/ak47-fire-serpent.png",
-                    weapon: "AK-47",
-                    badge: "Rare",
-                  },
-                  {
-                    name: "AK-47 | Neon Rider (Minimal Wear)",
-                    price: 129.99,
-                    image: "/ak47-neon-rider.png",
-                    weapon: "AK-47",
-                    badge: "Rare",
-                  },
-                  {
-                    name: "M4A4 | Howl (Field-Tested)",
-                    price: 1299.99,
-                    image: "/m4a4-howl.png",
-                    weapon: "M4A4",
-                    badge: "Mythique",
-                  },
-                  {
-                    name: "AWP | Asiimov (Battle-Scarred)",
-                    price: 89.99,
-                    image: "/awp-asiimov.png",
-                    weapon: "AWP",
-                    badge: "Rare",
-                  },
-                ].map((skin, i) => (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full max-w-6xl mx-auto px-4">
+                  {[
+                    {
+                      name: t('home.skin_fire_serpent'),
+                      price: 1899.99,
+                      image: "/ak47-fire-serpent.png",
+                      weapon: t('home.weapon_ak47'),
+                      badge: t('home.badge_rare'),
+                      game: 'cs2',
+                    },
+                    {
+                      name: t('home.skin_neon_rider'),
+                      price: 129.99,
+                      image: "/ak47-neon-rider.png",
+                      weapon: t('home.weapon_ak47'),
+                      badge: t('home.badge_rare'),
+                      game: 'cs2',
+                    },
+                    {
+                      name: t('home.skin_howl'),
+                      price: 1299.99,
+                      image: "/m4a4-howl.png",
+                      weapon: t('home.weapon_m4a4'),
+                      badge: t('home.badge_mythic'),
+                      game: 'cs2',
+                    },
+                    {
+                      name: t('home.skin_asiimov'),
+                      price: 89.99,
+                      image: "/awp-asiimov.png",
+                      weapon: t('home.weapon_awp'),
+                      badge: t('home.badge_rare'),
+                      game: 'cs2',
+                    },
+                  ].map((skin, i) => (
                     <Card key={i} className="bg-opnskin-bg-card border-opnskin-bg-secondary card-hover overflow-hidden group">
                       <div className="aspect-square relative overflow-hidden">
                         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-opnskin-bg-card/80 z-10"></div>
                         <img
-                        src={skin.image}
-                        alt={skin.name}
+                          src={skin.image}
+                          alt={skin.name}
                           className="w-full h-full object-contain p-2 transition-transform duration-500 group-hover:scale-105"
                         />
                         <Badge className="absolute top-2 right-2 z-20 bg-opnskin-accent/10 text-opnskin-accent border-opnskin-accent/30 text-xs">
-                        {t('home.badge_mythic')}
+                          {skin.badge}
                         </Badge>
                         <div className="absolute bottom-0 left-0 right-0 p-2 z-20">
                           <h3 className="font-satoshi-bold text-sm truncate text-opnskin-text-primary mb-1">{skin.name}</h3>
@@ -327,11 +331,11 @@ export default function Home() {
                           </span>
                         </div>
                         <div className="flex justify-between items-center gap-2">
-                          <Button size="sm" className="btn-opnskin-secondary flex-1 text-xs">
-                          {t('home.buy')}
+                          <Button size="sm" className="btn-opnskin-secondary flex-1 text-xs" asChild>
+                            <Link href={`/marketplace?game=${skin.game}`}>{t('home.go_to_marketplace')}</Link>
                           </Button>
                           <Button size="sm" variant="outline" className="border-opnskin-primary/30 text-opnskin-primary hover:bg-opnskin-primary/10 text-xs">
-                          {t('home.details')}
+                            {t('home.details')}
                           </Button>
                         </div>
                       </CardContent>

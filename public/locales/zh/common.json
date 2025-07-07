@@ -10,7 +10,8 @@
     "language": "语言",
     "level": "等级",
     "xp": "经验",
-    "coming_soon": "即将推出"
+    "coming_soon": "即将推出",
+    "assistance": "客服"
   },
   "header": {
     "search_placeholder": "搜索皮肤、武器...",
@@ -77,7 +78,16 @@
     "footer_privacy": "隐私政策",
     "footer_mentions": "法律声明",
     "footer_cookies": "Cookies",
-    "footer_copyright": "© 2025 OPNSKIN. 保留所有权利。"
+    "footer_copyright": "© 2025 OPNSKIN. 保留所有权利。",
+    "skin_fire_serpent": "AK-47 | 火蛇（出厂全新）",
+    "skin_neon_rider": "AK-47 | 霓虹骑士（略有磨损）",
+    "skin_howl": "M4A4 | 嚎叫（久经沙场）",
+    "skin_asiimov": "AWP | 艾西莫夫（战痕累累）",
+    "weapon_ak47": "AK-47",
+    "weapon_m4a4": "M4A4",
+    "weapon_awp": "AWP",
+    "badge_rare": "稀有",
+    "go_to_marketplace": "前往市场"
   },
   "marketplace": {
     "choose_universe": "选择你的世界",

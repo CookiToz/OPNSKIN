@@ -10,7 +10,8 @@
     "language": "Язык",
     "level": "Уровень",
     "xp": "ОП",
-    "coming_soon": "Скоро"
+    "coming_soon": "Скоро",
+    "assistance": "Поддержка"
   },
   "header": {
     "search_placeholder": "Поиск скина, оружия...",
@@ -77,7 +78,16 @@
     "footer_privacy": "Политика конфиденциальности",
     "footer_mentions": "Правовая информация",
     "footer_cookies": "Cookies",
-    "footer_copyright": "© 2025 OPNSKIN. Все права защищены."
+    "footer_copyright": "© 2025 OPNSKIN. Все права защищены.",
+    "skin_fire_serpent": "AK-47 | Fire Serpent (Прямо с завода)",
+    "skin_neon_rider": "AK-47 | Neon Rider (Немного поношенное)",
+    "skin_howl": "M4A4 | Howl (После полевых испытаний)",
+    "skin_asiimov": "AWP | Asiimov (Закалённое в боях)",
+    "weapon_ak47": "AK-47",
+    "weapon_m4a4": "M4A4",
+    "weapon_awp": "AWP",
+    "badge_rare": "Редкий",
+    "go_to_marketplace": "Смотреть на маркетплейсе"
   },
   "marketplace": {
     "choose_universe": "Выберите свой мир",
