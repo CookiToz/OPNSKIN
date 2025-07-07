@@ -1,0 +1,173 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 220 25% 7%; /* #0B111D */
+    --foreground: 0 0% 100%;
+
+    --card: 220 25% 7%; /* #0B111D */
+    --card-foreground: 0 0% 100%;
+
+    --popover: 220 25% 7%; /* #0B111D */
+    --popover-foreground: 0 0% 100%;
+
+    --primary: 217 100% 60%; /* #287CFA */
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 220 15% 13%; /* #1C1F26 */
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 220 15% 13%; /* #1C1F26 */
+    --muted-foreground: 220 10% 85%; /* #C6CDD7 */
+
+    --accent: 220 15% 13%; /* #1C1F26 */
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 160 100% 46%; /* #0CE49B */
+    --success-foreground: 0 0% 100%;
+
+    --border: 217 100% 60%; /* #287CFA */
+    --input: 220 15% 13%; /* #1C1F26 */
+    --ring: 217 100% 60%; /* #287CFA */
+
+    --radius: 0.5rem;
+
+    /* OPNSKIN specific colors */
+    --opnskin-primary: 217 100% 60%; /* #287CFA */
+    --opnskin-primary-hover: 217 100% 70%; /* #4A9FFF */
+    --opnskin-bg-primary: 220 25% 7%; /* #0B111D */
+    --opnskin-bg-secondary: 220 15% 13%; /* #1C1F26 */
+    --opnskin-bg-card: 220 20% 12%; /* #13181F */
+    --opnskin-text-primary: 0 0% 100%; /* #FFFFFF */
+    --opnskin-text-secondary: 220 10% 85%; /* #C6CDD7 */
+    --opnskin-accent: 160 100% 46%; /* #0CE49B */
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    background-image: radial-gradient(circle at 15% 50%, rgba(40, 124, 250, 0.05) 0%, transparent 25%),
+      radial-gradient(circle at 85% 30%, rgba(12, 228, 155, 0.03) 0%, transparent 25%);
+    letter-spacing: 0.5px;
+  }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-satoshi-bold;
+  }
+  p,
+  span,
+  div {
+    @apply font-satoshi-regular;
+  }
+  .font-mono {
+    @apply font-share-tech-mono;
+  }
+
+  /* Glassmorphism effects */
+  .glassmorphism {
+    @apply bg-opnskin-bg-primary/30 backdrop-blur-md border border-opnskin-primary/10 shadow-[0_4px_30px_rgba(0,0,0,0.1)];
+  }
+
+  /* Neon text effects */
+  .neon-text {
+    @apply text-opnskin-accent drop-shadow-[0_0_5px_rgba(12,228,155,0.5)];
+  }
+
+  /* Terminal style */
+  .terminal-bg {
+    @apply bg-opnskin-bg-primary/80 border border-opnskin-primary/30 relative overflow-hidden;
+  }
+  .terminal-bg::before {
+    content: "";
+    @apply absolute inset-0 bg-gradient-to-b from-transparent to-opnskin-primary/5 opacity-50 pointer-events-none;
+  }
+  .terminal-bg::after {
+    content: "";
+    @apply absolute inset-0 opacity-5 pointer-events-none;
+    background-image: url("/grid.svg");
+    background-size: 30px 30px;
+  }
+
+  /* Transition */
+  .transition-all {
+    transition-property: all;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 300ms;
+  }
+
+  /* Navigation styles */
+  .nav-item {
+    @apply flex items-center gap-3 px-3 py-2 rounded-md transition-all;
+  }
+
+  .nav-item-active {
+    @apply bg-opnskin-primary/20 text-opnskin-primary shadow-[0_0_10px_rgba(40,124,250,0.2)];
+  }
+
+  .nav-item-inactive {
+    @apply text-opnskin-text-secondary hover:text-opnskin-text-primary hover:bg-opnskin-bg-secondary/50;
+  }
+
+  /* Card styles */
+  .card-hover {
+    @apply hover:border-opnskin-primary/50 hover:scale-[1.02] transition-all duration-300;
+  }
+
+  /* Badge styles */
+  .badge-opnskin {
+    @apply bg-opnskin-accent/10 text-opnskin-accent border-opnskin-accent/30;
+  }
+
+  /* Button styles */
+  .btn-opnskin {
+    @apply bg-opnskin-primary text-opnskin-text-primary font-satoshi-bold rounded-md px-4 py-2 transition-all duration-300 hover:bg-opnskin-primary-hover hover:shadow-[0_0_20px_rgba(40,124,250,0.3)] hover:scale-105;
+  }
+
+  .btn-opnskin-secondary {
+    @apply bg-transparent text-opnskin-primary border border-opnskin-primary rounded-md px-4 py-2 transition-all duration-300 hover:bg-opnskin-primary/10 hover:border-opnskin-primary-hover;
+  }
+
+  /* Focus styles for accessibility */
+  .focus-visible:focus-visible {
+    @apply outline-none ring-2 ring-opnskin-primary ring-offset-2;
+  }
+
+  .neon-glow {
+    color: #287CFA;
+  }
+}
+
+/* Scrollbar OPNSKIN */
+::-webkit-scrollbar {
+  width: 10px;
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #287CFA;
+  border-radius: 8px;
+  border: 2px solid #18181b;
+}
+
+::-webkit-scrollbar-track {
+  background: #18181b;
+  border-radius: 8px;
+}
+
+html {
+  scrollbar-width: thin;
+  scrollbar-color: #287CFA #18181b;
+}
