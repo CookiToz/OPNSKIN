@@ -16,6 +16,7 @@ import { useCurrencyStore } from '@/hooks/use-currency-store';
 import { useCryptoRatesStore } from '@/hooks/use-currency-store';
 import { useCryptoRates } from '@/hooks/use-crypto-rates';
 import { formatPrice } from '@/lib/utils';
+import { useSearchStore } from '@/hooks/use-search-store';
 
 export type GameType = {
   key: string;
@@ -116,6 +117,8 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
   // Utiliser le hook pour mettre à jour les taux crypto toutes les 30 secondes
   useCryptoRates();
 
+  const searchQuery = useSearchStore((state) => state.searchQuery);
+
   const handleBack = () => {
     localStorage.removeItem('opnskin-inventory-game');
     if (onBack) onBack();
@@ -151,7 +154,10 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
     if (item.marketPrice !== undefined && item.marketPrice < 0.02) {
       return false;
     }
-    
+    // Filtre par recherche (nom)
+    if (searchQuery && !item.name.toLowerCase().includes(searchQuery.toLowerCase())) {
+      return false;
+    }
     // Filtre par rareté
     if (rarityFilter !== 'all') {
       const itemRarity = item.rarityCode ? rarityKeyMap[item.rarityCode] : null;
@@ -159,7 +165,6 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
         return false;
       }
     }
-    
     // Filtre par prix minimum
     if (priceMinFilter && item.marketPrice !== undefined) {
       const minPrice = parseFloat(priceMinFilter);
@@ -167,7 +172,6 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
         return false;
       }
     }
-    
     // Filtre par prix maximum
     if (priceMaxFilter && item.marketPrice !== undefined) {
       const maxPrice = parseFloat(priceMaxFilter);
@@ -175,7 +179,6 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
         return false;
       }
     }
-    
     // Filtre par catégorie d'arme
     if (weaponFilter !== 'all') {
       const itemWeapon = getWeaponCategory(item.name);
@@ -183,7 +186,6 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
         return false;
       }
     }
-    
     return true;
   });
   
