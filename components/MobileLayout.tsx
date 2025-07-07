@@ -8,9 +8,11 @@ import { Menu, X } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useTranslation } from 'next-i18next';
 import SteamAuthStatus from '@/components/SteamAuthStatus';
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 
 export default function MobileLayout({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
+  const [langMenuOpen, setLangMenuOpen] = useState(false);
   const pathname = usePathname();
   const { t, i18n } = useTranslation('common');
   const languages = [
@@ -45,30 +47,31 @@ export default function MobileLayout({ children }: { children: React.ReactNode }
         </Link>
         <div className="flex items-center gap-2">
           {/* Sélecteur de langue rapide (icône globe ou flag) */}
-          <div className="relative">
-            <button
-              aria-label="Changer de langue"
-              className="p-2 rounded text-opnskin-primary focus:outline-none focus:ring-2 focus:ring-opnskin-primary"
-              onClick={() => setOpen(l => !l)}
-            >
-              <span className="text-xl">{languages.find(l => l.code === currentLang)?.flag || '🌐'}</span>
-            </button>
-            {/* Menu langues rapide (affiché si drawer fermé) */}
-            {!open && (
-              <div className="absolute right-0 mt-2 bg-opnskin-bg-card border border-opnskin-bg-secondary rounded shadow-lg z-50 flex flex-col min-w-[120px]">
+          <Popover open={langMenuOpen} onOpenChange={setLangMenuOpen}>
+            <PopoverTrigger asChild>
+              <button
+                aria-label="Changer de langue"
+                className="p-2 rounded text-opnskin-primary focus:outline-none focus:ring-2 focus:ring-opnskin-primary"
+                type="button"
+              >
+                <span className="text-xl">{languages.find(l => l.code === currentLang)?.flag || '🌐'}</span>
+              </button>
+            </PopoverTrigger>
+            <PopoverContent align="end" className="p-0 w-36">
+              <div className="flex flex-col">
                 {languages.map(lang => (
                   <button
                     key={lang.code}
-                    onClick={() => { i18n.changeLanguage(lang.code); setOpen(false); }}
-                    className={`flex items-center gap-2 px-3 py-2 text-sm ${currentLang === lang.code ? 'bg-opnskin-primary/20 text-opnskin-primary' : 'text-opnskin-text-primary hover:bg-opnskin-bg-secondary/60'}`}
+                    onClick={() => { i18n.changeLanguage(lang.code); setLangMenuOpen(false); }}
+                    className={`flex items-center gap-2 px-3 py-2 text-sm text-left w-full ${currentLang === lang.code ? 'bg-opnskin-primary/20 text-opnskin-primary' : 'text-opnskin-text-primary hover:bg-opnskin-bg-secondary/60'}`}
                   >
                     <span>{lang.flag}</span>
                     <span>{lang.label}</span>
                   </button>
                 ))}
               </div>
-            )}
-          </div>
+            </PopoverContent>
+          </Popover>
           {/* Auth Steam */}
           <div className="ml-2">
             <SteamAuthStatus />
