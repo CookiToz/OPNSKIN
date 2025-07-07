@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useCryptoRatesStore } from '@/hooks/use-currency-store';
 
-const COINGECKO_URL = 'https://api.coingecko.com/api/v3/simple/price?ids=ethereum,bitcoin,solana,ripple,litecoin,tron,game-market-coin&vs_currencies=eur,usd';
+const COINGECKO_URL = '/api/crypto-prices';
 let lastFetch = 0;
 let lastRates: any = null;
 let lastError: string | null = null;
