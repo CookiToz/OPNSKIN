@@ -81,7 +81,7 @@ export default function Home() {
   return (
     <div className="relative min-h-screen">
       {/* HERO SECTION avec fond animé */}
-      <section className="relative flex flex-col justify-center items-center h-[60vh] min-h-[400px] w-full overflow-hidden bg-transparent">
+      <section className="relative flex flex-col justify-center items-center h-[40vh] md:h-[60vh] min-h-[220px] md:min-h-[400px] w-full overflow-hidden bg-transparent">
         {/* Fond animé, seulement sur desktop */}
         <div className="absolute inset-0 w-full h-full pointer-events-none select-none overflow-hidden z-0 hidden md:block">
           <div
@@ -123,17 +123,17 @@ export default function Home() {
         </div>
         {/* Contenu Hero */}
         <div className="relative z-10 flex flex-col items-center lg:items-start justify-center h-full w-full px-4 md:px-4">
-            <Badge className="mb-4 px-4 py-1 w-fit bg-opnskin-primary/10 text-opnskin-primary border-opnskin-primary/30 text-xs md:text-base mt-6 md:mt-0">
+            <Badge className="mb-3 md:mb-4 px-4 py-1 w-fit bg-opnskin-primary/10 text-opnskin-primary border-opnskin-primary/30 text-xs md:text-base mt-6 md:mt-0">
             {t('home.hero_badge')}
             </Badge>
-          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-6xl font-bold mb-4 md:mb-6 font-satoshi-bold text-center lg:text-left w-full lg:w-auto leading-tight md:leading-tight">
+          <h1 className="text-xl sm:text-2xl md:text-4xl lg:text-6xl font-bold mb-3 md:mb-4 font-satoshi-bold text-center lg:text-left w-full lg:w-auto leading-tight md:leading-tight">
             {t('home.hero_title_1')} <span className="neon-text">{t('home.hero_title_skins')}</span> {t('home.hero_title_2')} <span className="neon-text">{t('home.hero_title_opportunities')}</span>
           </h1>
-          <p className="text-base sm:text-lg text-opnskin-text-secondary mb-6 md:mb-8 max-w-xl md:max-w-2xl text-center lg:text-left w-full lg:w-auto">
+          <p className="text-sm sm:text-base md:text-lg text-opnskin-text-secondary mb-4 md:mb-6 max-w-xs sm:max-w-xl md:max-w-2xl text-center lg:text-left w-full lg:w-auto">
             {t('home.hero_subtitle')}
           </p>
           <div className="flex flex-col sm:flex-row gap-3 md:gap-4 w-full lg:w-auto justify-center lg:justify-start">
-            <Link href="/marketplace">
+            <Link href="/marketplace" className="w-full sm:w-auto">
               <Button size="lg" className="btn-opnskin flex items-center w-full sm:w-auto text-base md:text-lg py-3 md:py-4">
                 {t('home.hero_cta')}
                 <ArrowRight className="ml-2 h-5 w-5" />
@@ -141,7 +141,7 @@ export default function Home() {
             </Link>
           </div>
           {/* Animation mobile : SOUS le texte, visible uniquement sur mobile */}
-          <div className="block md:hidden w-full flex justify-center mt-6">
+          <div className="block md:hidden w-full flex justify-center mt-4">
             <div className="skin-bg-container-mobile max-w-xs w-full flex items-center justify-center">
               <img
                 src={skinImages[bgIndex]}
