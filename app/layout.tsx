@@ -1,4 +1,4 @@
-import React from "react"
+import type React from "react"
 import type { Metadata } from "next"
 import { Poppins, Sora, Share_Tech_Mono, Inter } from "next/font/google"
 import "./globals.css"
@@ -47,35 +47,6 @@ export const metadata: Metadata = {
   },
 }
 
-// ErrorBoundary pour capturer les erreurs JS côté client
-class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean }> {
-  constructor(props: { children: React.ReactNode }) {
-    super(props);
-    this.state = { hasError: false };
-  }
-  static getDerivedStateFromError(error: any) {
-    return { hasError: true };
-  }
-  componentDidCatch(error: any, errorInfo: any) {
-    // Tu peux logguer l'erreur ici si besoin
-    if (typeof window !== 'undefined') {
-      // eslint-disable-next-line no-console
-      console.error('Erreur capturée par ErrorBoundary:', error, errorInfo);
-    }
-  }
-  render() {
-    if (this.state.hasError) {
-      return (
-        <div style={{ color: '#fff', background: '#1a1a1a', padding: 40, textAlign: 'center', minHeight: '100vh' }}>
-          <h1>Une erreur est survenue dans l'application.</h1>
-          <p>Essayez de recharger la page ou de désactiver vos extensions navigateur (ex: MetaMask).</p>
-        </div>
-      );
-    }
-    return this.props.children;
-  }
-}
-
 export default function RootLayout({
   children,
 }: {
@@ -99,11 +70,9 @@ export default function RootLayout({
             <Sidebar />
             <div className="flex-1 flex flex-col overflow-hidden">
               <Header />
-              <ErrorBoundary>
-                <main className="flex-1 overflow-y-auto bg-opnskin-bg-primary">
-                  {children}
-                </main>
-              </ErrorBoundary>
+              <main className="flex-1 overflow-y-auto bg-opnskin-bg-primary">
+                {children}
+              </main>
             </div>
           </div>
         </ThemeProvider>
