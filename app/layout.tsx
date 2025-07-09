@@ -12,6 +12,7 @@ import { UserProvider } from "@/components/UserProvider"
 import { InventoryProvider } from "@/components/InventoryProvider"
 import { FloatProvider } from "@/components/FloatProvider"
 import MobileLayout from '@/components/MobileLayout'
+import { Toaster } from "@/components/ui/toaster"
 
 // Utilisation de Poppins comme alternative à Satoshi Bold
 const satoshiBold = Poppins({
@@ -81,6 +82,7 @@ export default function RootLayout({
               </main>
             </div>
           </div>
+          <Toaster />
         </ThemeProvider>
         </FloatProvider>
         </InventoryProvider>

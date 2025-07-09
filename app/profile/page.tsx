@@ -42,6 +42,51 @@ export default function Profile() {
   const [loadingInventory, setLoadingInventory] = useState(true);
   const currency = useCurrencyStore((state) => state.currency);
   const cryptoRates = useCryptoRatesStore();
+  const currentUserId = 'user_simule_123';
+  const [tradeUrl, setTradeUrl] = useState<string>("");
+  const [tradeUrlLoading, setTradeUrlLoading] = useState(false);
+  const [tradeUrlMessage, setTradeUrlMessage] = useState<string | null>(null);
+
+  // Charger le tradeUrl actuel au montage (simulé)
+  useEffect(() => {
+    // À remplacer par un vrai endpoint user/me plus tard
+    fetch(`/api/user/${currentUserId}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.tradeUrl) setTradeUrl(data.tradeUrl);
+      });
+  }, []);
+
+  function isValidTradeUrl(url: string) {
+    return url.startsWith('https://steamcommunity.com/tradeoffer/new/');
+  }
+
+  const handleTradeUrlSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setTradeUrlMessage(null);
+    if (!isValidTradeUrl(tradeUrl)) {
+      setTradeUrlMessage("Le lien doit commencer par https://steamcommunity.com/tradeoffer/new/");
+      return;
+    }
+    setTradeUrlLoading(true);
+    try {
+      const res = await fetch('/api/users/update-trade-url.ts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: currentUserId, tradeUrl }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setTradeUrlMessage("Lien d'échange Steam mis à jour !");
+      } else {
+        setTradeUrlMessage(data.error || "Erreur lors de la mise à jour.");
+      }
+    } catch (err) {
+      setTradeUrlMessage("Erreur réseau ou serveur.");
+    } finally {
+      setTradeUrlLoading(false);
+    }
+  };
 
   useEffect(() => {
     fetch('/api/me')
@@ -199,9 +244,26 @@ export default function Profile() {
           </TabsContent>
 
           <TabsContent value="settings">
-            <Card className="bg-black/40 border-white/5">
-              <CardContent className="p-6 text-white/70">
-                <p>Paramètres du compte (non fonctionnel pour la démo).</p>
+            <Card className="bg-black/40 border-white/5 mb-4 md:mb-6">
+              <CardContent className="p-4 md:p-6">
+                <h3 className="text-lg md:text-xl font-bold font-rajdhani mb-3 md:mb-4">Lien d'échange Steam</h3>
+                <form onSubmit={handleTradeUrlSubmit} className="flex flex-col gap-3 max-w-lg">
+                  <label htmlFor="tradeUrl" className="text-sm text-white/70">Votre Steam Trade URL</label>
+                  <input
+                    id="tradeUrl"
+                    type="text"
+                    value={tradeUrl}
+                    onChange={e => setTradeUrl(e.target.value)}
+                    className="bg-opnskin-bg-secondary border border-opnskin-bg-secondary text-opnskin-text-primary rounded px-3 py-2 text-base"
+                    placeholder="https://steamcommunity.com/tradeoffer/new/?partner=..."
+                  />
+                  <Button type="submit" className="w-fit" disabled={tradeUrlLoading}>
+                    {tradeUrlLoading ? "Mise à jour..." : "Mettre à jour"}
+                  </Button>
+                  {tradeUrlMessage && (
+                    <div className={`text-sm mt-1 ${tradeUrlMessage.includes('mis à jour') ? 'text-green-400' : 'text-red-400'}`}>{tradeUrlMessage}</div>
+                  )}
+                </form>
               </CardContent>
             </Card>
           </TabsContent>
