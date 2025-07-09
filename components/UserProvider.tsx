@@ -23,7 +23,7 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
 export function UserProvider({ children }: { children: React.ReactNode }) {
-  const { data, error, isLoading, mutate } = useSWR<User>("/api/me", fetcher, {
+  const { data, error, isLoading, mutate } = useSWR<User>("/api/users/me", fetcher, {
     dedupingInterval: 30000, // 30s cache
     revalidateOnFocus: false,
   });

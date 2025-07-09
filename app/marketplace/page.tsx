@@ -77,83 +77,6 @@ const mockItems = [
   },
 ];
 
-function MarketplaceGameSelect({ onSelect }: { onSelect: (game: string) => void }) {
-  const { t } = useTranslation('common');
-  return (
-    <div className="min-h-screen flex flex-col items-center justify-start bg-[#0e0e10] px-2 md:px-4 pt-6 md:pt-8 pb-4">
-      <h1 className="text-2xl md:text-5xl font-bold text-center mb-6 md:mb-10 text-white font-rajdhani drop-shadow-lg">
-        {t('marketplace.choose_universe', 'Choisis ton univers')}
-        <span className="ml-2 md:ml-4 px-2 md:px-3 py-1 rounded-full bg-white text-[#287CFA] text-sm md:text-base font-semibold align-middle shadow-md">{t('marketplace.badge')}</span>
-      </h1>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8 w-full max-w-6xl">
-        {GAMES.map(game => (
-          <button
-            key={game.key}
-            onClick={() => onSelect(game.key)}
-            className="group relative rounded-2xl overflow-hidden shadow-lg bg-gradient-to-br from-[#101c2c] to-[#0e0e10] border-2 border-transparent hover:border-[#00ffe7] transition-all duration-300 focus:outline-none flex flex-col w-full max-w-full md:max-w-400 h-56 md:h-100"
-            aria-label={t(`marketplace.game_${game.key}`, game.name)}
-          >
-            <img
-              src={game.cover}
-              alt={t(`marketplace.game_${game.key}`, game.name)}
-              className="w-full h-full object-cover object-center transition-transform duration-300 group-hover:scale-105 group-hover:brightness-110"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#00ffe7]/20 via-transparent to-transparent pointer-events-none group-hover:from-[#00ffe7]/40 transition-all duration-300" />
-          </button>
-        ))}
-      </div>
-      <style jsx global>{`
-        .neon-glow {
-          box-shadow: 0 0 8px #00ffe7, 0 0 16px #00ffe7, 0 0 32px #00ffe7;
-          text-shadow: 0 0 8px #00ffe7, 0 0 16px #00ffe7;
-        }
-      `}</style>
-    </div>
-  );
-}
-
-function MarketplaceByGame({ game, onBack }: { game: string, onBack: () => void }) {
-  const { t } = useTranslation('common');
-  const searchQuery = useSearchStore((state) => state.searchQuery);
-  // Placeholder pour la suite : header sticky, filtres, grille
-  return (
-    <div className="min-h-screen bg-[#0e0e10] text-white flex flex-col">
-      {/* Header sticky */}
-      <div className="sticky top-0 z-20 bg-[#0e0e10]/95 backdrop-blur border-b border-[#1a1a1d] px-2 md:px-4 py-3 md:py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-2 md:gap-4 shadow-lg">
-        <div className="flex items-center gap-2 md:gap-4 flex-1">
-          <button onClick={onBack} className="text-[#00ffe7] font-bold text-lg mr-2 hover:underline">←</button>
-          <h2 className="text-lg md:text-2xl font-bold font-rajdhani tracking-tight">{t('marketplace.title')} {t(`marketplace.game_${game}`)}</h2>
-        </div>
-        <div className="flex flex-1 gap-2 items-center justify-end">
-          {/* Recherche supprimée, gérée par le header global */}
-          <select className="bg-[#18181b] border border-[#222] rounded-lg px-2 md:px-3 py-2 text-white text-sm md:text-base">
-            <option value="price_asc">{t('marketplace.sort_price_asc')}</option>
-            <option value="price_desc">{t('marketplace.sort_price_desc')}</option>
-            <option value="float_asc">{t('marketplace.sort_float_asc')}</option>
-            <option value="good_deal">{t('marketplace.sort_good_deal')}</option>
-          </select>
-          <select className="bg-[#18181b] border border-[#222] rounded-lg px-2 md:px-3 py-2 text-white text-sm md:text-base">
-            <option value="all">{t('marketplace.filter_all')}</option>
-            <option value="online">{t('marketplace.filter_online')}</option>
-            <option value="offline">{t('marketplace.filter_offline')}</option>
-          </select>
-          <button className="ml-2 px-3 md:px-4 py-2 rounded-lg bg-[#00ffe7] text-black font-bold hover:bg-[#00e6cc] transition text-sm md:text-base">{t('marketplace.reset')}</button>
-        </div>
-      </div>
-      {/* Filtres latéraux ou top bar (à venir) */}
-      <div className="flex-1 flex flex-col md:flex-row">
-        <aside className="hidden md:block w-64 bg-[#101c2c]/40 border-r border-[#1a1a1d] p-6">{t('marketplace.filters_coming')}</aside>
-        <main className="flex-1 p-3 md:p-6 flex flex-col items-center justify-center">
-          <div className="text-center opacity-60">
-            <p className="text-base md:text-lg">{t('marketplace.grid_coming')}</p>
-            <p className="mt-2 text-xs md:text-sm">{t('marketplace.grid_hint')}</p>
-          </div>
-        </main>
-      </div>
-    </div>
-  );
-}
-
 export default function MarketplacePage() {
   const { t } = useTranslation('common');
   const [selectedGame, setSelectedGame] = useState<string | null>(null);
@@ -191,8 +114,73 @@ export default function MarketplacePage() {
   }, [items, selectedGame, selectedCategory, rarity, exterior, stattrak, priceRange, floatRange, searchQuery, sort]);
 
   if (!selectedGame) {
-    return <MarketplaceGameSelect onSelect={setSelectedGame} />;
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-start bg-[#0e0e10] px-2 md:px-4 pt-6 md:pt-8 pb-4">
+        <h1 className="text-2xl md:text-5xl font-bold text-center mb-6 md:mb-10 text-white font-rajdhani drop-shadow-lg">
+          {t('marketplace.choose_universe', 'Choisis ton univers')}
+          <span className="ml-2 md:ml-4 px-2 md:px-3 py-1 rounded-full bg-white text-[#287CFA] text-sm md:text-base font-semibold align-middle shadow-md">{t('marketplace.badge')}</span>
+        </h1>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8 w-full max-w-6xl">
+          {GAMES.map(game => (
+            <button
+              key={game.key}
+              onClick={() => setSelectedGame(game.key)}
+              className="group relative rounded-2xl overflow-hidden shadow-lg bg-gradient-to-br from-[#101c2c] to-[#0e0e10] border-2 border-transparent hover:border-[#00ffe7] transition-all duration-300 focus:outline-none flex flex-col w-full max-w-full md:max-w-400 h-56 md:h-100"
+              aria-label={t(`marketplace.game_${game.key}`, game.name)}
+            >
+              <img
+                src={game.cover}
+                alt={t(`marketplace.game_${game.key}`, game.name)}
+                className="w-full h-full object-cover object-center transition-transform duration-300 group-hover:scale-105 group-hover:brightness-110"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#00ffe7]/20 via-transparent to-transparent pointer-events-none group-hover:from-[#00ffe7]/40 transition-all duration-300" />
+            </button>
+          ))}
+        </div>
+        <style jsx global>{`
+          .neon-glow {
+            box-shadow: 0 0 8px #00ffe7, 0 0 16px #00ffe7, 0 0 32px #00ffe7;
+            text-shadow: 0 0 8px #00ffe7, 0 0 16px #00ffe7;
+          }
+        `}</style>
+      </div>
+    );
   }
 
-  return <MarketplaceByGame game={selectedGame} onBack={() => setSelectedGame(null)} />;
+  return (
+    <div className="min-h-screen bg-[#0e0e10] text-white flex flex-col">
+      {/* Header sticky */}
+      <div className="sticky top-0 z-20 bg-[#0e0e10]/95 backdrop-blur border-b border-[#1a1a1d] px-2 md:px-4 py-3 md:py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-2 md:gap-4 shadow-lg">
+        <div className="flex items-center gap-2 md:gap-4 flex-1">
+          <button onClick={() => setSelectedGame(null)} className="text-[#00ffe7] font-bold text-lg mr-2 hover:underline">←</button>
+          <h2 className="text-lg md:text-2xl font-bold font-rajdhani tracking-tight">{t('marketplace.title')} {t(`marketplace.game_${selectedGame}`)}</h2>
+        </div>
+        <div className="flex flex-1 gap-2 items-center justify-end">
+          {/* Recherche supprimée, gérée par le header global */}
+          <select className="bg-[#18181b] border border-[#222] rounded-lg px-2 md:px-3 py-2 text-white text-sm md:text-base">
+            <option value="price_asc">{t('marketplace.sort_price_asc')}</option>
+            <option value="price_desc">{t('marketplace.sort_price_desc')}</option>
+            <option value="float_asc">{t('marketplace.sort_float_asc')}</option>
+            <option value="good_deal">{t('marketplace.sort_good_deal')}</option>
+          </select>
+          <select className="bg-[#18181b] border border-[#222] rounded-lg px-2 md:px-3 py-2 text-white text-sm md:text-base">
+            <option value="all">{t('marketplace.filter_all')}</option>
+            <option value="online">{t('marketplace.filter_online')}</option>
+            <option value="offline">{t('marketplace.filter_offline')}</option>
+          </select>
+          <button className="ml-2 px-3 md:px-4 py-2 rounded-lg bg-[#00ffe7] text-black font-bold hover:bg-[#00e6cc] transition text-sm md:text-base">{t('marketplace.reset')}</button>
+        </div>
+      </div>
+      {/* Filtres latéraux ou top bar (à venir) */}
+      <div className="flex-1 flex flex-col md:flex-row">
+        <aside className="hidden md:block w-64 bg-[#101c2c]/40 border-r border-[#1a1a1d] p-6">{t('marketplace.filters_coming')}</aside>
+        <main className="flex-1 p-3 md:p-6 flex flex-col items-center justify-center">
+          <div className="text-center opacity-60">
+            <p className="text-base md:text-lg">{t('marketplace.grid_coming')}</p>
+            <p className="mt-2 text-xs md:text-sm">{t('marketplace.grid_hint')}</p>
+          </div>
+        </main>
+      </div>
+    </div>
+  );
 }
