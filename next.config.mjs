@@ -9,11 +9,8 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  i18n: {
-    locales: ['fr', 'en', 'es', 'pt', 'ru', 'zh'],
-    defaultLocale: 'fr',
-    localeDetection: true,
-  },
+  // Suppression de la configuration i18n (non supportée avec App Router)
+  // L'internationalisation est gérée via next-i18next dans les composants
 }
 
 export default nextConfig

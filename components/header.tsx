@@ -27,6 +27,9 @@ export function Header() {
   const { t } = useTranslation('common');
   const [notifications, setNotifications] = useState<any[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [cartCount] = useState(2);
+  const { user, isLoading: userLoading, isError: userError, refetch } = useUser();
 
   // Charger les notifications
   useEffect(() => {
@@ -44,10 +47,6 @@ export function Header() {
         });
     }
   }, [user]);
-
-  const [showNotifications, setShowNotifications] = useState(false);
-  const [cartCount] = useState(2);
-  const { user, isLoading: userLoading, isError: userError, refetch } = useUser();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const { currency, setCurrency } = useCurrencyStore();
   const rawCryptoRates = useCryptoRates();
