@@ -11,13 +11,21 @@ datasource db {
 
 model User {
   id           String   @id @default(cuid())
+  steamId      String   @unique
+  name         String?
+  avatar       String?
+  profileUrl   String?
   email        String?  @unique
   walletBalance Float   @default(0)
   bannedUntil  DateTime?
+  tradeUrl     String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  // Relations
   offers       Offer[]
   transactions Transaction[]
   notifications Notification[]
-  tradeUrl     String?
 }
 
 model Offer {
@@ -25,12 +33,16 @@ model Offer {
   sellerId   String
   seller     User     @relation(fields: [sellerId], references: [id])
   itemId     String
+  itemName   String?
+  itemImage  String?
+  game       String?  // cs2, dota2, rust, tf2
   price      Float
   status     OfferStatus @default(AVAILABLE)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
   expiresAt  DateTime?
 
+  // Relations
   transaction Transaction?
 }
 
@@ -52,7 +64,9 @@ model Notification {
   userId    String
   user      User     @relation(fields: [userId], references: [id])
   type      NotificationType
+  title     String
   message   String
+  read      Boolean  @default(false)
   createdAt DateTime @default(now())
 }
 
@@ -72,6 +86,11 @@ enum TransactionStatus {
 }
 
 enum NotificationType {
+  OFFER_CREATED
+  OFFER_SOLD
+  OFFRE_CANCELLED
+  TRANSACTION_STARTED
+  TRANSACTION_COMPLETED
   REMINDER
   PENALTY
   CONFIRM

@@ -38,10 +38,10 @@ export default function MarketplaceGamePage() {
   useEffect(() => {
     if (!game) return;
     setLoading(true);
-    fetch(`/api/offers/list-by-game?game=${game}`)
+    fetch(`/api/offers?game=${game}`)
       .then((res) => res.json())
       .then((data) => {
-        setOffers(Array.isArray(data) ? data : []);
+        setOffers(data.offers || []);
         setLoading(false);
       })
       .catch((error) => {
@@ -58,12 +58,11 @@ export default function MarketplaceGamePage() {
   const handleBuy = async (offerId: string, offerPrice: number) => {
     setBuyingId(offerId);
     try {
-      const res = await fetch(`/api/offers/${offerId}/accept`, {
+      const res = await fetch(`/api/transactions`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
-          buyerId: currentUserId, 
-          escrowAmount: offerPrice 
+          offerId: offerId
         }),
       });
       
@@ -72,7 +71,7 @@ export default function MarketplaceGamePage() {
       if (res.ok) {
         toast({
           title: "Achat réussi !",
-          description: "L'offre est maintenant en cours d'échange. Vérifiez vos annonces.",
+          description: "L'offre est maintenant en cours d'échange. Vérifiez vos transactions.",
         });
         // Rafraîchir la liste des offres
         setOffers(prev => prev.filter(offer => offer.id !== offerId));

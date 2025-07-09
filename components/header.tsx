@@ -25,22 +25,25 @@ import { usePathname } from 'next/navigation';
 
 export function Header() {
   const { t } = useTranslation('common');
-  const [notifications] = useState([
-    {
-      id: 1,
-      title: 'Nouvelle offre reçue',
-      message: 'Vous avez reçu une offre pour votre skin AK-47',
-      time: 'Il y a 5 minutes',
-      unread: true,
-    },
-    {
-      id: 2,
-      title: 'Vente réussie',
-      message: 'Votre item a été vendu avec succès',
-      time: 'Il y a 1 heure',
-      unread: false,
-    },
-  ]);
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  // Charger les notifications
+  useEffect(() => {
+    if (user && user.loggedIn) {
+      fetch('/api/notifications?unread=true&limit=5')
+        .then(res => res.json())
+        .then(data => {
+          if (data.notifications) {
+            setNotifications(data.notifications);
+            setUnreadCount(data.notifications.filter((n: any) => !n.read).length);
+          }
+        })
+        .catch(error => {
+          console.error('Erreur lors du chargement des notifications:', error);
+        });
+    }
+  }, [user]);
 
   const [showNotifications, setShowNotifications] = useState(false);
   const [cartCount] = useState(2);
@@ -122,7 +125,7 @@ export function Header() {
                     onClick={() => setShowNotifications(!showNotifications)}
                   >
                     <Bell className="h-5 w-5" />
-                    {notifications.some(n => n.unread) && (
+                    {unreadCount > 0 && (
                       <span className="absolute top-1 right-1 w-2 h-2 bg-opnskin-accent rounded-full animate-pulse" />
                     )}
                   </Button>
@@ -130,19 +133,32 @@ export function Header() {
                     <div className="absolute right-0 mt-2 w-80 p-4 rounded-lg bg-opnskin-bg-card/95 border border-opnskin-bg-secondary shadow-xl">
                       <h3 className="font-satoshi-bold mb-3 text-opnskin-text-primary">Notifications</h3>
                       <div className="space-y-3">
-                        {notifications.map((notification) => (
-                          <div
-                            key={notification.id}
-                            className={cn(
-                              'p-3 rounded-md transition-colors',
-                              notification.unread ? 'bg-opnskin-primary/10' : 'bg-transparent'
-                            )}
-                          >
-                            <h4 className="font-satoshi-bold text-sm text-opnskin-text-primary">{notification.title}</h4>
-                            <p className="text-sm text-opnskin-text-secondary">{notification.message}</p>
-                            <span className="text-xs text-opnskin-text-secondary/60">{notification.time}</span>
-                          </div>
-                        ))}
+                        {notifications.length === 0 ? (
+                          <p className="text-sm text-opnskin-text-secondary">Aucune notification</p>
+                        ) : (
+                          notifications.map((notification) => (
+                            <div
+                              key={notification.id}
+                              className={cn(
+                                'p-3 rounded-md transition-colors',
+                                !notification.read ? 'bg-opnskin-primary/10' : 'bg-transparent'
+                              )}
+                            >
+                              <h4 className="font-satoshi-bold text-sm text-opnskin-text-primary">{notification.title}</h4>
+                              <p className="text-sm text-opnskin-text-secondary">{notification.message}</p>
+                              <span className="text-xs text-opnskin-text-secondary/60">
+                                {new Date(notification.createdAt).toLocaleString()}
+                              </span>
+                            </div>
+                          ))
+                        )}
+                        {notifications.length > 0 && (
+                          <Link href="/notifications">
+                            <Button variant="outline" size="sm" className="w-full border-opnskin-primary/30 text-opnskin-primary hover:bg-opnskin-primary/10">
+                              Voir toutes les notifications
+                            </Button>
+                          </Link>
+                        )}
                       </div>
                     </div>
                   )}

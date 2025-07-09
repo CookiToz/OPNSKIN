@@ -60,12 +60,11 @@ export const OfferCard: React.FC<OfferCardProps> = ({ offer, currentUserId, onOf
   const handleCancelOffer = async () => {
     setIsCancelling(true);
     try {
-      const response = await fetch(`/api/offers/${offer.id}/cancel`, {
-        method: 'POST',
+      const response = await fetch(`/api/offers/${offer.id}`, {
+        method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ sellerId: currentUserId }),
       });
 
       if (response.ok) {

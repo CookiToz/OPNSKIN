@@ -17,11 +17,16 @@ export default function Listings() {
   const fetchOffers = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`/api/offers/list?sellerId=${currentUserId}`);
+      const response = await fetch(`/api/users/me`);
       const data = await response.json();
-      setOffers(Array.isArray(data) ? data : []);
+      if (data.loggedIn && data.user) {
+        setOffers(data.user.offers || []);
+      } else {
+        setOffers([]);
+      }
     } catch (error) {
       console.error('Erreur lors du chargement des offres:', error);
+      setOffers([]);
     } finally {
       setLoading(false);
     }

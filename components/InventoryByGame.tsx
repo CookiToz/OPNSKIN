@@ -16,6 +16,7 @@ import { useCurrencyStore } from '@/hooks/use-currency-store';
 import { useCryptoRatesStore } from '@/hooks/use-currency-store';
 import { formatPrice } from '@/lib/utils';
 import { useSearchStore } from '@/hooks/use-search-store';
+import { useToast } from '@/hooks/use-toast';
 
 export type GameType = {
   key: string;
@@ -85,12 +86,14 @@ const getWeaponCategory = (name: string): string => {
 
 export default function InventoryByGame({ game, onBack }: InventoryByGameProps) {
   const { t } = useTranslation('common');
+  const { toast } = useToast();
   const [hasRequestedLoad, setHasRequestedLoad] = useState(false);
   const { items, isLoading, isError, errorMsg, refetch } = useInventory(hasRequestedLoad ? (game?.appid ? String(game.appid) : undefined) : undefined);
   const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
   const [sellDialogOpen, setSellDialogOpen] = useState(false);
   const [sellPrice, setSellPrice] = useState('');
   const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
+  const [isSelling, setIsSelling] = useState(false);
   
   // États pour les filtres
   const [rarityFilter, setRarityFilter] = useState<string>('all');
@@ -131,12 +134,82 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
     setSellDialogOpen(true);
   };
 
-  const handleSellConfirm = () => {
-    // TODO: Implémenter la logique de vente
-    console.log('Vendre', selectedItem?.name, 'pour', sellPrice, '€');
-    setSellDialogOpen(false);
-    setSelectedItem(null);
-    setSellPrice('');
+  const handleSellConfirm = async () => {
+    if (!selectedItem || !sellPrice) {
+      toast({
+        title: "Erreur",
+        description: "Veuillez entrer un prix valide.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const price = parseFloat(sellPrice);
+    if (isNaN(price) || price <= 0) {
+      toast({
+        title: "Erreur",
+        description: "Le prix doit être un nombre positif.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSelling(true);
+    try {
+      const response = await fetch('/api/offers', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          itemId: selectedItem.id,
+          itemName: selectedItem.name,
+          itemImage: selectedItem.icon,
+          game: game.key,
+          price: price,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        toast({
+          title: "Offre créée !",
+          description: `${selectedItem.name} a été mis en vente pour ${formatPrice(price, currency, {
+            ETH: cryptoRates.ETH,
+            BTC: cryptoRates.BTC,
+            SOL: cryptoRates.SOL,
+            XRP: cryptoRates.XRP,
+            LTC: cryptoRates.LTC,
+            TRX: cryptoRates.TRX,
+            GMC: cryptoRates.GMC,
+          })}.`,
+        });
+        
+        // Fermer la modal et réinitialiser
+        setSellDialogOpen(false);
+        setSelectedItem(null);
+        setSellPrice('');
+        
+        // Optionnel : rafraîchir l'inventaire pour masquer l'item vendu
+        // refetch();
+      } else {
+        toast({
+          title: "Erreur",
+          description: data.error || "Impossible de créer l'offre.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error('Erreur lors de la création de l\'offre:', error);
+      toast({
+        title: "Erreur réseau",
+        description: "Vérifiez votre connexion et réessayez.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSelling(false);
+    }
   };
 
   const handleDetails = (item: InventoryItem) => {
@@ -558,8 +631,8 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
               />
             </div>
             <div className="flex gap-2">
-              <Button onClick={handleSellConfirm} className="btn-opnskin flex-1">
-                {t('inventory.confirm_sale', 'Confirmer la vente')}
+              <Button onClick={handleSellConfirm} className="btn-opnskin flex-1" disabled={isSelling}>
+                {isSelling ? t('inventory.selling', 'Vente en cours...') : t('inventory.confirm_sale', 'Confirmer la vente')}
               </Button>
               <Button 
                 variant="outline" 

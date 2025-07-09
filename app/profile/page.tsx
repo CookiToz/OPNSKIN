@@ -70,10 +70,10 @@ export default function Profile() {
     }
     setTradeUrlLoading(true);
     try {
-      const res = await fetch('/api/users/update-trade-url.ts', {
-        method: 'POST',
+      const res = await fetch('/api/users/me', {
+        method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: currentUserId, tradeUrl }),
+        body: JSON.stringify({ tradeUrl }),
       });
       const data = await res.json();
       if (res.ok) {
@@ -89,10 +89,20 @@ export default function Profile() {
   };
 
   useEffect(() => {
-    fetch('/api/me')
+    fetch('/api/users/me')
       .then((res) => res.json())
       .then((data) => {
-        if (data.loggedIn) setSteamUser(data);
+        if (data.loggedIn && data.user) {
+          setSteamUser({
+            name: data.user.name || 'Steam User',
+            avatar: data.user.avatar || '',
+            steamId: data.user.steamId,
+            profileUrl: data.user.profileUrl || ''
+          });
+          if (data.user.tradeUrl) {
+            setTradeUrl(data.user.tradeUrl);
+          }
+        }
       });
   }, []);
 
