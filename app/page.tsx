@@ -60,7 +60,7 @@ export default function Home() {
   };
 
   useEffect(() => {
-    fetch('/api/me').then(res => res.json()).then((data) => {
+    fetch('/api/users/me').then(res => res.json()).then((data) => {
       if (data && typeof data === 'object' && 'loggedIn' in data) {
         setSteamStatus(data);
       }
@@ -139,6 +139,9 @@ export default function Home() {
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>
+            <div className="flex justify-center lg:justify-start">
+              <SteamAuthStatus />
+            </div>
           </div>
           {/* Animation mobile : SOUS le texte, visible uniquement sur mobile */}
           <div className="block md:hidden w-full flex justify-center mt-6">
