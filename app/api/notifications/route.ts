@@ -1,44 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { supabase } from '@/lib/supabaseClient';
 
 // Récupérer les notifications de l'utilisateur
 export async function GET(req: NextRequest) {
   try {
     const steamId = req.cookies.get('steamid')?.value;
-    
     if (!steamId) {
-      return NextResponse.json({ 
-        error: 'Authentication required'
-      }, { status: 401 });
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
-
-    const user = await prisma.user.findUnique({
-      where: { steamId }
-    });
-
-    if (!user) {
-      return NextResponse.json({ 
-        error: 'User not found'
-      }, { status: 404 });
+    const { data: user, error: userError } = await supabase.from('User').select('*').eq('steamId', steamId).single();
+    if (userError || !user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
-
     const { searchParams } = new URL(req.url);
     const unreadOnly = searchParams.get('unread') === 'true';
     const limit = parseInt(searchParams.get('limit') || '50');
-
-    const notifications = await prisma.notification.findMany({
-      where: {
-        userId: user.id,
-        ...(unreadOnly && { read: false })
-      },
-      orderBy: { createdAt: 'desc' },
-      take: limit
-    });
-
+    let query = supabase.from('Notification').select('*').eq('userId', user.id);
+    if (unreadOnly) query = query.eq('read', false);
+    query = query.order('createdAt', { ascending: false }).limit(limit);
+    const { data: notifications, error: notifError } = await query;
+    if (notifError) {
+      return NextResponse.json({ error: notifError.message }, { status: 500 });
+    }
     return NextResponse.json({
-      notifications: notifications.map(n => ({
+      notifications: (notifications || []).map(n => ({
         id: n.id,
         type: n.type,
         title: n.title,
@@ -47,12 +32,8 @@ export async function GET(req: NextRequest) {
         createdAt: n.createdAt
       }))
     });
-
   } catch (error: any) {
-    console.error('[NOTIFICATIONS API] Error fetching notifications:', error);
-    return NextResponse.json({ 
-      error: error.message || 'Internal server error'
-    }, { status: 500 });
+    return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -60,60 +41,29 @@ export async function GET(req: NextRequest) {
 export async function PUT(req: NextRequest) {
   try {
     const steamId = req.cookies.get('steamid')?.value;
-    
     if (!steamId) {
-      return NextResponse.json({ 
-        error: 'Authentication required'
-      }, { status: 401 });
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
-
     const { notificationId } = await req.json();
-
     if (!notificationId) {
-      return NextResponse.json({ 
-        error: 'Notification ID required'
-      }, { status: 400 });
+      return NextResponse.json({ error: 'Notification ID required' }, { status: 400 });
     }
-
-    const user = await prisma.user.findUnique({
-      where: { steamId }
-    });
-
-    if (!user) {
-      return NextResponse.json({ 
-        error: 'User not found'
-      }, { status: 404 });
+    const { data: user, error: userError } = await supabase.from('User').select('*').eq('steamId', steamId).single();
+    if (userError || !user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
-
     // Vérifier que la notification appartient à l'utilisateur
-    const notification = await prisma.notification.findFirst({
-      where: {
-        id: notificationId,
-        userId: user.id
-      }
-    });
-
-    if (!notification) {
-      return NextResponse.json({ 
-        error: 'Notification not found'
-      }, { status: 404 });
+    const { data: notification, error: notifError } = await supabase.from('Notification').select('*').eq('id', notificationId).eq('userId', user.id).single();
+    if (notifError || !notification) {
+      return NextResponse.json({ error: 'Notification not found' }, { status: 404 });
     }
-
     // Marquer comme lue
-    await prisma.notification.update({
-      where: { id: notificationId },
-      data: { read: true }
-    });
-
-    return NextResponse.json({
-      success: true,
-      message: 'Notification marked as read'
-    });
-
+    const { error: updateError } = await supabase.from('Notification').update({ read: true }).eq('id', notificationId);
+    if (updateError) {
+      return NextResponse.json({ error: updateError.message }, { status: 500 });
+    }
+    return NextResponse.json({ success: true, message: 'Notification marked as read' });
   } catch (error: any) {
-    console.error('[NOTIFICATIONS API] Error updating notification:', error);
-    return NextResponse.json({ 
-      error: error.message || 'Internal server error'
-    }, { status: 500 });
+    return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 });
   }
 } 

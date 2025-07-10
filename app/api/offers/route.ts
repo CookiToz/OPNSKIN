@@ -1,93 +1,46 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { supabase } from '@/lib/supabaseClient';
 
 // Créer une nouvelle offre
 export async function POST(req: NextRequest) {
   try {
     const steamId = req.cookies.get('steamid')?.value;
-    
     if (!steamId) {
-      return NextResponse.json({ 
-        error: 'Authentication required'
-      }, { status: 401 });
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
-
     const { itemId, itemName, itemImage, game, price } = await req.json();
-
-    // Validation
     if (!itemId || !price || price <= 0) {
-      return NextResponse.json({ 
-        error: 'Invalid offer data'
-      }, { status: 400 });
+      return NextResponse.json({ error: 'Invalid offer data' }, { status: 400 });
     }
-
     // Récupérer l'utilisateur
-    const user = await prisma.user.findUnique({
-      where: { steamId }
-    });
-
-    if (!user) {
-      return NextResponse.json({ 
-        error: 'User not found'
-      }, { status: 404 });
+    const { data: user, error: userError } = await supabase.from('User').select('*').eq('steamId', steamId).single();
+    if (userError || !user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
-
     // Créer l'offre
-    const offer = await prisma.offer.create({
-      data: {
-        sellerId: user.id,
-        itemId,
-        itemName: itemName || `Item ${itemId}`,
-        itemImage: itemImage || '',
-        game: game || 'cs2',
-        price: parseFloat(price),
-        status: 'AVAILABLE',
-        expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 jours
-      },
-      include: {
-        seller: {
-          select: {
-            id: true,
-            steamId: true,
-            name: true,
-            avatar: true
-          }
-        }
-      }
-    });
-
+    const { data: offer, error: offerError } = await supabase.from('Offer').insert([{
+      sellerId: user.id,
+      itemId,
+      itemName: itemName || `Item ${itemId}`,
+      itemImage: itemImage || '',
+      game: game || 'cs2',
+      price: parseFloat(price),
+      status: 'AVAILABLE',
+      expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+    }]).select('*,seller(id,steamId,name,avatar)').single();
+    if (offerError) {
+      return NextResponse.json({ error: offerError.message }, { status: 500 });
+    }
     // Créer une notification pour le vendeur
-    await prisma.notification.create({
-      data: {
-        userId: user.id,
-        type: 'OFFER_CREATED',
-        title: 'Offre créée',
-        message: `Votre offre pour ${offer.itemName} a été créée avec succès.`
-      }
-    });
-
-    return NextResponse.json({
-      success: true,
-      offer: {
-        id: offer.id,
-        itemId: offer.itemId,
-        itemName: offer.itemName,
-        itemImage: offer.itemImage,
-        game: offer.game,
-        price: offer.price,
-        status: offer.status,
-        createdAt: offer.createdAt,
-        seller: offer.seller
-      }
-    });
-
+    await supabase.from('Notification').insert([{
+      userId: user.id,
+      type: 'OFFER_CREATED',
+      title: 'Offre créée',
+      message: `Votre offre pour ${offer.itemName} a été créée avec succès.`
+    }]);
+    return NextResponse.json({ offer });
   } catch (error: any) {
-    console.error('[OFFERS API] Error creating offer:', error);
-    return NextResponse.json({ 
-      error: error.message || 'Internal server error'
-    }, { status: 500 });
+    return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -118,25 +71,16 @@ export async function GET(req: NextRequest) {
     }
 
     // Récupérer les offres
-    const [offers, total] = await Promise.all([
-      prisma.offer.findMany({
-        where,
-        include: {
-          seller: {
-            select: {
-              id: true,
-              steamId: true,
-              name: true,
-              avatar: true
-            }
-          }
-        },
-        orderBy: { createdAt: 'desc' },
-        skip,
-        take: limit
-      }),
-      prisma.offer.count({ where })
-    ]);
+    const { data: offers, error: offersError, count: total } = await supabase
+      .from('Offer')
+      .select('*,seller(id,steamId,name,avatar)', { count: 'exact' })
+      .eq('status', 'AVAILABLE')
+      .order('createdAt', { ascending: false })
+      .range(skip, skip + limit - 1);
+
+    if (offersError) {
+      return NextResponse.json({ error: offersError.message }, { status: 500 });
+    }
 
     return NextResponse.json({
       offers: offers.map(offer => ({
@@ -159,9 +103,6 @@ export async function GET(req: NextRequest) {
     });
 
   } catch (error: any) {
-    console.error('[OFFERS API] Error fetching offers:', error);
-    return NextResponse.json({ 
-      error: error.message || 'Internal server error'
-    }, { status: 500 });
+    return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 });
   }
 } 
