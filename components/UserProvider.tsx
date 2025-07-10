@@ -9,6 +9,11 @@ type User = {
   name?: string;
   avatar?: string;
   profileUrl?: string;
+  tradeUrl?: string;
+  walletBalance?: number;
+  offersCount?: number;
+  transactionsCount?: number;
+  unreadNotificationsCount?: number;
 };
 
 type UserContextType = {
@@ -23,15 +28,18 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
 export function UserProvider({ children }: { children: React.ReactNode }) {
-  const { data, error, isLoading, mutate } = useSWR<User>("/api/users/me", fetcher, {
+  const { data, error, isLoading, mutate } = useSWR<any>("/api/users/me", fetcher, {
     dedupingInterval: 30000, // 30s cache
     revalidateOnFocus: false,
   });
 
+  // Correction : on prend data.user si loggedIn, sinon null
+  const user: User | null = data && data.loggedIn && data.user ? { loggedIn: true, ...data.user } : null;
+
   return (
     <UserContext.Provider
       value={{
-        user: data ?? null,
+        user,
         isLoading,
         isError: !!error,
         refetch: () => mutate(),
