@@ -59,11 +59,16 @@ export async function GET(req: NextRequest) {
     }
 
     // Récupérer les offres, transactions, notifications
-    const [{ data: offers = [] }, { data: transactions = [] }, { data: notifications = [] }] = await Promise.all([
+    const [offersResult, transactionsResult, notificationsResult] = await Promise.all([
       supabase.from('Offer').select('*').eq('sellerId', user.id).order('createdAt', { ascending: false }),
       supabase.from('Transaction').select('*,offer(*)').or(`buyerId.eq.${user.id},offer.sellerId.eq.${user.id}`).order('startedAt', { ascending: false }),
       supabase.from('Notification').select('*').eq('userId', user.id).eq('read', false).order('createdAt', { ascending: false })
     ]);
+
+    // Gérer les erreurs de requête
+    const offers = offersResult.data || [];
+    const transactions = transactionsResult.data || [];
+    const notifications = notificationsResult.data || [];
 
     return NextResponse.json({
       loggedIn: true,

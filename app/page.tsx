@@ -17,6 +17,7 @@ import { useCurrencyStore, useCryptoRatesStore } from '@/hooks/use-currency-stor
 import { cryptoIcons } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 import Image from 'next/image';
+import { useUser } from "@/components/UserProvider";
 
 type SteamProfile = {
   loggedIn: boolean;
@@ -30,6 +31,7 @@ export default function Home() {
   const { t, ready } = useTranslation('common');
   const { currency } = useCurrencyStore();
   const cryptoRates = useCryptoRatesStore();
+  const { user, isLoading, isError } = useUser();
   
   // Utiliser le hook pour mettre à jour les taux crypto toutes les 30 secondes
   // useCryptoRates();
@@ -45,7 +47,6 @@ export default function Home() {
   ];
   const [bgIndex, setBgIndex] = useState(0); // Index du skin affiché
   const timeoutRef = useRef<NodeJS.Timeout|null>(null);
-  const [steamStatus, setSteamStatus] = useState<null | { loggedIn: boolean }>(null);
 
   // Fonction pour sélectionner le prochain skin en évitant les AK consécutifs
   const getNextSkinIndex = (currentIndex: number): number => {
@@ -60,14 +61,6 @@ export default function Home() {
   };
 
   useEffect(() => {
-    fetch('/api/users/me').then(res => res.json()).then((data) => {
-      if (data && typeof data === 'object' && 'loggedIn' in data) {
-        setSteamStatus(data);
-      }
-    });
-  }, []);
-
-  useEffect(() => {
     timeoutRef.current = setTimeout(() => {
       setBgIndex(getNextSkinIndex(bgIndex));
     }, 5000);
@@ -77,6 +70,8 @@ export default function Home() {
   }, [bgIndex, skinImages.length]);
 
   if (!ready) return null; // ou un loader si tu préfères
+  if (isLoading) return <div>Chargement…</div>;
+  if (isError) return <div>Erreur de connexion</div>;
 
   return (
     <div className="relative min-h-screen">
@@ -524,7 +519,7 @@ export default function Home() {
             <p className="text-base md:text-lg text-white/70 mb-6 md:mb-8">
               {t('home.community_subtitle')}
             </p>
-            {steamStatus === undefined ? null : steamStatus?.loggedIn ? (
+            {user?.loggedIn ? (
               <div className="inline-flex items-center gap-2 justify-center">
                 <span className="font-bold text-opnskin-accent">{t('home.connected')}</span>
                 <span className="inline-block w-3 h-3 rounded-full" style={{ background: '#0CE49B', boxShadow: '0 0 8px #0CE49B88' }}></span>

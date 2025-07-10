@@ -5,36 +5,60 @@ import { OfferCard } from "@/components/OfferCard";
 import { useTranslation } from "react-i18next";
 import { Loader2, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
-// Simule l'utilisateur connecté (à remplacer par l'auth plus tard)
-const currentUserId = "user_simule_123";
+import { useUser } from "@/components/UserProvider";
 
 export default function Listings() {
   const { t } = useTranslation("common");
+  const { user, isLoading, isError } = useUser();
   const [offers, setOffers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchOffers = async () => {
-    setLoading(true);
-    try {
-      const response = await fetch(`/api/users/me`);
-      const data = await response.json();
-      if (data.loggedIn && data.user) {
-        setOffers(data.user.offers || []);
+  useEffect(() => {
+    if (user && user.loggedIn) {
+      // Si user.offers est exposé par l'API, utilise-le directement
+      if (user.offers) {
+        setOffers(user.offers);
+        setLoading(false);
       } else {
-        setOffers([]);
+        // Sinon, fetch une route dédiée si besoin
+        fetch('/api/offers?mine=true')
+          .then(res => res.json())
+          .then(data => {
+            setOffers(data.offers || []);
+            setLoading(false);
+          })
+          .catch(() => {
+            setOffers([]);
+            setLoading(false);
+          });
       }
-    } catch (error) {
-      console.error('Erreur lors du chargement des offres:', error);
+    } else {
       setOffers([]);
-    } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
 
-  useEffect(() => {
-    fetchOffers();
-  }, []);
+  if (isLoading || loading) return <div>Chargement…</div>;
+  if (isError) return <div>Erreur de connexion</div>;
+  if (!user || !user.loggedIn) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center px-2 md:px-0">
+          <Package className="h-14 w-14 md:h-16 md:w-16 text-opnskin-text-secondary/30 mx-auto mb-3 md:mb-4" />
+          <h2 className="text-xl md:text-2xl font-bold mb-2 font-satoshi-bold text-opnskin-text-primary">{t('inventory.not_logged_in_title', 'Connecte-toi via Steam pour voir tes offres')}</h2>
+          <p className="text-opnskin-text-secondary mb-3 md:mb-4 text-base md:text-lg">{t('inventory.not_logged_in_desc', 'Tu dois être connecté via Steam pour accéder à tes offres.')}</p>
+          <Button onClick={() => window.location.href = '/api/auth/steam'} className="btn-opnskin flex items-center gap-2 w-full max-w-xs mx-auto text-base md:text-lg">
+            <img
+              src="/icons8-steam-128.png"
+              alt="Steam"
+              className="w-6 h-6 object-contain"
+            />
+            {t('inventory.login_button', 'Se connecter via Steam')}
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   // Trie et groupe les offres par statut
   const groupByStatus = (status: string) =>
@@ -107,7 +131,7 @@ export default function Listings() {
                         <OfferCard 
                           key={offer.id} 
                           offer={offer} 
-                          currentUserId={currentUserId}
+                          currentUserId={user?.id}
                           onOfferCancelled={handleOfferCancelled}
                         />
                       ))}

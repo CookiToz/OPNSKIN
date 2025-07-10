@@ -20,6 +20,7 @@ import {
 import { useCurrencyStore, useCryptoRatesStore } from '@/hooks/use-currency-store';
 import { formatPrice, cryptoIcons } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
+import { useUser } from "@/components/UserProvider";
 
 interface SteamUser {
   name: string;
@@ -37,25 +38,18 @@ interface InventoryItem {
 
 export default function Profile() {
   const { t } = useTranslation('common');
-  const [steamUser, setSteamUser] = useState<SteamUser | null>(null);
+  const { user, isLoading, isError } = useUser();
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
   const [loadingInventory, setLoadingInventory] = useState(true);
   const currency = useCurrencyStore((state) => state.currency);
   const cryptoRates = useCryptoRatesStore();
-  const currentUserId = 'user_simule_123';
   const [tradeUrl, setTradeUrl] = useState<string>("");
   const [tradeUrlLoading, setTradeUrlLoading] = useState(false);
   const [tradeUrlMessage, setTradeUrlMessage] = useState<string | null>(null);
 
-  // Charger le tradeUrl actuel au montage (simulé)
   useEffect(() => {
-    // À remplacer par un vrai endpoint user/me plus tard
-    fetch(`/api/user/${currentUserId}`)
-      .then(res => res.json())
-      .then(data => {
-        if (data.tradeUrl) setTradeUrl(data.tradeUrl);
-      });
-  }, []);
+    if (user && user.tradeUrl) setTradeUrl(user.tradeUrl);
+  }, [user]);
 
   function isValidTradeUrl(url: string) {
     return url.startsWith('https://steamcommunity.com/tradeoffer/new/');
@@ -88,26 +82,6 @@ export default function Profile() {
     }
   };
 
-  useEffect(() => {
-    fetch('/api/users/me')
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.loggedIn && data.user) {
-          setSteamUser({
-            name: data.user.name || 'Steam User',
-            avatar: data.user.avatar || '',
-            steamId: data.user.steamId,
-            profileUrl: data.user.profileUrl || ''
-          });
-          if (data.user.tradeUrl) {
-            setTradeUrl(data.user.tradeUrl);
-          }
-        }
-      });
-  }, []);
-
-  const totalValue = inventory.reduce((sum, item) => sum + (item.marketPrice || 0), 0);
-
   const fetchInventory = () => {
     setLoadingInventory(true);
     fetch(`/api/inventory?currency=${currency}`)
@@ -118,7 +92,13 @@ export default function Profile() {
       });
   };
 
-  if (!steamUser) {
+  if (isLoading) {
+    return <div className="min-h-screen flex items-center justify-center text-center p-4 md:p-6">Chargement…</div>;
+  }
+  if (isError) {
+    return <div className="min-h-screen flex items-center justify-center text-center p-4 md:p-6 text-red-500">Erreur de connexion</div>;
+  }
+  if (!user || !user.loggedIn) {
     return (
       <div className="min-h-screen flex items-center justify-center text-center p-4 md:p-6">
         <div>
@@ -140,6 +120,7 @@ export default function Profile() {
     );
   }
 
+  // Affichage du profil utilisateur Steam
   return (
     <div className="min-h-screen">
       <div className="container mx-auto p-3 md:p-6">
@@ -159,8 +140,8 @@ export default function Profile() {
             <Card className="bg-black/40 border-white/5 mb-4 md:mb-6">
               <CardContent className="p-4 md:p-6 flex flex-col items-center">
                 <Avatar className="h-20 w-20 md:h-24 md:w-24 border-2 border-kalpix-violet mb-3 md:mb-4">
-                  {steamUser ? (
-                    <img src={steamUser.avatar} alt="Avatar Steam" className="rounded-full" />
+                  {user ? (
+                    <img src={user.avatar} alt="Avatar Steam" className="rounded-full" />
                   ) : (
                     <AvatarFallback className="bg-kalpix-violet/20 text-kalpix-violet font-rajdhani text-2xl">
                       ?
@@ -169,7 +150,7 @@ export default function Profile() {
                 </Avatar>
 
                 <h2 className="text-lg md:text-2xl font-bold font-rajdhani mb-1">
-                  {steamUser?.name || t('profile.user')}
+                  {user?.name || t('profile.user')}
                 </h2>
                 <Badge className="bg-kalpix-violet/20 text-kalpix-violet border-kalpix-violet/30 mb-3 md:mb-4 text-xs md:text-base">
                   {t('profile.level_0')}
@@ -182,7 +163,7 @@ export default function Profile() {
                   </div>
                   <div className="text-center">
                     <p className="text-white/70 text-xs md:text-sm">{t('profile.steam_id')}</p>
-                    <p className="font-mono text-xs truncate">{steamUser?.steamId || '...'}</p>
+                    <p className="font-mono text-xs truncate">{user?.steamId || '...'}</p>
                   </div>
                 </div>
 
