@@ -1,9 +1,9 @@
 'use client';
 
-import { useCartStore } from '@/hooks/use-cart-store';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { useCurrencyStore } from '@/hooks/use-currency-store';
+import { Card, CardContent } from '../../components/ui/card';
+import { Button } from '../../components/ui/button';
+import useCartStore from '../../hooks/use-cart-store';
+import useCurrencyStore from '../../hooks/use-currency-store';
 import { useCryptoRatesStore } from '@/hooks/use-currency-store';
 import { formatPrice } from '@/lib/utils';
 import { cryptoIcons } from '@/lib/utils';
