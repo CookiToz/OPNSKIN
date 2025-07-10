@@ -1,17 +1,16 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { useTranslation } from 'next-i18next';
 import { Package } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent } from '@/components/ui/card';
-import { useUser } from '@/components/UserProvider';
-import { useCurrencyStore } from '@/hooks/use-currency-store';
-import InventoryGameSelect from '@/components/InventoryGameSelect';
-import InventoryByGame from '@/components/InventoryByGame';
+import { Button } from '../../components/ui/button';
+import { Input } from '../../components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
+import { Badge } from '../../components/ui/badge';
+import { Card, CardContent } from '../../components/ui/card';
+import { useUser } from '../../components/UserProvider';
+import useCurrencyStore from '../../hooks/use-currency-store';
+import InventoryGameSelect from '../../components/InventoryGameSelect';
+import InventoryByGame from '../../components/InventoryByGame';
 
 type InventoryItem = {
   id: string;
@@ -133,7 +132,6 @@ const GAMES = [
 ] as const;
 
 export default function InventoryPage() {
-  const { t } = useTranslation('common');
   const [selectedGame, setSelectedGame] = useState<null | typeof GAMES[number]>(null);
   const { user, isLoading: userLoading, isError: userError } = useUser();
 
@@ -143,15 +141,15 @@ export default function InventoryPage() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center px-2 md:px-0">
           <Package className="h-14 w-14 md:h-16 md:w-16 text-opnskin-text-secondary/30 mx-auto mb-3 md:mb-4" />
-          <h2 className="text-xl md:text-2xl font-bold mb-2 font-satoshi-bold text-opnskin-text-primary">{t('inventory.not_logged_in_title', 'Connecte-toi via Steam pour voir ton inventaire')}</h2>
-          <p className="text-opnskin-text-secondary mb-3 md:mb-4 text-base md:text-lg">{t('inventory.not_logged_in_desc', 'Tu dois être connecté via Steam pour accéder à ton inventaire.')}</p>
+          <h2 className="text-xl md:text-2xl font-bold mb-2 font-satoshi-bold text-opnskin-text-primary">Connecte-toi via Steam pour voir ton inventaire</h2>
+          <p className="text-opnskin-text-secondary mb-3 md:mb-4 text-base md:text-lg">Tu dois être connecté via Steam pour accéder à ton inventaire.</p>
           <Button onClick={() => window.location.href = '/api/auth/steam'} className="btn-opnskin flex items-center gap-2 w-full max-w-xs mx-auto text-base md:text-lg">
             <img
               src="/icons8-steam-128.png"
               alt="Steam"
               className="w-6 h-6 object-contain"
             />
-            {t('inventory.login_button', 'Se connecter via Steam')}
+            Se connecter via Steam
           </Button>
         </div>
       </div>
@@ -164,8 +162,8 @@ export default function InventoryPage() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center px-2 md:px-0">
           <Package className="h-14 w-14 md:h-16 md:w-16 text-opnskin-text-secondary/30 mx-auto mb-3 md:mb-4 animate-pulse" />
-          <h2 className="text-xl md:text-2xl font-bold mb-2 font-satoshi-bold text-opnskin-text-primary">{t('inventory.loading')}</h2>
-          <p className="text-opnskin-text-secondary text-base md:text-lg">{t('inventory.loading_description')}</p>
+          <h2 className="text-xl md:text-2xl font-bold mb-2 font-satoshi-bold text-opnskin-text-primary">Chargement...</h2>
+          <p className="text-opnskin-text-secondary text-base md:text-lg">Chargement de ton profil Steam...</p>
         </div>
       </div>
     );
