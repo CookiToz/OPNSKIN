@@ -49,7 +49,7 @@ export async function GET(req: NextRequest) {
     // Configuration du cookie pour le domaine Vercel
     response.cookies.set('steamid', steamId, {
       httpOnly: true,
-      secure: true, // true pour HTTPS en production
+      secure: process.env.NODE_ENV === 'production', // true seulement en production
       sameSite: 'lax',
       path: '/',
       maxAge: 60 * 60 * 24 * 7, // 7 jours

@@ -125,7 +125,8 @@ export default function MarketplacePage() {
             <button
               key={game.key}
               onClick={() => setSelectedGame(game.key)}
-              className="group relative rounded-2xl overflow-hidden shadow-lg bg-gradient-to-br from-[#101c2c] to-[#0e0e10] border-2 border-transparent hover:border-[#00ffe7] transition-all duration-300 focus:outline-none flex flex-col w-full max-w-full md:max-w-400 h-56 md:h-100"
+              className="group relative rounded-2xl overflow-hidden shadow-lg bg-gradient-to-br from-[#101c2c] to-[#0e0e10] border-2 border-transparent hover:border-[#00ffe7] transition-all duration-300 focus:outline-none flex flex-col"
+              style={{ width: '100%', maxWidth: 400, height: 400, minHeight: 400 }}
               aria-label={t(`marketplace.game_${game.key}`, game.name)}
             >
               <img
