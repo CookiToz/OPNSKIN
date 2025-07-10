@@ -1,10 +1,12 @@
 'use client';
 
-import { Card, CardContent } from '../../components/ui/card';
-import { Button } from '../../components/ui/button';
-import useCartStore, { useCryptoRatesStore } from '../../hooks/use-currency-store';
-import { formatPrice } from '../../lib/utils';
-import { cryptoIcons } from '../../lib/utils';
+import { useCartStore } from '@/hooks/use-cart-store';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { useCurrencyStore } from '@/hooks/use-currency-store';
+import { useCryptoRatesStore } from '@/hooks/use-currency-store';
+import { formatPrice } from '@/lib/utils';
+import { cryptoIcons } from '@/lib/utils';
 
 export default function CartPage() {
   const { items, remove, clear, total } = useCartStore();
