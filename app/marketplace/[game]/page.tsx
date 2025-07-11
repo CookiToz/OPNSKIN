@@ -109,6 +109,9 @@ export default function MarketplaceGamePage() {
     );
   }
 
+  // Log pour debug
+  console.log('OFFERS:', offers);
+
   return (
     <div className="min-h-screen">
       <div className="container mx-auto p-3 md:p-6">
@@ -215,7 +218,7 @@ export default function MarketplaceGamePage() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {offers.map((offer) => (
-              <Card key={offer.id} className="bg-opnskin-bg-card border-opnskin-bg-secondary hover:border-opnskin-primary/30 transition-all duration-300">
+              <Card key={offer.id || offer.itemId} className="bg-opnskin-bg-card border-opnskin-bg-secondary hover:border-opnskin-primary/30 transition-all duration-300">
                 <CardContent className="p-4">
                   {/* Image du skin */}
                   <div className="relative mb-3">
@@ -223,7 +226,7 @@ export default function MarketplaceGamePage() {
                       {offer.itemImage ? (
                         <img 
                           src={offer.itemImage} 
-                          alt={offer.itemName || offer.itemId} 
+                          alt={offer.itemName || offer.itemId || 'Skin'} 
                           className="w-full h-full object-contain rounded-lg" 
                         />
                       ) : (
@@ -234,35 +237,35 @@ export default function MarketplaceGamePage() {
                       )}
                     </div>
                     <Badge className="absolute top-2 right-2 bg-opnskin-accent/10 text-opnskin-accent border-opnskin-accent/30">
-                      {offer.status}
+                      {offer.status || 'Disponible'}
                     </Badge>
                   </div>
 
                   {/* Informations de l'offre */}
                   <div className="space-y-2">
                     <h3 className="font-satoshi-bold text-sm text-opnskin-text-primary truncate">
-                      {offer.itemName || offer.itemId}
+                      {offer.itemName || offer.itemId || 'Skin inconnu'}
                     </h3>
                     
                     <div className="flex items-center justify-between">
                       <span className="text-opnskin-text-secondary text-xs">
-                        Vendeur: {offer.sellerId}
+                        Vendeur: {offer.sellerId || 'Inconnu'}
                       </span>
                       <span className="font-mono text-opnskin-accent font-bold text-sm">
                         {cryptoIcons[currency] && currency !== 'EUR' && currency !== 'USD' && (
                           <img src={cryptoIcons[currency]!} alt={currency} className="inline w-4 h-4 mr-1 align-middle" />
                         )}
-                        {formatPrice(offer.price, currency, cryptoRates)}
+                        {formatPrice(offer.price || 0, currency, cryptoRates)}
                       </span>
                     </div>
 
                     {/* Bouton d'achat */}
                     <Button
                       className="w-full btn-opnskin mt-3"
-                      onClick={() => handleBuy(offer.id, offer.price)}
-                      disabled={buyingId === offer.id}
+                      onClick={() => handleBuy(offer.id || offer.itemId, offer.price || 0)}
+                      disabled={buyingId === (offer.id || offer.itemId)}
                     >
-                      {buyingId === offer.id ? (
+                      {buyingId === (offer.id || offer.itemId) ? (
                         <>
                           <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                           Achat en cours...
