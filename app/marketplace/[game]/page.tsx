@@ -33,7 +33,7 @@ export default function MarketplaceGamePage() {
   const [loading, setLoading] = useState(true);
   const [buyingId, setBuyingId] = useState<string | null>(null);
 
-  const gameInfo = GAME_INFO[game as keyof typeof GAME_INFO];
+  const gameInfo = GAME_INFO[(game as string).toLowerCase() as keyof typeof GAME_INFO];
 
   useEffect(() => {
     if (!game) return;

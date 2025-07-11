@@ -17,6 +17,7 @@ import { useCryptoRatesStore } from '@/hooks/use-currency-store';
 import { formatPrice } from '@/lib/utils';
 import { useSearchStore } from '@/hooks/use-search-store';
 import { useToast } from '@/hooks/use-toast';
+import { useUser } from '@/hooks/use-user';
 
 export type GameType = {
   key: string;
@@ -117,6 +118,24 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
   };
   
   const searchQuery = useSearchStore((state) => state.searchQuery);
+  const { user } = useUser();
+  const [listedItemIds, setListedItemIds] = useState<string[]>([]);
+
+  useEffect(() => {
+    // Récupérer les itemId des offres actives de l'utilisateur
+    if (user && user.loggedIn) {
+      fetch('/api/offers?mine=true')
+        .then(res => res.json())
+        .then(data => {
+          const ids = (data.offers || [])
+            .filter((offer: any) => offer.sellerId === user.id && offer.status === 'AVAILABLE')
+            .map((offer: any) => offer.itemId);
+          setListedItemIds(ids);
+        });
+    } else {
+      setListedItemIds([]);
+    }
+  }, [user]);
 
   const handleBack = () => {
     localStorage.removeItem('opnskin-inventory-game');
@@ -218,6 +237,8 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
 
   // Logique de filtrage
   const filteredItems = items.filter(item => {
+    // Exclure les items déjà listés en vente par l'utilisateur
+    if (listedItemIds.includes(item.id)) return false;
     // Filtre de base : exclure les skins de faible valeur (< 0.02€)
     if (item.marketPrice !== undefined && item.marketPrice < 0.02) {
       return false;

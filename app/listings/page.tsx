@@ -17,14 +17,14 @@ export default function Listings() {
     if (user && user.loggedIn) {
       // Si user.offers est exposé par l'API, utilise-le directement
       if (user.offers) {
-        setOffers(user.offers);
+        setOffers(user.offers.filter((offer: any) => offer.sellerId === user.id));
         setLoading(false);
       } else {
         // Sinon, fetch une route dédiée si besoin
         fetch('/api/offers?mine=true')
           .then(res => res.json())
           .then(data => {
-            setOffers(data.offers || []);
+            setOffers((data.offers || []).filter((offer: any) => offer.sellerId === user.id));
             setLoading(false);
           })
           .catch(() => {
