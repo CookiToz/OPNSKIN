@@ -24,6 +24,7 @@ const GAME_INFO = {
 };
 
 export default function MarketplaceGamePage() {
+  // Tous les hooks doivent être appelés au début, avant toute condition
   const { game } = useParams();
   const { t } = useTranslation('common');
   const { toast } = useToast();
@@ -34,49 +35,14 @@ export default function MarketplaceGamePage() {
   const [buyingId, setBuyingId] = useState<string | null>(null);
   const [isClient, setIsClient] = useState(false);
 
+  // Hook pour détecter le client
   useEffect(() => {
     setIsClient(true);
   }, []);
 
-  if (!isClient) {
-    return null;
-  }
-
-  if (!game || typeof game !== 'string') {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-opnskin-text-primary mb-4">Erreur : jeu non spécifié</h1>
-          <Link href="/marketplace">
-            <Button className="btn-opnskin">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Retour au marketplace
-            </Button>
-          </Link>
-        </div>
-      </div>
-    );
-  }
-
-  const gameInfo = GAME_INFO[game.toLowerCase() as keyof typeof GAME_INFO];
-  if (!gameInfo) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-opnskin-text-primary mb-4">Jeu non trouvé</h1>
-          <Link href="/marketplace">
-            <Button className="btn-opnskin">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Retour au marketplace
-            </Button>
-          </Link>
-        </div>
-      </div>
-    );
-  }
-
+  // Hook pour charger les offres
   useEffect(() => {
-    if (!game) return;
+    if (!game || !isClient) return;
     setLoading(true);
     fetch(`/api/offers?game=${game}`)
       .then((res) => res.json())
@@ -93,7 +59,7 @@ export default function MarketplaceGamePage() {
         });
         setLoading(false);
       });
-  }, [game, toast]);
+  }, [game, toast, isClient]);
 
   const handleBuy = async (offerId: string, offerPrice: number) => {
     setBuyingId(offerId);
@@ -135,6 +101,44 @@ export default function MarketplaceGamePage() {
 
   // Log pour debug
   console.log('OFFERS:', offers);
+
+  // Conditions de rendu après tous les hooks
+  if (!isClient) {
+    return null;
+  }
+
+  if (!game || typeof game !== 'string') {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-opnskin-text-primary mb-4">Erreur : jeu non spécifié</h1>
+          <Link href="/marketplace">
+            <Button className="btn-opnskin">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Retour au marketplace
+            </Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  const gameInfo = GAME_INFO[game.toLowerCase() as keyof typeof GAME_INFO];
+  if (!gameInfo) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-opnskin-text-primary mb-4">Jeu non trouvé</h1>
+          <Link href="/marketplace">
+            <Button className="btn-opnskin">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Retour au marketplace
+            </Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen">
