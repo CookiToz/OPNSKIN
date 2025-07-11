@@ -17,13 +17,31 @@ export async function POST(req: NextRequest) {
     if (userError || !user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
+    // Vérifier qu'il n'existe pas déjà une offre active pour ce skin
+    const { data: existingOffer } = await supabase
+      .from('Offer')
+      .select('*')
+      .eq('itemId', itemId)
+      .eq('sellerId', user.id)
+      .eq('status', 'AVAILABLE')
+      .single();
+
+    if (existingOffer) {
+      return NextResponse.json({ error: "Vous avez déjà une offre active pour ce skin." }, { status: 400 });
+    }
+    // Validation stricte du champ game
+    const allowedGames = ['cs2', 'dota2', 'rust', 'tf2'];
+    let offerGame = (game || '').toLowerCase();
+    if (!allowedGames.includes(offerGame)) {
+      offerGame = 'cs2';
+    }
     // Créer l'offre
     const { data: offer, error: offerError } = await supabase.from('Offer').insert([{
       sellerId: user.id,
       itemId,
       itemName: itemName || `Item ${itemId}`,
       itemImage: itemImage || '',
-      game: game || 'cs2',
+      game: offerGame,
       price: parseFloat(price),
       status: 'AVAILABLE',
       expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()

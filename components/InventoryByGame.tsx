@@ -191,8 +191,7 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
         setSelectedItem(null);
         setSellPrice('');
         
-        // Optionnel : rafraîchir l'inventaire pour masquer l'item vendu
-        // refetch();
+        refetch(); // Recharge l'inventaire pour masquer l'item vendu
       } else {
         toast({
           title: "Erreur",

@@ -32,7 +32,8 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
     }
     const { data: offer, error: offerError } = await supabase.from('Offer').select('*,transaction(*)').eq('id', params.id).single();
     if (offerError || !offer) {
-      return NextResponse.json({ error: 'Offer not found' }, { status: 404 });
+      console.error('Suppression offre : ID non trouvé', params.id);
+      return NextResponse.json({ error: 'Offer not found', offerId: params.id }, { status: 404 });
     }
     if (offer.sellerId !== user.id) {
       return NextResponse.json({ error: 'Not authorized to cancel this offer' }, { status: 403 });
