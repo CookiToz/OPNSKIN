@@ -89,10 +89,17 @@ export async function GET(req: NextRequest) {
     }
 
     // Récupérer les offres
-    const { data: offers, error: offersError, count: total } = await supabase
+    let query = supabase
       .from('Offer')
       .select('*', { count: 'exact' })
-      .eq('status', 'AVAILABLE')
+      .eq('status', 'AVAILABLE');
+
+    // Ajouter le filtre par game si fourni
+    if (game) {
+      query = query.eq('game', game);
+    }
+
+    const { data: offers, error: offersError, count: total } = await query
       .order('createdAt', { ascending: false })
       .range(skip, skip + limit - 1);
 
@@ -116,8 +123,8 @@ export async function GET(req: NextRequest) {
       pagination: {
         page,
         limit,
-        total,
-        pages: Math.ceil(total / limit)
+        total: total || 0,
+        pages: Math.ceil((total || 0) / limit)
       }
     });
 
