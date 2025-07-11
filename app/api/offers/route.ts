@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
       price: parseFloat(price),
       status: 'AVAILABLE',
       expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
-    }]).select('*,seller(id,steamId,name,avatar)').single();
+    }]).select('*').single();
     if (offerError) {
       return NextResponse.json({ error: offerError.message }, { status: 500 });
     }
@@ -73,7 +73,7 @@ export async function GET(req: NextRequest) {
     // Récupérer les offres
     const { data: offers, error: offersError, count: total } = await supabase
       .from('Offer')
-      .select('*,seller(id,steamId,name,avatar)', { count: 'exact' })
+      .select('*', { count: 'exact' })
       .eq('status', 'AVAILABLE')
       .order('createdAt', { ascending: false })
       .range(skip, skip + limit - 1);
@@ -82,6 +82,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: offersError.message }, { status: 500 });
     }
 
+    // Si besoin d'infos sur le vendeur, faire une requête séparée ici avec offer.sellerId
     return NextResponse.json({
       offers: offers.map(offer => ({
         id: offer.id,
@@ -92,7 +93,7 @@ export async function GET(req: NextRequest) {
         price: offer.price,
         status: offer.status,
         createdAt: offer.createdAt,
-        seller: offer.seller
+        sellerId: offer.sellerId
       })),
       pagination: {
         page,

@@ -6,9 +6,10 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
   try {
     const { data: offer, error } = await supabase
       .from('Offer')
-      .select('*,seller(id,steamId,name,avatar),transaction(buyer(id,steamId,name,avatar))')
+      .select('*')
       .eq('id', params.id)
       .single();
+    // Si besoin d'infos sur le vendeur, faire une requête séparée ici avec offer.sellerId
     if (error || !offer) {
       return NextResponse.json({ error: 'Offer not found' }, { status: 404 });
     }
