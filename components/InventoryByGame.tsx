@@ -17,7 +17,7 @@ import { useCryptoRatesStore } from '@/hooks/use-currency-store';
 import { formatPrice } from '@/lib/utils';
 import { useSearchStore } from '@/hooks/use-search-store';
 import { useToast } from '@/hooks/use-toast';
-import { useUser } from '@/hooks/use-user';
+import { useUser } from '@/components/UserProvider';
 
 export type GameType = {
   key: string;
