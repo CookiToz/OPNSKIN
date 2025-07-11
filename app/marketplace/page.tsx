@@ -14,6 +14,7 @@ import { cryptoIcons } from '@/lib/utils';
 import { Filter, SlidersHorizontal, ChevronDown } from 'lucide-react';
 import { useSearchStore } from '@/hooks/use-search-store';
 import { useTranslation } from 'next-i18next';
+import { useRouter } from 'next/navigation';
 
 const GAMES = [
   { key: 'cs2', name: 'CS2', cover: '/CS2.png' },
@@ -79,6 +80,7 @@ const mockItems = [
 
 export default function MarketplacePage() {
   const { t } = useTranslation('common');
+  const router = useRouter();
   const [selectedGame, setSelectedGame] = useState<string | null>(null);
   const [items] = useState(mockItems);
   const [filteredItems, setFilteredItems] = useState(mockItems);
@@ -124,7 +126,7 @@ export default function MarketplacePage() {
           {GAMES.map(game => (
             <button
               key={game.key}
-              onClick={() => setSelectedGame(game.key)}
+              onClick={() => router.push(`/marketplace/${game.key}`)}
               className="group relative rounded-2xl overflow-hidden shadow-lg bg-gradient-to-br from-[#101c2c] to-[#0e0e10] border-2 border-transparent hover:border-[#00ffe7] transition-all duration-300 focus:outline-none flex flex-col"
               style={{ width: '100%', maxWidth: 400, height: 400, minHeight: 400 }}
               aria-label={t(`marketplace.game_${game.key}`, game.name)}
