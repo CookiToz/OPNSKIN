@@ -32,6 +32,16 @@ export default function MarketplaceGamePage() {
   const [offers, setOffers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [buyingId, setBuyingId] = useState<string | null>(null);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  if (!isClient) {
+    // Empêche le rendu côté serveur pour éviter le mismatch
+    return null;
+  }
 
   const gameInfo = GAME_INFO[(game as string).toLowerCase() as keyof typeof GAME_INFO];
 
