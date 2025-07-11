@@ -1,5 +1,3 @@
-"use client";
-
 import type React from "react"
 import type { Metadata } from "next"
 import { Poppins, Sora, Share_Tech_Mono, Inter } from "next/font/google"

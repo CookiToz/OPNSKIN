@@ -12,6 +12,7 @@ import { formatPrice } from '@/lib/utils';
 import { cryptoIcons } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 import Link from "next/link";
+import SkinCard from '@/components/SkinCard';
 
 const currentUserId = "user_simule_123";
 
@@ -228,65 +229,30 @@ export default function MarketplaceGamePage() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {offers.map((offer) => (
-              <Card key={offer.id || offer.itemId} className="bg-opnskin-bg-card border-opnskin-bg-secondary hover:border-opnskin-primary/30 transition-all duration-300">
-                <CardContent className="p-4">
-                  {/* Image du skin */}
-                  <div className="relative mb-3">
-                    <div className="w-full h-32 bg-opnskin-bg-secondary rounded-lg flex items-center justify-center">
-                      {offer.itemImage ? (
-                        <img 
-                          src={offer.itemImage} 
-                          alt={offer.itemName || offer.itemId || 'Skin'} 
-                          className="w-full h-full object-contain rounded-lg" 
-                        />
-                      ) : (
-                        <div className="text-opnskin-text-secondary/50 text-center">
-                          <Store className="w-8 h-8 mx-auto mb-2" />
-                          <span className="text-xs">Image non disponible</span>
-                        </div>
-                      )}
-                    </div>
-                    <Badge className="absolute top-2 right-2 bg-opnskin-accent/10 text-opnskin-accent border-opnskin-accent/30">
-                      {offer.status || 'Disponible'}
-                    </Badge>
-                  </div>
-
-                  {/* Informations de l'offre */}
-                  <div className="space-y-2">
-                    <h3 className="font-satoshi-bold text-sm text-opnskin-text-primary truncate">
-                      {offer.itemName || offer.itemId || 'Skin inconnu'}
-                    </h3>
-                    
-                    <div className="flex items-center justify-between">
-                      <span className="text-opnskin-text-secondary text-xs">
-                        Vendeur: {offer.sellerId || 'Inconnu'}
-                      </span>
-                      <span className="font-mono text-opnskin-accent font-bold text-sm">
-                        {cryptoIcons[currency] && currency !== 'EUR' && currency !== 'USD' && (
-                          <img src={cryptoIcons[currency]!} alt={currency} className="inline w-4 h-4 mr-1 align-middle" />
-                        )}
-                        {formatPrice(offer.price || 0, currency, cryptoRates)}
-                      </span>
-                    </div>
-
-                    {/* Bouton d'achat */}
-                    <Button
-                      className="w-full btn-opnskin mt-3"
-                      onClick={() => handleBuy(offer.id || offer.itemId, offer.price || 0)}
-                      disabled={buyingId === (offer.id || offer.itemId)}
-                    >
-                      {buyingId === (offer.id || offer.itemId) ? (
-                        <>
-                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          Achat en cours...
-                        </>
-                      ) : (
-                        "Acheter"
-                      )}
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+              <SkinCard
+                key={offer.id || offer.itemId}
+                name={offer.itemName || offer.itemId || 'Skin inconnu'}
+                image={offer.itemImage || '/placeholder.svg'}
+                price={offer.price || 0}
+                rarityLabel={offer.status || 'Disponible'}
+                currency={currency}
+                actionButton={
+                  <Button
+                    className="w-full btn-opnskin mt-3"
+                    onClick={() => handleBuy(offer.id || offer.itemId, offer.price || 0)}
+                    disabled={buyingId === (offer.id || offer.itemId)}
+                  >
+                    {buyingId === (offer.id || offer.itemId) ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Achat en cours...
+                      </>
+                    ) : (
+                      "Acheter"
+                    )}
+                  </Button>
+                }
+              />
             ))}
           </div>
         )}
