@@ -64,7 +64,11 @@ export default function Listings() {
   const groupByStatus = (status: string) =>
     offers
       .filter((o) => o.status === status)
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .map(o => ({
+        ...o,
+        id: o.id || o.offerId // force l'UUID comme id si jamais il y a un mapping incorrect
+      }));
 
   const sections = [
     { key: "AVAILABLE", label: "Actives" },
