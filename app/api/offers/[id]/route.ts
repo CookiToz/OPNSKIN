@@ -31,7 +31,7 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
     console.log('Suppression offre : ID reçu', params.id, typeof params.id);
-    const { data: offer, error: offerError } = await supabase.from('Offer').select('*,transaction(*)').eq('id', String(params.id).trim()).single();
+    const { data: offer, error: offerError } = await supabase.from('Offer').select('*').eq('id', String(params.id).trim()).single();
     console.log('Offre récupérée pour suppression:', offer);
     if (offerError || !offer) {
       console.error('Suppression offre : ID non trouvé', params.id);
