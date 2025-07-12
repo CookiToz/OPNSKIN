@@ -33,6 +33,8 @@ type Offer = {
   sellerId: string;
   createdAt: string;
   transaction?: Transaction | null;
+  itemImage?: string | null;
+  itemName?: string | null;
 };
 
 type OfferCardProps = {
@@ -66,19 +68,18 @@ export const OfferCard: React.FC<OfferCardProps> = ({ offer, currentUserId, onOf
           'Content-Type': 'application/json',
         },
       });
-
+      const data = await response.json().catch(() => ({}));
       if (response.ok) {
         toast({
           title: "Offre retirée",
-          description: "Votre offre a été retirée avec succès.",
+          description: data.message || "Votre offre a été retirée avec succès.",
         });
         setShowCancelDialog(false);
         onOfferCancelled?.();
       } else {
-        const error = await response.json();
         toast({
           title: "Erreur",
-          description: error.error || "Impossible de retirer l'offre.",
+          description: data.error || data.message || "Impossible de retirer l'offre.",
           variant: "destructive",
         });
       }
@@ -96,6 +97,17 @@ export const OfferCard: React.FC<OfferCardProps> = ({ offer, currentUserId, onOf
   return (
     <div className="bg-opnskin-bg-card border border-opnskin-bg-secondary rounded-lg p-4 mb-4 shadow">
       <div className="flex flex-col gap-2">
+        {/* Image du skin */}
+        {offer.itemImage && (
+          <div className="flex justify-center mb-2">
+            <img
+              src={offer.itemImage}
+              alt={offer.itemName || 'Skin'}
+              className="w-24 h-24 object-contain rounded shadow"
+              loading="lazy"
+            />
+          </div>
+        )}
         <div>
           <span className="font-bold">Item :</span> {offer.itemId}
         </div>
