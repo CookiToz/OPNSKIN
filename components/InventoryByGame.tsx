@@ -164,10 +164,10 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
     }
 
     const price = parseFloat(sellPrice);
-    if (isNaN(price) || price <= 0) {
+    if (isNaN(price) || price < 0) {
       toast({
         title: "Erreur",
-        description: "Le prix doit être un nombre positif.",
+        description: "Le prix ne peut pas être négatif.",
         variant: "destructive",
       });
       return;
