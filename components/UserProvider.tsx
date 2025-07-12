@@ -4,6 +4,7 @@ import React, { createContext, useContext } from "react";
 import useSWR from "swr";
 
 type User = {
+  id?: string;
   loggedIn: boolean;
   steamId?: string;
   name?: string;

@@ -13,6 +13,7 @@ import { cryptoIcons } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 import Link from "next/link";
 import SkinCard from '@/components/SkinCard';
+import { useUser } from "@/components/UserProvider";
 
 const currentUserId = "user_simule_123";
 
@@ -34,6 +35,7 @@ export default function MarketplaceGamePage() {
   const [loading, setLoading] = useState(true);
   const [buyingId, setBuyingId] = useState<string | null>(null);
   const [isClient, setIsClient] = useState(false);
+  const { user, isLoading: userLoading } = useUser();
 
   // Hook pour détecter le client
   useEffect(() => {
@@ -224,7 +226,7 @@ export default function MarketplaceGamePage() {
         </div>
 
         {/* Liste des offres */}
-        {loading ? (
+        {loading || userLoading ? (
           <div className="flex items-center justify-center py-12">
             <Loader2 className="animate-spin h-8 w-8 text-opnskin-primary" />
           </div>
@@ -245,32 +247,39 @@ export default function MarketplaceGamePage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {offers.map((offer) => (
-              <SkinCard
-                key={offer.id || offer.itemId}
-                name={offer.itemName || offer.itemId || 'Skin inconnu'}
-                image={offer.itemImage || '/placeholder.svg'}
-                price={offer.price || 0}
-                rarityLabel={offer.status || 'Disponible'}
-                currency={currency}
-                actionButton={
-                  <Button
-                    className="w-full btn-opnskin mt-3"
-                    onClick={() => handleBuy(offer.id || offer.itemId, offer.price || 0)}
-                    disabled={buyingId === (offer.id || offer.itemId)}
-                  >
-                    {buyingId === (offer.id || offer.itemId) ? (
-                      <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Achat en cours...
-                      </>
+            {offers.map((offer) => {
+              const isMine = user && user.loggedIn && offer.sellerId === user.id;
+              return (
+                <SkinCard
+                  key={offer.id || offer.itemId}
+                  name={offer.itemName || offer.itemId || 'Skin inconnu'}
+                  image={offer.itemImage || '/placeholder.svg'}
+                  price={offer.price || 0}
+                  rarityLabel={offer.status || 'Disponible'}
+                  currency={currency}
+                  actionButton={
+                    isMine ? (
+                      <div className="w-full mt-3 text-center text-xs text-opnskin-accent font-bold">Mon offre</div>
                     ) : (
-                      "Acheter"
-                    )}
-                  </Button>
-                }
-              />
-            ))}
+                      <Button
+                        className="w-full btn-opnskin mt-3"
+                        onClick={() => handleBuy(offer.id || offer.itemId, offer.price || 0)}
+                        disabled={buyingId === (offer.id || offer.itemId)}
+                      >
+                        {buyingId === (offer.id || offer.itemId) ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            Achat en cours...
+                          </>
+                        ) : (
+                          "Acheter"
+                        )}
+                      </Button>
+                    )
+                  }
+                />
+              );
+            })}
           </div>
         )}
       </div>
