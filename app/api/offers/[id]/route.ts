@@ -32,10 +32,13 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
     }
     console.log('Suppression offre : ID reçu', params.id, typeof params.id);
     const { data: offer, error: offerError } = await supabase.from('Offer').select('*,transaction(*)').eq('id', String(params.id).trim()).single();
+    console.log('Offre récupérée pour suppression:', offer);
     if (offerError || !offer) {
       console.error('Suppression offre : ID non trouvé', params.id);
       return NextResponse.json({ error: 'Offer not found', offerId: params.id }, { status: 404 });
     }
+    console.log('Suppression offre : user.id', user.id, 'offer.sellerId', offer.sellerId);
+    console.log('Suppression offre : user.steamId', user.steamId);
     if (offer.sellerId !== user.id) {
       return NextResponse.json({ error: 'Not authorized to cancel this offer' }, { status: 403 });
     }
