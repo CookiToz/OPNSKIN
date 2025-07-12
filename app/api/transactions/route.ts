@@ -20,7 +20,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
     // Récupérer l'offre
-    const { data: offer, error: offerError } = await supabase.from('Offer').select('*,seller(*)').eq('id', offerId).single();
+    console.log('offerId envoyé:', offerId, typeof offerId);
+    const { data: offer, error: offerError } = await supabase
+      .from('Offer')
+      .select('*')
+      .eq('id', String(offerId).trim())
+      .single();
     console.log('offre trouvée:', offer, 'Erreur:', offerError);
     if (offerError || !offer) {
       console.log('ERREUR: Offer not found', offerError, offer);
