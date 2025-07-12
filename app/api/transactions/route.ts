@@ -79,13 +79,13 @@ export async function GET(req: NextRequest) {
     // 1. Transactions où l'utilisateur est acheteur
     const { data: buyerTx, error: buyerTxError } = await supabase
       .from('Transaction')
-      .select('*,offerId(*),buyerId(*)')
+      .select('*,offer(*),buyer(*)')
       .eq('buyerId', user.id)
       .order('startedAt', { ascending: false });
     // 2. Transactions où l'utilisateur est vendeur (via offerId.sellerId)
     const { data: sellerTx, error: sellerTxError } = await supabase
       .from('Transaction')
-      .select('*,offerId(*),buyerId(*)')
+      .select('*,offer(*),buyer(*)')
       .order('startedAt', { ascending: false });
     // On filtre côté JS pour sellerId
     const sellerTxFiltered = (sellerTx || []).filter(t => t.offerId?.sellerId === user.id);
