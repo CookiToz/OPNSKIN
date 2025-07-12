@@ -70,16 +70,29 @@ export async function GET(req: NextRequest) {
     if (userError || !user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
-    const { data: transactions, error: txError } = await supabase
+    // Correction : on fait deux requêtes séparées pour éviter l'erreur de parsing
+    // 1. Transactions où l'utilisateur est acheteur
+    const { data: buyerTx, error: buyerTxError } = await supabase
       .from('Transaction')
       .select('*,offer(*,seller(id,steamId,name,avatar)),buyer(id,steamId,name,avatar)')
-      .or(`buyerId.eq.${user.id},offer.sellerId.eq.${user.id}`)
+      .eq('buyerId', user.id)
       .order('startedAt', { ascending: false });
-    if (txError) {
-      return NextResponse.json({ error: txError.message }, { status: 500 });
+    // 2. Transactions où l'utilisateur est vendeur (via offer.sellerId)
+    const { data: sellerTx, error: sellerTxError } = await supabase
+      .from('Transaction')
+      .select('*,offer(*,seller(id,steamId,name,avatar)),buyer(id,steamId,name,avatar)')
+      .order('startedAt', { ascending: false });
+    // On filtre côté JS pour sellerId
+    const sellerTxFiltered = (sellerTx || []).filter(t => t.offer?.sellerId === user.id);
+    // On fusionne et on déduplique
+    const allTx = [...(buyerTx || []), ...sellerTxFiltered].filter((tx, idx, arr) =>
+      arr.findIndex(t => t.id === tx.id) === idx
+    );
+    if (buyerTxError || sellerTxError) {
+      return NextResponse.json({ error: (buyerTxError?.message || sellerTxError?.message) }, { status: 500 });
     }
     return NextResponse.json({
-      transactions: (transactions || []).map(t => ({
+      transactions: (allTx || []).map(t => ({
         id: t.id,
         offerId: t.offerId,
         escrowAmount: t.escrowAmount,
