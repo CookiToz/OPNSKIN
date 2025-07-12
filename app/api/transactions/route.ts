@@ -74,16 +74,16 @@ export async function GET(req: NextRequest) {
     // 1. Transactions où l'utilisateur est acheteur
     const { data: buyerTx, error: buyerTxError } = await supabase
       .from('Transaction')
-      .select('*,offer(*,seller(id,steamId,name,avatar)),buyer(id,steamId,name,avatar)')
+      .select('*,offerId(*),buyerId(*)')
       .eq('buyerId', user.id)
       .order('startedAt', { ascending: false });
-    // 2. Transactions où l'utilisateur est vendeur (via offer.sellerId)
+    // 2. Transactions où l'utilisateur est vendeur (via offerId.sellerId)
     const { data: sellerTx, error: sellerTxError } = await supabase
       .from('Transaction')
-      .select('*,offer(*,seller(id,steamId,name,avatar)),buyer(id,steamId,name,avatar)')
+      .select('*,offerId(*),buyerId(*)')
       .order('startedAt', { ascending: false });
     // On filtre côté JS pour sellerId
-    const sellerTxFiltered = (sellerTx || []).filter(t => t.offer?.sellerId === user.id);
+    const sellerTxFiltered = (sellerTx || []).filter(t => t.offerId?.sellerId === user.id);
     // On fusionne et on déduplique
     const allTx = [...(buyerTx || []), ...sellerTxFiltered].filter((tx, idx, arr) =>
       arr.findIndex(t => t.id === tx.id) === idx
@@ -100,10 +100,10 @@ export async function GET(req: NextRequest) {
         startedAt: t.startedAt,
         completedAt: t.completedAt,
         cancelledAt: t.cancelledAt,
-        offer: t.offer,
-        buyer: t.buyer,
+        offer: t.offerId, // pour compatibilité frontend
+        buyer: t.buyerId, // pour compatibilité frontend
         isBuyer: t.buyerId === user.id,
-        isSeller: t.offer?.sellerId === user.id
+        isSeller: t.offerId?.sellerId === user.id
       }))
     });
   } catch (error: any) {
