@@ -9,7 +9,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
     const { itemId, itemName, itemImage, game, price } = await req.json();
-    if (!itemId || !price || price <= 0) {
+    if (!itemId || price === undefined || price === null) {
       return NextResponse.json({ error: 'Invalid offer data' }, { status: 400 });
     }
     // Récupérer l'utilisateur
