@@ -27,8 +27,8 @@ export function usePingPresence() {
 
     // Ping immédiatement au montage
     ping();
-    // Puis toutes les 60 secondes
-    const interval = setInterval(ping, 60000);
+    // Puis toutes les 20 secondes (temps réel)
+    const interval = setInterval(ping, 20000);
     return () => clearInterval(interval);
   }, [user]);
 } 
