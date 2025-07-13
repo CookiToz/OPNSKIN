@@ -88,10 +88,10 @@ export async function GET(req: NextRequest) {
       if (maxPrice) where.price.lte = parseFloat(maxPrice);
     }
 
-    // Récupérer les offres
+    // Récupérer les offres avec jointure sur le vendeur
     let query = supabase
       .from('Offer')
-      .select('*', { count: 'exact' })
+      .select('*, seller:User(id, name, last_seen)', { count: 'exact' })
       .eq('status', 'AVAILABLE');
 
     // Ajouter le filtre par game si fourni
@@ -107,7 +107,6 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: offersError.message }, { status: 500 });
     }
 
-    // Si besoin d'infos sur le vendeur, faire une requête séparée ici avec offer.sellerId
     return NextResponse.json({
       offers: offers.map(offer => ({
         id: offer.id,
@@ -119,11 +118,11 @@ export async function GET(req: NextRequest) {
         status: offer.status,
         createdAt: offer.createdAt,
         sellerId: offer.sellerId,
-        seller: {
+        seller: offer.seller ? {
           id: offer.seller.id,
           name: offer.seller.name,
           last_seen: offer.seller.last_seen
-        }
+        } : null
       })),
       pagination: {
         page,
