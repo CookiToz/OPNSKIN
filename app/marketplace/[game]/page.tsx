@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Store, ArrowLeft } from "lucide-react";
+import { Loader2, Store, ArrowLeft, RefreshCw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useCurrencyStore, useCryptoRatesStore } from '@/hooks/use-currency-store';
 import { formatPrice } from '@/lib/utils';
@@ -35,6 +35,7 @@ export default function MarketplaceGamePage() {
   const cryptoRates = useCryptoRatesStore();
   const [offers, setOffers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [buyingId, setBuyingId] = useState<string | null>(null);
   const [isClient, setIsClient] = useState(false);
   const { user, isLoading: userLoading } = useUser();
@@ -49,12 +50,32 @@ export default function MarketplaceGamePage() {
   const [showDetails, setShowDetails] = useState(false);
   const [selectedOffer, setSelectedOffer] = useState<any>(null);
 
-  // (SUPPRIMÉ) Tick d'horloge pour présence live
-  // const [now, setNow] = useState(Date.now());
-  // useEffect(() => {
-  //   const interval = setInterval(() => setNow(Date.now()), 1000);
-  //   return () => clearInterval(interval);
-  // }, []);
+  // Fonction pour charger les offres
+  const fetchOffers = async (showLoading = true) => {
+    if (!game || !isClient) return;
+    
+    if (showLoading) {
+      setLoading(true);
+    } else {
+      setRefreshing(true);
+    }
+    
+    try {
+      const res = await fetch(`/api/offers?game=${game}`);
+      const data = await res.json();
+      setOffers(Array.isArray(data.offers) ? data.offers : []);
+    } catch (error) {
+      console.error('Erreur lors du chargement des offres:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de charger les offres pour ce jeu.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
 
   // Charger le panier au montage
   useEffect(() => {
@@ -73,46 +94,16 @@ export default function MarketplaceGamePage() {
     setIsClient(true);
   }, []);
 
-  // Hook pour charger les offres
+  // Hook pour charger les offres initiales (suppression de l'auto-refresh)
   useEffect(() => {
     if (!game || !isClient) return;
-    setLoading(true);
-    fetch(`/api/offers?game=${game}`)
-      .then((res) => res.json())
-      .then((data) => {
-        setOffers(Array.isArray(data.offers) ? data.offers : []);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error('Erreur lors du chargement des offres:', error);
-        toast({
-          title: "Erreur",
-          description: "Impossible de charger les offres pour ce jeu.",
-          variant: "destructive",
-        });
-        setLoading(false);
-      });
-  }, [game, toast, isClient, cartItems.length]);
-
-  // Auto-refresh offres après un ping de présence
-  useEffect(() => {
-    const handler = () => {
-      if (!game || !isClient) return;
-      setLoading(true);
-      fetch(`/api/offers?game=${game}`)
-        .then((res) => res.json())
-        .then((data) => {
-          setOffers(Array.isArray(data.offers) ? data.offers : []);
-          setLoading(false);
-        })
-        .catch((error) => {
-          console.error('Erreur lors du rechargement des offres:', error);
-          setLoading(false);
-        });
-    };
-    window.addEventListener('presence-pinged', handler);
-    return () => window.removeEventListener('presence-pinged', handler);
+    fetchOffers(true);
   }, [game, isClient]);
+
+  // Fonction de refresh manuel
+  const handleRefresh = () => {
+    fetchOffers(false);
+  };
 
   const handleBuy = async (offerId: string, offerPrice: number) => {
     setBuyingId(offerId);
@@ -132,8 +123,7 @@ export default function MarketplaceGamePage() {
           title: "Achat réussi !",
           description: "L'offre est maintenant en cours d'échange. Vérifiez vos transactions.",
         });
-        // Rafraîchir la liste des offres
-        setOffers(prev => prev.filter(offer => offer.id !== offerId));
+        // L'utilisateur peut rafraîchir manuellement s'il le souhaite
       } else {
         toast({
           title: "Erreur lors de l'achat",
@@ -234,19 +224,33 @@ export default function MarketplaceGamePage() {
     <div className="min-h-screen">
       <div className="container mx-auto p-3 md:p-6">
         {/* Header avec navigation */}
-        <div className="flex items-center gap-4 mb-6">
-          <Link href="/marketplace">
-            <Button variant="outline" size="sm" className="border-opnskin-primary/30 text-opnskin-primary hover:bg-opnskin-primary/10">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Retour
-            </Button>
-          </Link>
-          <div className="flex items-center gap-3">
-            <img src={gameInfo.cover} alt={gameInfo.name} className="w-8 h-8 rounded" />
-            <h1 className="text-2xl md:text-3xl font-bold font-rajdhani text-opnskin-text-primary">
-              Marketplace - {gameInfo.name}
-            </h1>
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-4">
+            <Link href="/marketplace">
+              <Button variant="outline" size="sm" className="border-opnskin-primary/30 text-opnskin-primary hover:bg-opnskin-primary/10">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Retour
+              </Button>
+            </Link>
+            <div className="flex items-center gap-3">
+              <img src={gameInfo.cover} alt={gameInfo.name} className="w-8 h-8 rounded" />
+              <h1 className="text-2xl md:text-3xl font-bold font-rajdhani text-opnskin-text-primary">
+                Marketplace - {gameInfo.name}
+              </h1>
+            </div>
           </div>
+          
+          {/* Bouton de refresh */}
+          <Button 
+            onClick={handleRefresh}
+            disabled={refreshing || loading}
+            variant="outline"
+            size="sm"
+            className="border-opnskin-primary/30 text-opnskin-primary hover:bg-opnskin-primary/10"
+          >
+            <RefreshCw className={`w-4 h-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
+            {refreshing ? 'Actualisation...' : 'Actualiser'}
+          </Button>
         </div>
 
         {/* Statistiques */}
