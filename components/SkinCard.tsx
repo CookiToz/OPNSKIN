@@ -27,6 +27,7 @@ export type SkinCardProps = {
   onDetails?: () => void;
   actionButton?: React.ReactNode;
   className?: string;
+  last_seen?: string;
 };
 
 export default function SkinCard({
@@ -45,6 +46,7 @@ export default function SkinCard({
   onDetails,
   actionButton,
   className = '',
+  last_seen,
 }: SkinCardProps) {
   const { t } = useTranslation('common');
   const _currency = useCurrencyStore((s) => s.currency);
@@ -65,6 +67,9 @@ export default function SkinCard({
 
   // Nettoyer le nom du skin pour ne pas afficher l'état d'usure
   const cleanName = name.replace(/\s*\(.*?\)\s*$/, '').trim();
+
+  // DEBUG : log présence vendeur
+  console.log('[SkinCard]', { name, isSellerOnline, last_seen });
 
   return (
     <Card className={`bg-opnskin-bg-card border-opnskin-bg-secondary card-hover overflow-hidden group flex flex-col justify-between min-h-[340px] ${className}`}>
