@@ -28,6 +28,7 @@ export type SkinCardProps = {
   actionButton?: React.ReactNode;
   className?: string;
   last_seen?: string;
+  lastSeenDiff?: number;
 };
 
 export default function SkinCard({
@@ -47,6 +48,7 @@ export default function SkinCard({
   actionButton,
   className = '',
   last_seen,
+  lastSeenDiff,
 }: SkinCardProps) {
   const { t } = useTranslation('common');
   const _currency = useCurrencyStore((s) => s.currency);
@@ -69,7 +71,7 @@ export default function SkinCard({
   const cleanName = name.replace(/\s*\(.*?\)\s*$/, '').trim();
 
   // DEBUG : log présence vendeur
-  console.log('[SkinCard]', { name, isSellerOnline, last_seen });
+  console.log('[SkinCard]', { name, isSellerOnline, last_seen, lastSeenDiff });
 
   return (
     <Card className={`bg-opnskin-bg-card border-opnskin-bg-secondary card-hover overflow-hidden group flex flex-col justify-between min-h-[340px] ${className}`}>
@@ -102,6 +104,12 @@ export default function SkinCard({
             className={`absolute top-3 left-3 z-20 w-3 h-3 rounded-full ${isSellerOnline ? 'neon-online' : 'neon-offline'}`}
             title={isSellerOnline ? t('marketplace.seller_online', 'Vendeur en ligne') : t('marketplace.seller_offline', 'Vendeur hors ligne')}
           />
+        )}
+        {/* DEBUG : différence de temps */}
+        {typeof lastSeenDiff === 'number' && (
+          <span style={{ color: isSellerOnline ? 'green' : 'red', fontSize: 10, position: 'absolute', top: 8, left: 20 }}>
+            {lastSeenDiff} ms
+          </span>
         )}
         {/* Image */}
         <div className="w-full flex justify-center items-center aspect-square relative">

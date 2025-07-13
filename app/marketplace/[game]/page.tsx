@@ -348,8 +348,11 @@ export default function MarketplaceGamePage() {
               
               // Calculer la vraie présence du vendeur
               let isSellerOnline = false;
+              let lastSeen = undefined;
               if (offer.seller && offer.seller.last_seen) {
-                const lastSeen = new Date(offer.seller.last_seen).getTime();
+                // Forcer parsing UTC (ajoute 'Z' si pas déjà présent)
+                const lastSeenStr = offer.seller.last_seen.endsWith('Z') ? offer.seller.last_seen : offer.seller.last_seen + 'Z';
+                lastSeen = Date.parse(lastSeenStr);
                 isSellerOnline = Date.now() - lastSeen < 30 * 1000;
               }
               
@@ -378,6 +381,7 @@ export default function MarketplaceGamePage() {
                   statTrak={isStatTrak}
                   isSellerOnline={isSellerOnline}
                   last_seen={offer.seller?.last_seen}
+                  lastSeenDiff={lastSeen ? Date.now() - lastSeen : undefined}
                   actionButton={
                     isMine ? (
                       <div className="w-full mt-3 text-center text-xs text-opnskin-accent font-bold">Mon offre</div>
