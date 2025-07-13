@@ -1,3 +1,5 @@
+"use client";
+
 import type React from "react"
 import type { Metadata } from "next"
 import { Poppins, Sora, Share_Tech_Mono, Inter } from "next/font/google"
@@ -13,6 +15,7 @@ import { InventoryProvider } from "@/components/InventoryProvider"
 import { FloatProvider } from "@/components/FloatProvider"
 import MobileLayout from '@/components/MobileLayout'
 import { Toaster } from "@/components/ui/toaster"
+import { usePingPresence } from './hooks/use-ping-presence';
 
 // Utilisation de Poppins comme alternative à Satoshi Bold
 const satoshiBold = Poppins({
@@ -54,6 +57,7 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
+  usePingPresence();
   return (
     <html lang="fr" suppressHydrationWarning>
       <body className={`${satoshiBold.variable} ${satoshiRegular.variable} ${shareTechMono.variable} ${inter.className} font-sans bg-background`}>
