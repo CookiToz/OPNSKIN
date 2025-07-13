@@ -356,6 +356,15 @@ export default function MarketplaceGamePage() {
               // Simuler le float (à remplacer par les vraies données)
               const float = offer.float ?? undefined;
               
+              // DEBUG mapping présence
+              console.log('[PRESENCE DEBUG]', {
+                userId: user?.id,
+                offerSellerId: offer.sellerId,
+                offerSellerObjId: offer.seller?.id,
+                last_seen: offer.seller?.last_seen,
+                isSellerOnline
+              });
+              
               return (
                 <SkinCard
                   key={offer.id || offer.itemId}
