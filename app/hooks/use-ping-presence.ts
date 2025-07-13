@@ -16,6 +16,8 @@ export function usePingPresence() {
           } else {
             const data = await res.json().catch(() => ({}));
             console.log('[PING] Réponse OK:', data);
+            // Dispatch custom event pour auto-refresh
+            window.dispatchEvent(new Event('presence-pinged'));
           }
         })
         .catch((err) => {
