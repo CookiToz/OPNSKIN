@@ -4,6 +4,10 @@ import { cookies } from 'next/headers';
 
 export async function POST(req: NextRequest) {
   try {
+    const cookieStore = await cookies();
+    for (const cookie of cookieStore) {
+      console.log('[PING] cookie:', cookie);
+    }
     const supabase = createRouteHandlerClient({ cookies });
 
     const {
