@@ -68,11 +68,33 @@ export default function SkinCard({
 
   return (
     <Card className={`bg-opnskin-bg-card border-opnskin-bg-secondary card-hover overflow-hidden group flex flex-col justify-between min-h-[340px] ${className}`}>
+      <style jsx global>{`
+        @keyframes neonPulseOnline {
+          0% { box-shadow: 0 0 8px 2px #00ffe7, 0 0 2px 1px #00ffe7; opacity: 1; }
+          50% { box-shadow: 0 0 16px 6px #00ffe7, 0 0 4px 2px #00ffe7; opacity: 0.7; }
+          100% { box-shadow: 0 0 8px 2px #00ffe7, 0 0 2px 1px #00ffe7; opacity: 1; }
+        }
+        @keyframes neonPulseOffline {
+          0% { box-shadow: 0 0 8px 2px #ff1744, 0 0 2px 1px #ff1744; opacity: 1; }
+          50% { box-shadow: 0 0 12px 4px #ff1744, 0 0 4px 2px #ff1744; opacity: 0.6; }
+          100% { box-shadow: 0 0 8px 2px #ff1744, 0 0 2px 1px #ff1744; opacity: 1; }
+        }
+        .neon-online {
+          background: #00ffe7;
+          box-shadow: 0 0 8px 2px #00ffe7, 0 0 2px 1px #00ffe7;
+          animation: neonPulseOnline 1.2s infinite;
+        }
+        .neon-offline {
+          background: #ff1744;
+          box-shadow: 0 0 8px 2px #ff1744, 0 0 2px 1px #ff1744;
+          animation: neonPulseOffline 2.2s infinite;
+        }
+      `}</style>
       <div className="relative flex-1 flex flex-col">
-        {/* Présence vendeur néon */}
+        {/* Présence vendeur néon animée */}
         {typeof isSellerOnline === 'boolean' && (
           <span
-            className={`absolute top-3 left-3 z-20 w-3 h-3 rounded-full border-2 border-white shadow-neon ${isSellerOnline ? 'bg-[#00ffe7] shadow-[0_0_8px_2px_#00ffe7,0_0_2px_1px_#00ffe7]' : 'bg-[#ff1744] shadow-[0_0_8px_2px_#ff1744,0_0_2px_1px_#ff1744]'}`}
+            className={`absolute top-3 left-3 z-20 w-3 h-3 rounded-full ${isSellerOnline ? 'neon-online' : 'neon-offline'}`}
             title={isSellerOnline ? t('marketplace.seller_online', 'Vendeur en ligne') : t('marketplace.seller_offline', 'Vendeur hors ligne')}
           />
         )}
