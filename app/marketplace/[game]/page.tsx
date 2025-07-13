@@ -49,12 +49,12 @@ export default function MarketplaceGamePage() {
   const [showDetails, setShowDetails] = useState(false);
   const [selectedOffer, setSelectedOffer] = useState<any>(null);
 
-  // Tick d'horloge pour présence live
-  const [now, setNow] = useState(Date.now());
-  useEffect(() => {
-    const interval = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(interval);
-  }, []);
+  // (SUPPRIMÉ) Tick d'horloge pour présence live
+  // const [now, setNow] = useState(Date.now());
+  // useEffect(() => {
+  //   const interval = setInterval(() => setNow(Date.now()), 1000);
+  //   return () => clearInterval(interval);
+  // }, []);
 
   // Charger le panier au montage
   useEffect(() => {
@@ -350,7 +350,7 @@ export default function MarketplaceGamePage() {
               let isSellerOnline = false;
               if (offer.seller && offer.seller.last_seen) {
                 const lastSeen = new Date(offer.seller.last_seen).getTime();
-                isSellerOnline = now - lastSeen < 30 * 1000; // 30 secondes
+                isSellerOnline = Date.now() - lastSeen < 30 * 1000;
               }
               
               // Simuler le float (à remplacer par les vraies données)
