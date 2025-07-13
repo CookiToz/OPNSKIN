@@ -5,8 +5,16 @@ import { cookies } from 'next/headers';
 export async function POST(req: NextRequest) {
   try {
     const cookieStore = await cookies();
-    for (const cookie of cookieStore) {
-      console.log('[PING] cookie:', cookie);
+    console.log('[PING] typeof cookieStore:', typeof cookieStore);
+    console.log('[PING] cookieStore keys:', Object.keys(cookieStore));
+    if (typeof cookieStore.getAll === 'function') {
+      console.log('[PING] cookies (getAll):', cookieStore.getAll());
+    } else {
+      try {
+        console.log('[PING] cookies (spread):', [...cookieStore]);
+      } catch (e) {
+        console.log('[PING] cookies (error spread):', e);
+      }
     }
     const supabase = createRouteHandlerClient({ cookies });
 
