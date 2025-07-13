@@ -45,6 +45,10 @@ export default function MarketplaceGamePage() {
   const syncCart = useCartStore((state) => state.syncWithBackend);
   const cartItems = useCartStore((state) => state.items);
 
+  // Hooks modaux (déplacés ici AVANT tout return/condition)
+  const [showDetails, setShowDetails] = useState(false);
+  const [selectedOffer, setSelectedOffer] = useState<any>(null);
+
   // Charger le panier au montage
   useEffect(() => {
     const fetchCart = async () => {
@@ -196,8 +200,8 @@ export default function MarketplaceGamePage() {
     );
   }
 
-  const [showDetails, setShowDetails] = useState(false);
-  const [selectedOffer, setSelectedOffer] = useState<any>(null);
+  // Définir la liste des cryptos supportées
+  const SUPPORTED_CRYPTOS = ['ETH', 'GMC', 'BTC', 'SOL', 'XRP', 'LTC', 'TRX'];
 
   return (
     <div className="min-h-screen">
@@ -364,8 +368,8 @@ export default function MarketplaceGamePage() {
               <div className="text-sm text-opnskin-text-secondary">ID: {selectedOffer.itemId || 'N/A'}</div>
               <div className="font-mono text-opnskin-accent font-bold">
                 {typeof selectedOffer.price === 'number' && !isNaN(selectedOffer.price)
-                  ? (cryptoRates && typeof cryptoRates[currency] === 'number' && cryptoRates[currency] > 0
-                      ? formatPrice(selectedOffer.price, currency, cryptoRates)
+                  ? (SUPPORTED_CRYPTOS.includes(currency)
+                      ? formatPrice(selectedOffer.price, currency, cryptoRates as unknown as Record<string, import('@/hooks/use-currency-store').CryptoRate>)
                       : `${selectedOffer.price.toFixed(2)} €`)
                   : 'N/A'}
               </div>
