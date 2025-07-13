@@ -37,6 +37,22 @@ export default function MarketplaceGamePage() {
   const [isClient, setIsClient] = useState(false);
   const { user, isLoading: userLoading } = useUser();
 
+  // Ajout panier
+  const [addingId, setAddingId] = useState<string | null>(null);
+  const [cartOfferIds, setCartOfferIds] = useState<string[]>([]);
+
+  // Charger le panier au montage
+  useEffect(() => {
+    const fetchCart = async () => {
+      const res = await fetch('/api/cart');
+      const data = await res.json();
+      if (Array.isArray(data.cart)) {
+        setCartOfferIds(data.cart.map((item: any) => item.offerId));
+      }
+    };
+    fetchCart();
+  }, []);
+
   // Hook pour détecter le client
   useEffect(() => {
     setIsClient(true);
@@ -98,6 +114,39 @@ export default function MarketplaceGamePage() {
       });
     } finally {
       setBuyingId(null);
+    }
+  };
+
+  const handleAddToCart = async (offerId: string) => {
+    setAddingId(offerId);
+    try {
+      const res = await fetch('/api/cart', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ offerId }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        toast({
+          title: "Ajouté au panier !",
+          description: "L'offre a été ajoutée à votre panier.",
+        });
+        setCartOfferIds(prev => [...prev, offerId]);
+      } else {
+        toast({
+          title: "Erreur",
+          description: data.error || "Impossible d'ajouter au panier.",
+          variant: "destructive",
+        });
+      }
+    } catch (err) {
+      toast({
+        title: "Erreur réseau",
+        description: "Vérifiez votre connexion et réessayez.",
+        variant: "destructive",
+      });
+    } finally {
+      setAddingId(null);
     }
   };
 
@@ -260,19 +309,23 @@ export default function MarketplaceGamePage() {
                   actionButton={
                     isMine ? (
                       <div className="w-full mt-3 text-center text-xs text-opnskin-accent font-bold">Mon offre</div>
+                    ) : cartOfferIds.includes(offer.id) ? (
+                      <Button className="w-full btn-opnskin mt-3" disabled>
+                        Déjà dans le panier
+                      </Button>
                     ) : (
                       <Button
                         className="w-full btn-opnskin mt-3"
-                        onClick={() => handleBuy(offer.id || offer.itemId, offer.price || 0)}
-                        disabled={buyingId === (offer.id || offer.itemId)}
+                        onClick={() => handleAddToCart(offer.id)}
+                        disabled={addingId === offer.id}
                       >
-                        {buyingId === (offer.id || offer.itemId) ? (
+                        {addingId === offer.id ? (
                           <>
                             <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                            Achat en cours...
+                            Ajout...
                           </>
                         ) : (
-                          "Acheter"
+                          "Ajouter au panier"
                         )}
                       </Button>
                     )
