@@ -4,16 +4,18 @@ import { supabase } from '@/lib/supabaseClient';
 export async function POST(req: NextRequest) {
   try {
     const steamId = req.cookies.get('steamid')?.value;
+    console.log('[PING] steamId reçu:', steamId);
     if (!steamId) {
       return NextResponse.json({ error: 'Not authenticated', debug: { steamId } }, { status: 401 });
     }
 
-    // Récupérer l'utilisateur par steamId
     const { data: user, error: userError } = await supabase
       .from('User')
-      .select('id')
+      .select('id, steamId')
       .eq('steamId', steamId)
       .single();
+
+    console.log('[PING] user trouvé:', user);
 
     if (userError || !user) {
       return NextResponse.json({ error: 'User not found', debug: { userError } }, { status: 404 });
