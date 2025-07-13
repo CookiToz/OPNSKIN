@@ -70,24 +70,24 @@ export default function SkinCard({
     <Card className={`bg-opnskin-bg-card border-opnskin-bg-secondary card-hover overflow-hidden group flex flex-col justify-between min-h-[340px] ${className}`}>
       <style jsx global>{`
         @keyframes neonPulseOnline {
-          0% { box-shadow: 0 0 8px 2px #00ffe7, 0 0 2px 1px #00ffe7; opacity: 1; }
-          50% { box-shadow: 0 0 16px 6px #00ffe7, 0 0 4px 2px #00ffe7; opacity: 0.7; }
-          100% { box-shadow: 0 0 8px 2px #00ffe7, 0 0 2px 1px #00ffe7; opacity: 1; }
+          0% { box-shadow: 0 0 4px 1px #00c97b, 0 0 1px 0px #00c97b; opacity: 1; }
+          50% { box-shadow: 0 0 8px 2px #00c97b, 0 0 2px 1px #00c97b; opacity: 0.8; }
+          100% { box-shadow: 0 0 4px 1px #00c97b, 0 0 1px 0px #00c97b; opacity: 1; }
         }
         @keyframes neonPulseOffline {
-          0% { box-shadow: 0 0 8px 2px #ff1744, 0 0 2px 1px #ff1744; opacity: 1; }
-          50% { box-shadow: 0 0 12px 4px #ff1744, 0 0 4px 2px #ff1744; opacity: 0.6; }
-          100% { box-shadow: 0 0 8px 2px #ff1744, 0 0 2px 1px #ff1744; opacity: 1; }
+          0% { box-shadow: 0 0 4px 1px #ff3b3b, 0 0 1px 0px #ff3b3b; opacity: 1; }
+          50% { box-shadow: 0 0 8px 2px #ff3b3b, 0 0 2px 1px #ff3b3b; opacity: 0.8; }
+          100% { box-shadow: 0 0 4px 1px #ff3b3b, 0 0 1px 0px #ff3b3b; opacity: 1; }
         }
         .neon-online {
-          background: #00ffe7;
-          box-shadow: 0 0 8px 2px #00ffe7, 0 0 2px 1px #00ffe7;
-          animation: neonPulseOnline 1.2s infinite;
+          background: #00c97b;
+          box-shadow: 0 0 4px 1px #00c97b, 0 0 1px 0px #00c97b;
+          animation: neonPulseOnline 2s infinite;
         }
         .neon-offline {
-          background: #ff1744;
-          box-shadow: 0 0 8px 2px #ff1744, 0 0 2px 1px #ff1744;
-          animation: neonPulseOffline 2.2s infinite;
+          background: #ff3b3b;
+          box-shadow: 0 0 4px 1px #ff3b3b, 0 0 1px 0px #ff3b3b;
+          animation: neonPulseOffline 2s infinite;
         }
       `}</style>
       <div className="relative flex-1 flex flex-col">
