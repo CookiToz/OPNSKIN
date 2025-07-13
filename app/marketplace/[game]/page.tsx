@@ -354,7 +354,7 @@ export default function MarketplaceGamePage() {
               }
               
               // Simuler le float (à remplacer par les vraies données)
-              const float = Math.random() * 1; // Float entre 0 et 1
+              const float = offer.float ?? undefined;
               
               return (
                 <SkinCard
