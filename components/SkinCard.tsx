@@ -21,6 +21,9 @@ export type SkinCardProps = {
   cryptoRates?: any;
   badge?: React.ReactNode;
   wear?: string;
+  float?: number;
+  statTrak?: boolean;
+  isSellerOnline?: boolean;
   onDetails?: () => void;
   actionButton?: React.ReactNode;
   className?: string;
@@ -36,6 +39,9 @@ export default function SkinCard({
   cryptoRates,
   badge,
   wear,
+  float,
+  statTrak,
+  isSellerOnline,
   onDetails,
   actionButton,
   className = '',
@@ -66,6 +72,17 @@ export default function SkinCard({
           alt={name}
           className="w-full h-full object-contain p-2 transition-transform duration-500 group-hover:scale-105"
         />
+        {/* Marqueur de présence en ligne du vendeur */}
+        {typeof isSellerOnline === 'boolean' && (
+          <span
+            className={`absolute top-2 left-2 z-20 w-3 h-3 rounded-full border-2 border-white ${isSellerOnline ? 'bg-green-500' : 'bg-gray-400'}`}
+            title={isSellerOnline ? t('marketplace.seller_online', 'Vendeur en ligne') : t('marketplace.seller_offline', 'Vendeur hors ligne')}
+          />
+        )}
+        {/* Badge StatTrak */}
+        {statTrak && (
+          <Badge className="absolute top-2 left-8 z-20 bg-orange-500/90 text-white border-orange-500/80 text-xs font-bold shadow">StatTrak™</Badge>
+        )}
         {rarityLabel && (
           <Badge className="absolute top-2 right-2 z-20 bg-opnskin-accent/10 text-opnskin-accent border-opnskin-accent/30 text-xs">
             {rarityLabel}
@@ -78,6 +95,10 @@ export default function SkinCard({
             <p className="text-xs text-opnskin-text-secondary italic">
               {t(`inventory.${wear}`)}
             </p>
+          )}
+          {/* Affichage du float si dispo */}
+          {typeof float === 'number' && !isNaN(float) && (
+            <p className="text-xs text-opnskin-accent font-mono">Float: {float}</p>
           )}
         </div>
       </div>

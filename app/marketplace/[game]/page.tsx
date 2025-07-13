@@ -246,7 +246,7 @@ export default function MarketplaceGamePage() {
                   ? formatPrice(
                       offers.reduce((sum, offer) => sum + offer.price, 0) / offers.length,
                       currency,
-                      cryptoRates
+                      cryptoRates as unknown as Record<string, import('@/hooks/use-currency-store').CryptoRate>
                     )
                   : "N/A"
                 }
@@ -264,7 +264,7 @@ export default function MarketplaceGamePage() {
                   ? formatPrice(
                       offers.reduce((sum, offer) => sum + offer.price, 0),
                       currency,
-                      cryptoRates
+                      cryptoRates as unknown as Record<string, import('@/hooks/use-currency-store').CryptoRate>
                     )
                   : "N/A"
                 }
@@ -310,14 +310,33 @@ export default function MarketplaceGamePage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {offers.map((offer) => {
               const isMine = user && user.loggedIn && offer.sellerId === user.id;
+              
+              // Extraire les infos du skin depuis le nom (ex: "AK-47 | Fire Serpent (Factory New)")
+              const skinName = offer.itemName || offer.itemId || 'Skin inconnu';
+              const wearMatch = skinName.match(/\((.*?)\)/);
+              const wear = wearMatch ? wearMatch[1] : undefined;
+              
+              // Simuler StatTrak (à remplacer par les vraies données)
+              const isStatTrak = skinName.toLowerCase().includes('stattrak') || skinName.toLowerCase().includes('stat trak');
+              
+              // Simuler la présence en ligne du vendeur (à remplacer par les vraies données)
+              const isSellerOnline = Math.random() > 0.3; // 70% de chance d'être en ligne
+              
+              // Simuler le float (à remplacer par les vraies données)
+              const float = Math.random() * 1; // Float entre 0 et 1
+              
               return (
                 <SkinCard
                   key={offer.id || offer.itemId}
-                  name={offer.itemName || offer.itemId || 'Skin inconnu'}
+                  name={skinName}
                   image={offer.itemImage || '/placeholder.svg'}
                   price={offer.price || 0}
                   rarityLabel={offer.status || 'Disponible'}
                   currency={currency}
+                  wear={wear}
+                  float={float}
+                  statTrak={isStatTrak}
+                  isSellerOnline={isSellerOnline}
                   actionButton={
                     isMine ? (
                       <div className="w-full mt-3 text-center text-xs text-opnskin-accent font-bold">Mon offre</div>

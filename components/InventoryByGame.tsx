@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useTranslation } from 'next-i18next';
 import { useInventory } from "@/components/InventoryProvider";
 import { useFloat } from "@/components/FloatProvider";
+import SkinCard from '@/components/SkinCard';
 import { motion, AnimatePresence } from "framer-motion";
 import { RefreshCw, Tag, ExternalLink, Filter, X } from 'lucide-react';
 import { useCurrencyStore } from '@/hooks/use-currency-store';
@@ -538,67 +539,27 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
               const weaponWear = getWeaponWear(item.name);
               
               return (
-                <Card key={item.id} className="bg-opnskin-bg-card border-opnskin-bg-secondary card-hover overflow-hidden group">
-                  <div className="aspect-square relative overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-opnskin-bg-card/80 z-10"></div>
-                    <img
-                      src={item.icon}
-                      alt={item.name}
-                      className="w-full h-full object-contain p-2 transition-transform duration-500 group-hover:scale-105"
-                    />
-                    {rarity && (
-                      <Badge className="absolute top-2 right-2 z-20 bg-opnskin-accent/10 text-opnskin-accent border-opnskin-accent/30 text-xs">
-                        {t(`inventory.${rarity}`)}
-                      </Badge>
-                    )}
-                    <div className="absolute bottom-0 left-0 right-0 p-2 z-20">
-                      <h3 className="font-satoshi-bold text-sm truncate text-opnskin-text-primary mb-1">{item.name}</h3>
-                      {weaponWear && (
-                        <p className="text-xs text-opnskin-text-secondary italic">
-                          {t(`inventory.${weaponWear}`)}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                  <CardContent className="p-3">
-                    <div className="flex justify-between items-center mb-2">
-                      {item.marketPrice !== undefined && (
-                        <span className="font-mono text-opnskin-accent font-bold text-sm">
-                          {cryptoIcons[currency] && currency !== 'EUR' && currency !== 'USD' && (
-                            <img src={cryptoIcons[currency]!} alt={currency} className="inline w-4 h-4 mr-1 align-middle" />
-                          )}
-                          {formatPrice(item.marketPrice, currency, {
-                            ETH: cryptoRates.ETH,
-                            BTC: cryptoRates.BTC,
-                            SOL: cryptoRates.SOL,
-                            XRP: cryptoRates.XRP,
-                            LTC: cryptoRates.LTC,
-                            TRX: cryptoRates.TRX,
-                            GMC: cryptoRates.GMC,
-                          })}
-                        </span>
-                      )}
-                    </div>
-                    <div className="flex justify-between items-center gap-2">
-                      <Button 
-                        size="sm" 
-                        className="btn-opnskin-secondary flex-1 text-xs" 
-                        onClick={() => handleSell(item)}
-                      >
-                        <Tag className="w-3 h-3 mr-1" />
-                        {t('inventory.sell', 'Vendre')}
-                      </Button>
-                      <Button 
-                        size="sm" 
-                        variant="outline" 
-                        className="border-opnskin-primary/30 text-opnskin-primary hover:bg-opnskin-primary/10 text-xs"
-                        onClick={() => handleDetails(item)}
-                      >
-                        <ExternalLink className="w-3 h-3" />
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
+                <SkinCard
+                  key={item.id}
+                  name={item.name}
+                  image={item.icon}
+                  rarity={rarity || undefined}
+                  rarityLabel={rarity ? t(`inventory.${rarity}`) : undefined}
+                  price={item.marketPrice}
+                  currency={currency}
+                  wear={weaponWear}
+                  actionButton={
+                    <Button 
+                      size="sm" 
+                      className="btn-opnskin-secondary flex-1 text-xs" 
+                      onClick={() => handleSell(item)}
+                    >
+                      <Tag className="w-3 h-3 mr-1" />
+                      {t('inventory.sell', 'Vendre')}
+                    </Button>
+                  }
+                  onDetails={() => handleDetails(item)}
+                />
               );
             })}
           </div>
