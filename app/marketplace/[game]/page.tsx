@@ -42,6 +42,7 @@ export default function MarketplaceGamePage() {
   const [addingId, setAddingId] = useState<string | null>(null);
   const [cartOfferIds, setCartOfferIds] = useState<string[]>([]);
   const syncCart = useCartStore((state) => state.syncWithBackend);
+  const cartItems = useCartStore((state) => state.items);
 
   // Charger le panier au montage
   useEffect(() => {
@@ -79,7 +80,7 @@ export default function MarketplaceGamePage() {
         });
         setLoading(false);
       });
-  }, [game, toast, isClient]);
+  }, [game, toast, isClient, cartItems.length]);
 
   const handleBuy = async (offerId: string, offerPrice: number) => {
     setBuyingId(offerId);
