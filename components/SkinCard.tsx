@@ -63,13 +63,16 @@ export default function SkinCard({
     GMC: '/crypto/gmc.svg',
   };
 
+  // Nettoyer le nom du skin pour ne pas afficher l'état d'usure
+  const cleanName = name.replace(/\s*\(.*?\)\s*$/, '').trim();
+
   return (
     <Card className={`bg-opnskin-bg-card border-opnskin-bg-secondary card-hover overflow-hidden group flex flex-col justify-between min-h-[340px] ${className}`}>
       <div className="relative flex-1 flex flex-col">
-        {/* Présence vendeur */}
+        {/* Présence vendeur néon */}
         {typeof isSellerOnline === 'boolean' && (
           <span
-            className={`absolute top-3 left-3 z-20 w-3 h-3 rounded-full border-2 border-white ${isSellerOnline ? 'bg-green-500' : 'bg-gray-400'}`}
+            className={`absolute top-3 left-3 z-20 w-3 h-3 rounded-full border-2 border-white shadow-neon ${isSellerOnline ? 'bg-[#00ffe7] shadow-[0_0_8px_2px_#00ffe7,0_0_2px_1px_#00ffe7]' : 'bg-[#ff1744] shadow-[0_0_8px_2px_#ff1744,0_0_2px_1px_#ff1744]'}`}
             title={isSellerOnline ? t('marketplace.seller_online', 'Vendeur en ligne') : t('marketplace.seller_offline', 'Vendeur hors ligne')}
           />
         )}
@@ -83,7 +86,7 @@ export default function SkinCard({
         </div>
         {/* Nom + badges */}
         <div className="flex items-center gap-2 mt-2 px-3">
-          <h3 className="font-satoshi-bold text-base truncate text-opnskin-text-primary flex-1" title={name}>{name}</h3>
+          <h3 className="font-satoshi-bold text-base truncate text-opnskin-text-primary flex-1" title={cleanName}>{cleanName}</h3>
           {statTrak && (
             <Badge className="bg-orange-500/90 text-white border-orange-500/80 text-xs font-bold shadow">StatTrak™</Badge>
           )}
@@ -96,10 +99,10 @@ export default function SkinCard({
         {/* État et float */}
         <div className="flex flex-col gap-1 mt-1 px-3">
           {wear && (
-            <span className="text-xs text-opnskin-text-secondary italic">{t(`inventory.${wear}`)}</span>
+            <span className="text-xs text-opnskin-text-secondary italic">{t(wear)}</span>
           )}
           {typeof float === 'number' && !isNaN(float) && (
-            <span className="text-xs text-opnskin-accent font-mono">Float: {float.toFixed(6)}</span>
+            <span className="text-xs text-gray-400 font-mono">Float: {float.toFixed(6)}</span>
           )}
         </div>
       </div>
