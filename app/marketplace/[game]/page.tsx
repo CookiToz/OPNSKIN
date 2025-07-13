@@ -15,6 +15,7 @@ import Link from "next/link";
 import SkinCard from '@/components/SkinCard';
 import { useUser } from "@/components/UserProvider";
 import { useCartStore } from '@/hooks/use-cart-store';
+import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogClose } from '@/components/ui/dialog';
 
 const currentUserId = "user_simule_123";
 
@@ -195,6 +196,9 @@ export default function MarketplaceGamePage() {
     );
   }
 
+  const [showDetails, setShowDetails] = useState(false);
+  const [selectedOffer, setSelectedOffer] = useState<any>(null);
+
   return (
     <div className="min-h-screen">
       <div className="container mx-auto p-3 md:p-6">
@@ -318,20 +322,29 @@ export default function MarketplaceGamePage() {
                         Déjà dans le panier
                       </Button>
                     ) : (
-                      <Button
-                        className="w-full btn-opnskin mt-3"
-                        onClick={() => handleAddToCart(offer.id)}
-                        disabled={addingId === offer.id}
-                      >
-                        {addingId === offer.id ? (
-                          <>
-                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                            Ajout...
-                          </>
-                        ) : (
-                          "Ajouter au panier"
-                        )}
-                      </Button>
+                      <div className="flex flex-col gap-2">
+                        <Button
+                          className="w-full btn-opnskin mt-3"
+                          onClick={() => handleAddToCart(offer.id)}
+                          disabled={addingId === offer.id}
+                        >
+                          {addingId === offer.id ? (
+                            <>
+                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                              Ajout...
+                            </>
+                          ) : (
+                            "Ajouter au panier"
+                          )}
+                        </Button>
+                        <Button
+                          className="w-full btn-opnskin-secondary"
+                          variant="outline"
+                          onClick={() => { setSelectedOffer(offer); setShowDetails(true); }}
+                        >
+                          Détail
+                        </Button>
+                      </div>
                     )
                   }
                 />
@@ -340,6 +353,26 @@ export default function MarketplaceGamePage() {
           </div>
         )}
       </div>
+      {/* Modal détail skin */}
+      <Dialog open={showDetails} onOpenChange={setShowDetails}>
+        <DialogContent>
+          <DialogTitle>Détail du skin</DialogTitle>
+          {selectedOffer && (
+            <div className="flex flex-col items-center gap-4">
+              <img src={selectedOffer.itemImage || '/placeholder.svg'} alt={selectedOffer.itemName} className="w-32 h-32 object-contain rounded" />
+              <div className="font-bold text-lg">{selectedOffer.itemName}</div>
+              <div className="text-sm text-opnskin-text-secondary">ID: {selectedOffer.itemId}</div>
+              <div className="font-mono text-opnskin-accent font-bold">
+                {formatPrice(selectedOffer.price, currency, cryptoRates)}
+              </div>
+              <div className="text-xs text-opnskin-text-secondary">Statut: {selectedOffer.status}</div>
+              <DialogClose asChild>
+                <Button className="mt-4">Fermer</Button>
+              </DialogClose>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 } 

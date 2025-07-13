@@ -30,11 +30,13 @@ export default function CartPage() {
               <div className="flex-1">
                 <div className="font-bold text-lg">{skin.name}</div>
                 {cryptoIcons[currency] && <img src={cryptoIcons[currency]!} alt={currency} className="inline w-5 h-5 mr-1 align-middle" />}
-                {cryptoRates[currency] ? (
-                  <div className="font-mono text-opnskin-accent font-bold">{formatPrice(skin.price, currency, cryptoRates)}</div>
-                ) : (
-                  <span>Loading...</span>
-                )}
+                <div className="font-mono text-opnskin-accent font-bold">
+                  {cryptoRates[currency]
+                    ? formatPrice(skin.price, currency, cryptoRates)
+                    : currency === 'EUR'
+                      ? `${skin.price.toFixed(2)} €`
+                      : 'N/A'}
+                </div>
               </div>
               <Button size="sm" variant="destructive" onClick={async () => {
                 await fetch(`/api/cart/${skin.id}`, { method: 'DELETE' });
