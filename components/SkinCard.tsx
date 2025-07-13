@@ -116,7 +116,7 @@ export default function SkinCard({
           <img
             src={image}
             alt={name}
-            className="max-h-20 object-contain p-1 transition-transform duration-500 group-hover:scale-105"
+            className="max-h-28 object-contain p-1 transition-transform duration-500 group-hover:scale-105"
           />
         </div>
         {/* Nom + badges */}
