@@ -359,13 +359,17 @@ export default function MarketplaceGamePage() {
           <DialogTitle>Détail du skin</DialogTitle>
           {selectedOffer && (
             <div className="flex flex-col items-center gap-4">
-              <img src={selectedOffer.itemImage || '/placeholder.svg'} alt={selectedOffer.itemName} className="w-32 h-32 object-contain rounded" />
-              <div className="font-bold text-lg">{selectedOffer.itemName}</div>
-              <div className="text-sm text-opnskin-text-secondary">ID: {selectedOffer.itemId}</div>
+              <img src={selectedOffer.itemImage || '/placeholder.svg'} alt={selectedOffer.itemName || 'Skin'} className="w-32 h-32 object-contain rounded" />
+              <div className="font-bold text-lg">{selectedOffer.itemName || selectedOffer.itemId || 'Nom inconnu'}</div>
+              <div className="text-sm text-opnskin-text-secondary">ID: {selectedOffer.itemId || 'N/A'}</div>
               <div className="font-mono text-opnskin-accent font-bold">
-                {formatPrice(selectedOffer.price, currency, cryptoRates)}
+                {typeof selectedOffer.price === 'number' && !isNaN(selectedOffer.price)
+                  ? (cryptoRates && typeof cryptoRates[currency] === 'number' && cryptoRates[currency] > 0
+                      ? formatPrice(selectedOffer.price, currency, cryptoRates)
+                      : `${selectedOffer.price.toFixed(2)} €`)
+                  : 'N/A'}
               </div>
-              <div className="text-xs text-opnskin-text-secondary">Statut: {selectedOffer.status}</div>
+              <div className="text-xs text-opnskin-text-secondary">Statut: {selectedOffer.status || 'N/A'}</div>
               <DialogClose asChild>
                 <Button className="mt-4">Fermer</Button>
               </DialogClose>
