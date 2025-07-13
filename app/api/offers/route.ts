@@ -118,7 +118,12 @@ export async function GET(req: NextRequest) {
         price: offer.price,
         status: offer.status,
         createdAt: offer.createdAt,
-        sellerId: offer.sellerId
+        sellerId: offer.sellerId,
+        seller: {
+          id: offer.seller.id,
+          name: offer.seller.name,
+          last_seen: offer.seller.last_seen
+        }
       })),
       pagination: {
         page,

@@ -319,8 +319,12 @@ export default function MarketplaceGamePage() {
               // Simuler StatTrak (à remplacer par les vraies données)
               const isStatTrak = skinName.toLowerCase().includes('stattrak') || skinName.toLowerCase().includes('stat trak');
               
-              // Simuler la présence en ligne du vendeur (à remplacer par les vraies données)
-              const isSellerOnline = Math.random() > 0.3; // 70% de chance d'être en ligne
+              // Calculer la vraie présence du vendeur
+              let isSellerOnline = false;
+              if (offer.seller && offer.seller.last_seen) {
+                const lastSeen = new Date(offer.seller.last_seen).getTime();
+                isSellerOnline = Date.now() - lastSeen < 2 * 60 * 1000; // 2 minutes
+              }
               
               // Simuler le float (à remplacer par les vraies données)
               const float = Math.random() * 1; // Float entre 0 et 1
