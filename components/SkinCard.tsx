@@ -64,62 +64,62 @@ export default function SkinCard({
   };
 
   return (
-    <Card className={`bg-opnskin-bg-card border-opnskin-bg-secondary card-hover overflow-hidden group ${className}`}>
-      <div className="aspect-square relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-opnskin-bg-card/80 z-10"></div>
-        <img
-          src={image}
-          alt={name}
-          className="w-full h-full object-contain p-2 transition-transform duration-500 group-hover:scale-105"
-        />
-        {/* Marqueur de présence en ligne du vendeur */}
+    <Card className={`bg-opnskin-bg-card border-opnskin-bg-secondary card-hover overflow-hidden group flex flex-col justify-between min-h-[340px] ${className}`}>
+      <div className="relative flex-1 flex flex-col">
+        {/* Présence vendeur */}
         {typeof isSellerOnline === 'boolean' && (
           <span
-            className={`absolute top-2 left-2 z-20 w-3 h-3 rounded-full border-2 border-white ${isSellerOnline ? 'bg-green-500' : 'bg-gray-400'}`}
+            className={`absolute top-3 left-3 z-20 w-3 h-3 rounded-full border-2 border-white ${isSellerOnline ? 'bg-green-500' : 'bg-gray-400'}`}
             title={isSellerOnline ? t('marketplace.seller_online', 'Vendeur en ligne') : t('marketplace.seller_offline', 'Vendeur hors ligne')}
           />
         )}
-        {/* Badge StatTrak */}
-        {statTrak && (
-          <Badge className="absolute top-2 left-8 z-20 bg-orange-500/90 text-white border-orange-500/80 text-xs font-bold shadow">StatTrak™</Badge>
-        )}
-        {rarityLabel && (
-          <Badge className="absolute top-2 right-2 z-20 bg-opnskin-accent/10 text-opnskin-accent border-opnskin-accent/30 text-xs">
-            {rarityLabel}
-          </Badge>
-        )}
-        {badge}
-        <div className="absolute bottom-0 left-0 right-0 p-2 z-20">
-          <h3 className="font-satoshi-bold text-sm truncate text-opnskin-text-primary mb-1">{name}</h3>
-          {wear && (
-            <p className="text-xs text-opnskin-text-secondary italic">
-              {t(`inventory.${wear}`)}
-            </p>
+        {/* Image */}
+        <div className="w-full flex justify-center items-center aspect-square relative">
+          <img
+            src={image}
+            alt={name}
+            className="max-h-32 object-contain p-2 transition-transform duration-500 group-hover:scale-105"
+          />
+        </div>
+        {/* Nom + badges */}
+        <div className="flex items-center gap-2 mt-2 px-3">
+          <h3 className="font-satoshi-bold text-base truncate text-opnskin-text-primary flex-1" title={name}>{name}</h3>
+          {statTrak && (
+            <Badge className="bg-orange-500/90 text-white border-orange-500/80 text-xs font-bold shadow">StatTrak™</Badge>
           )}
-          {/* Affichage du float si dispo */}
+          {rarityLabel && (
+            <Badge className="bg-opnskin-accent/10 text-opnskin-accent border-opnskin-accent/30 text-xs ml-1">
+              {rarityLabel}
+            </Badge>
+          )}
+        </div>
+        {/* État et float */}
+        <div className="flex flex-col gap-1 mt-1 px-3">
+          {wear && (
+            <span className="text-xs text-opnskin-text-secondary italic">{t(`inventory.${wear}`)}</span>
+          )}
           {typeof float === 'number' && !isNaN(float) && (
-            <p className="text-xs text-opnskin-accent font-mono">Float: {float}</p>
+            <span className="text-xs text-opnskin-accent font-mono">Float: {float.toFixed(6)}</span>
           )}
         </div>
       </div>
-      <CardContent className="p-3">
-        <div className="flex justify-between items-center mb-2">
-          {price !== undefined && (
-            <span className="font-mono text-opnskin-accent font-bold text-sm">
-              {cryptoIcons[displayCurrency] && displayCurrency !== 'EUR' && displayCurrency !== 'USD' && (
-                <img src={cryptoIcons[displayCurrency]!} alt={displayCurrency} className="inline w-4 h-4 mr-1 align-middle" />
-              )}
-              {formatPrice(price, displayCurrency, displayCryptoRates)}
-            </span>
-          )}
+      {/* Bas de card : prix + actions */}
+      <CardContent className="pt-2 pb-3 px-3 flex flex-col gap-2">
+        <div className="flex items-center justify-between mb-2">
+          <span className="font-mono text-opnskin-accent font-bold text-lg">
+            {cryptoIcons[displayCurrency] && displayCurrency !== 'EUR' && displayCurrency !== 'USD' && (
+              <img src={cryptoIcons[displayCurrency]!} alt={displayCurrency} className="inline w-5 h-5 mr-1 align-middle" />
+            )}
+            {price !== undefined ? formatPrice(price, displayCurrency, displayCryptoRates) : '--'}
+          </span>
         </div>
-        <div className="flex justify-between items-center gap-2">
+        <div className="flex flex-col gap-2 w-full">
           {actionButton}
           {onDetails && (
             <Button 
               size="sm" 
               variant="outline" 
-              className="border-opnskin-primary/30 text-opnskin-primary hover:bg-opnskin-primary/10 text-xs"
+              className="border-opnskin-primary/30 text-opnskin-primary hover:bg-opnskin-primary/10 text-xs w-full"
               onClick={onDetails}
             >
               Détails
