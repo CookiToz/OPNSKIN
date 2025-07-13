@@ -74,7 +74,7 @@ export default function SkinCard({
   console.log('[SkinCard]', { name, isSellerOnline, last_seen, lastSeenDiff });
 
   return (
-    <Card className={`bg-opnskin-bg-card border-opnskin-bg-secondary card-hover overflow-hidden group flex flex-col justify-between min-h-[340px] ${className}`}>
+    <Card className={`bg-opnskin-bg-card border-opnskin-bg-secondary card-hover overflow-hidden group flex flex-col justify-between min-h-[280px] ${className}`}>
       <style jsx global>{`
         @keyframes neonPulseOnline {
           0% { box-shadow: 0 0 4px 1px #00c97b, 0 0 1px 0px #00c97b; opacity: 1; }
@@ -116,11 +116,11 @@ export default function SkinCard({
           <img
             src={image}
             alt={name}
-            className="max-h-32 object-contain p-2 transition-transform duration-500 group-hover:scale-105"
+            className="max-h-28 object-contain p-2 transition-transform duration-500 group-hover:scale-105"
           />
         </div>
         {/* Nom + badges */}
-        <div className="flex items-center gap-2 mt-2 px-3">
+        <div className="flex items-center gap-2 mt-1 px-3">
           <h3 className="font-satoshi-bold text-base truncate text-opnskin-text-primary flex-1" title={cleanName}>{cleanName}</h3>
           {statTrak && (
             <Badge className="bg-orange-500/90 text-white border-orange-500/80 text-xs font-bold shadow">StatTrak™</Badge>
@@ -132,7 +132,7 @@ export default function SkinCard({
           )}
         </div>
         {/* État et float */}
-        <div className="flex flex-col gap-1 mt-1 px-3">
+        <div className="flex flex-col gap-0.5 mt-1 px-3">
           {wear && (
             <span className="text-xs text-opnskin-text-secondary italic">{t(wear)}</span>
           )}
@@ -142,8 +142,8 @@ export default function SkinCard({
         </div>
       </div>
       {/* Bas de card : prix + actions */}
-      <CardContent className="pt-2 pb-3 px-3 flex flex-col gap-2">
-        <div className="flex items-center justify-between mb-2">
+      <CardContent className="pt-1 pb-2 px-3 flex flex-col gap-1.5">
+        <div className="flex items-center justify-between mb-1">
           <span className="font-mono text-opnskin-accent font-bold text-lg">
             {cryptoIcons[displayCurrency] && displayCurrency !== 'EUR' && displayCurrency !== 'USD' && (
               <img src={cryptoIcons[displayCurrency]!} alt={displayCurrency} className="inline w-5 h-5 mr-1 align-middle" />
@@ -151,7 +151,7 @@ export default function SkinCard({
             {price !== undefined ? formatPrice(price, displayCurrency, displayCryptoRates) : '--'}
           </span>
         </div>
-        <div className="flex flex-col gap-2 w-full">
+        <div className="flex flex-col gap-1.5 w-full">
           {actionButton}
           {onDetails && (
             <Button 
