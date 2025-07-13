@@ -106,11 +106,11 @@ export default function SkinCard({
           />
         )}
         {/* DEBUG : différence de temps */}
-        {typeof lastSeenDiff === 'number' && (
+        {/* (supprimé) {typeof lastSeenDiff === 'number' && (
           <span style={{ color: isSellerOnline ? 'green' : 'red', fontSize: 10, position: 'absolute', top: 8, left: 20 }}>
             {lastSeenDiff} ms
           </span>
-        )}
+        )} */}
         {/* Image */}
         <div className="w-full flex justify-center items-center aspect-square relative">
           <img
