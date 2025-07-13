@@ -36,7 +36,10 @@ export default function CartPage() {
                   <span>Loading...</span>
                 )}
               </div>
-              <Button size="sm" variant="destructive" onClick={async () => { remove(skin.id); await syncWithBackend(); }}>
+              <Button size="sm" variant="destructive" onClick={async () => {
+                await fetch(`/api/cart/${skin.id}`, { method: 'DELETE' });
+                await syncWithBackend();
+              }}>
                 Retirer
               </Button>
             </Card>
