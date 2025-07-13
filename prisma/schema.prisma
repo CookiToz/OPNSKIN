@@ -26,6 +26,7 @@ model User {
   offers       Offer[]
   transactions Transaction[]
   notifications Notification[]
+  cartItems    CartItem[]
 }
 
 model Offer {
@@ -44,6 +45,7 @@ model Offer {
 
   // Relations
   transaction Transaction?
+  cartItems   CartItem[]
 }
 
 model Transaction {
@@ -68,6 +70,15 @@ model Notification {
   message   String
   read      Boolean  @default(false)
   createdAt DateTime @default(now())
+}
+
+model CartItem {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  offerId   String
+  offer     Offer    @relation(fields: [offerId], references: [id])
+  addedAt   DateTime @default(now())
 }
 
 enum OfferStatus {
