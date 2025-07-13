@@ -49,6 +49,13 @@ export default function MarketplaceGamePage() {
   const [showDetails, setShowDetails] = useState(false);
   const [selectedOffer, setSelectedOffer] = useState<any>(null);
 
+  // Tick d'horloge pour présence live
+  const [now, setNow] = useState(Date.now());
+  useEffect(() => {
+    const interval = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(interval);
+  }, []);
+
   // Charger le panier au montage
   useEffect(() => {
     const fetchCart = async () => {
@@ -86,6 +93,26 @@ export default function MarketplaceGamePage() {
         setLoading(false);
       });
   }, [game, toast, isClient, cartItems.length]);
+
+  // Auto-refresh offres après un ping de présence
+  useEffect(() => {
+    const handler = () => {
+      if (!game || !isClient) return;
+      setLoading(true);
+      fetch(`/api/offers?game=${game}`)
+        .then((res) => res.json())
+        .then((data) => {
+          setOffers(Array.isArray(data.offers) ? data.offers : []);
+          setLoading(false);
+        })
+        .catch((error) => {
+          console.error('Erreur lors du rechargement des offres:', error);
+          setLoading(false);
+        });
+    };
+    window.addEventListener('presence-pinged', handler);
+    return () => window.removeEventListener('presence-pinged', handler);
+  }, [game, isClient]);
 
   const handleBuy = async (offerId: string, offerPrice: number) => {
     setBuyingId(offerId);
@@ -323,7 +350,7 @@ export default function MarketplaceGamePage() {
               let isSellerOnline = false;
               if (offer.seller && offer.seller.last_seen) {
                 const lastSeen = new Date(offer.seller.last_seen).getTime();
-                isSellerOnline = Date.now() - lastSeen < 2 * 60 * 1000; // 2 minutes
+                isSellerOnline = now - lastSeen < 30 * 1000; // 30 secondes
               }
               
               // Simuler le float (à remplacer par les vraies données)
@@ -341,6 +368,7 @@ export default function MarketplaceGamePage() {
                   float={float}
                   statTrak={isStatTrak}
                   isSellerOnline={isSellerOnline}
+                  last_seen={offer.seller?.last_seen}
                   actionButton={
                     isMine ? (
                       <div className="w-full mt-3 text-center text-xs text-opnskin-accent font-bold">Mon offre</div>

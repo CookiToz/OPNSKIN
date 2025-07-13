@@ -10,7 +10,7 @@ datasource db {
 }
 
 model User {
-  id           String   @id @default(cuid())
+  id           String   @id @default(uuid())
   steamId      String   @unique
   name         String?
   avatar       String?
@@ -21,6 +21,7 @@ model User {
   tradeUrl     String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+  last_seen    DateTime?
   
   // Relations
   offers       Offer[]
