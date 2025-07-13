@@ -74,7 +74,7 @@ export default function SkinCard({
   console.log('[SkinCard]', { name, isSellerOnline, last_seen, lastSeenDiff });
 
   return (
-    <Card className={`bg-opnskin-bg-card border-opnskin-bg-secondary card-hover overflow-hidden group flex flex-col justify-between min-h-[220px] p-2 ${className}`}>
+    <Card className={`bg-opnskin-bg-card border-opnskin-bg-secondary card-hover overflow-hidden group flex flex-col justify-between min-h-[180px] p-1.5 ${className}`}>
       <style jsx global>{`
         @keyframes neonPulseOnline {
           0% { box-shadow: 0 0 4px 1px #00c97b, 0 0 1px 0px #00c97b; opacity: 1; }
@@ -101,7 +101,7 @@ export default function SkinCard({
         {/* Présence vendeur néon animée */}
         {typeof isSellerOnline === 'boolean' && (
           <span
-            className={`absolute top-2 left-2 z-20 w-2.5 h-2.5 rounded-full ${isSellerOnline ? 'neon-online' : 'neon-offline'}`}
+            className={`absolute top-1.5 left-1.5 z-20 w-2 h-2 rounded-full ${isSellerOnline ? 'neon-online' : 'neon-offline'}`}
             title={isSellerOnline ? t('marketplace.seller_online', 'Vendeur en ligne') : t('marketplace.seller_offline', 'Vendeur hors ligne')}
           />
         )}
@@ -116,42 +116,42 @@ export default function SkinCard({
           <img
             src={image}
             alt={name}
-            className="max-h-28 object-contain p-1 transition-transform duration-500 group-hover:scale-105"
+            className="max-h-28 object-contain p-0.5 transition-transform duration-500 group-hover:scale-105"
           />
         </div>
         {/* Nom + badges */}
-        <div className="flex items-center gap-1 mt-1 px-2">
-          <h3 className="font-satoshi-bold text-sm truncate text-opnskin-text-primary flex-1" title={cleanName}>{cleanName}</h3>
+        <div className="flex items-center gap-0.5 mt-0.5 px-1.5">
+          <h3 className="font-satoshi-bold text-[13px] truncate text-opnskin-text-primary flex-1 leading-tight" title={cleanName}>{cleanName}</h3>
           {statTrak && (
-            <Badge className="bg-orange-500/90 text-white border-orange-500/80 text-[10px] font-bold shadow">StatTrak™</Badge>
+            <Badge className="bg-orange-500/90 text-white border-orange-500/80 text-[9px] font-bold shadow">StatTrak™</Badge>
           )}
           {rarityLabel && (
-            <Badge className="bg-opnskin-accent/10 text-opnskin-accent border-opnskin-accent/30 text-[10px] ml-1">
+            <Badge className="bg-opnskin-accent/10 text-opnskin-accent border-opnskin-accent/30 text-[9px] ml-0.5">
               {rarityLabel}
             </Badge>
           )}
         </div>
         {/* État et float */}
-        <div className="flex flex-col gap-0.5 mt-0.5 px-2">
+        <div className="flex flex-col gap-0 mt-0.5 px-1.5">
           {wear && (
-            <span className="text-[11px] text-opnskin-text-secondary italic">{t(wear)}</span>
+            <span className="text-[10px] text-opnskin-text-secondary italic leading-tight">{t(wear)}</span>
           )}
           {typeof float === 'number' && !isNaN(float) && (
-            <span className="text-[11px] text-gray-400 font-mono">Float: {float.toFixed(6)}</span>
+            <span className="text-[10px] text-gray-400 font-mono leading-tight">Float: {float.toFixed(6)}</span>
           )}
         </div>
       </div>
       {/* Bas de card : prix + actions */}
-      <CardContent className="pt-1 pb-2 px-2 flex flex-col gap-1">
-        <div className="flex items-center justify-between mb-1">
-          <span className="font-mono text-opnskin-accent font-bold text-base">
+      <CardContent className="pt-1 pb-1 px-1.5 flex flex-col gap-0.5">
+        <div className="flex items-center justify-between mb-0.5">
+          <span className="font-mono text-opnskin-accent font-bold text-[15px]">
             {cryptoIcons[displayCurrency] && displayCurrency !== 'EUR' && displayCurrency !== 'USD' && (
               <img src={cryptoIcons[displayCurrency]!} alt={displayCurrency} className="inline w-4 h-4 mr-1 align-middle" />
             )}
             {price !== undefined ? formatPrice(price, displayCurrency, displayCryptoRates) : '--'}
           </span>
         </div>
-        <div className="flex flex-col gap-1 w-full">
+        <div className="flex flex-col gap-0.5 w-full">
           {actionButton}
           {onDetails && (
             <Button 
