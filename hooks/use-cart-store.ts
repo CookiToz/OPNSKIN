@@ -13,6 +13,7 @@ type CartState = {
   remove: (id: string) => void;
   clear: () => void;
   total: () => number;
+  syncWithBackend: () => Promise<void>;
 };
 
 export const useCartStore = create<CartState>((set: (fn: (state: CartState) => Partial<CartState> | CartState) => void, get: () => CartState) => ({
@@ -27,4 +28,20 @@ export const useCartStore = create<CartState>((set: (fn: (state: CartState) => P
   })),
   clear: () => set((state: CartState) => ({ ...state, items: [] })),
   total: () => get().items.reduce((sum: number, s: Skin) => sum + s.price, 0),
+  syncWithBackend: async () => {
+    try {
+      const res = await fetch('/api/cart');
+      const data = await res.json();
+      if (Array.isArray(data.cart)) {
+        set((state) => ({ ...state, items: data.cart.map((item: any) => ({
+          id: item.offerId,
+          name: item.offer?.itemName || '',
+          price: item.offer?.price || 0,
+          image: item.offer?.itemImage || '',
+        })) }));
+      }
+    } catch (e) {
+      // ignore
+    }
+  },
 })); 

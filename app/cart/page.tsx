@@ -7,11 +7,13 @@ import { useCurrencyStore } from '@/hooks/use-currency-store';
 import { useCryptoRatesStore } from '@/hooks/use-currency-store';
 import { formatPrice } from '@/lib/utils';
 import { cryptoIcons } from '@/lib/utils';
+import { useToast } from '@/hooks/use-toast';
 
 export default function CartPage() {
-  const { items, remove, clear, total } = useCartStore();
+  const { items, remove, clear, total, syncWithBackend } = useCartStore();
   const currency = useCurrencyStore((state) => state.currency);
   const cryptoRates = useCryptoRatesStore();
+  const { toast } = useToast();
 
   return (
     <div className="container py-12 min-h-screen">
@@ -34,7 +36,7 @@ export default function CartPage() {
                   <span>Loading...</span>
                 )}
               </div>
-              <Button size="sm" variant="destructive" onClick={() => remove(skin.id)}>
+              <Button size="sm" variant="destructive" onClick={async () => { remove(skin.id); await syncWithBackend(); }}>
                 Retirer
               </Button>
             </Card>
@@ -43,7 +45,44 @@ export default function CartPage() {
             <div className="font-bold text-xl">Total :</div>
             <div className="font-mono text-2xl text-opnskin-accent">{formatPrice(total(), currency, cryptoRates)}</div>
           </div>
-          <Button size="lg" className="btn-opnskin w-full mt-4" disabled>
+          <Button
+            size="lg"
+            className="btn-opnskin w-full mt-4"
+            onClick={async () => {
+              if (items.length === 0) return;
+              try {
+                const offerIds = items.map((skin) => skin.id);
+                const res = await fetch('/api/transactions/bulk', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ offerIds }),
+                });
+                const data = await res.json();
+                if (res.ok && data.results && data.results.every((r: any) => r.success)) {
+                  toast({
+                    title: 'Achat groupé réussi !',
+                    description: 'Tous les skins ont été achetés avec succès.',
+                  });
+                  clear();
+                  await syncWithBackend();
+                } else {
+                  toast({
+                    title: 'Erreur lors de l\'achat',
+                    description: data.error || 'Certains achats ont échoué.',
+                    variant: 'destructive',
+                  });
+                  await syncWithBackend();
+                }
+              } catch (err) {
+                toast({
+                  title: 'Erreur réseau',
+                  description: 'Impossible de finaliser l\'achat.',
+                  variant: 'destructive',
+                });
+              }
+            }}
+            disabled={items.length === 0}
+          >
             Passer au paiement
           </Button>
         </div>

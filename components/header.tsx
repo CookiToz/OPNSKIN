@@ -22,13 +22,16 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { usePathname } from 'next/navigation';
+import { useCartStore } from '@/hooks/use-cart-store';
 
 export function Header() {
   const { t } = useTranslation('common');
   const [notifications, setNotifications] = useState<any[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [showNotifications, setShowNotifications] = useState(false);
-  const [cartCount] = useState(2);
+  const cartItems = useCartStore((state) => state.items);
+  const syncCart = useCartStore((state) => state.syncWithBackend);
+  useEffect(() => { syncCart(); }, []);
   const { user, isLoading: userLoading, isError: userError, refetch } = useUser();
 
   // Charger les notifications
@@ -177,6 +180,11 @@ export function Header() {
                     className="relative text-opnskin-text-secondary hover:text-opnskin-text-primary"
                   >
                     <ShoppingCart className="h-5 w-5" />
+                    {cartItems.length > 0 && (
+                      <span className="absolute -top-1 -right-1 bg-opnskin-accent text-white text-xs rounded-full px-1.5 py-0.5 min-w-[20px] text-center">
+                        {cartItems.length}
+                      </span>
+                    )}
                     <span className="sr-only">{t('header.cart')}</span>
                   </Button>
                 </Link>

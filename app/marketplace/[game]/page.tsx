@@ -14,6 +14,7 @@ import { useTranslation } from 'react-i18next';
 import Link from "next/link";
 import SkinCard from '@/components/SkinCard';
 import { useUser } from "@/components/UserProvider";
+import { useCartStore } from '@/hooks/use-cart-store';
 
 const currentUserId = "user_simule_123";
 
@@ -40,6 +41,7 @@ export default function MarketplaceGamePage() {
   // Ajout panier
   const [addingId, setAddingId] = useState<string | null>(null);
   const [cartOfferIds, setCartOfferIds] = useState<string[]>([]);
+  const syncCart = useCartStore((state) => state.syncWithBackend);
 
   // Charger le panier au montage
   useEffect(() => {
@@ -132,6 +134,7 @@ export default function MarketplaceGamePage() {
           description: "L'offre a été ajoutée à votre panier.",
         });
         setCartOfferIds(prev => [...prev, offerId]);
+        await syncCart();
       } else {
         toast({
           title: "Erreur",
