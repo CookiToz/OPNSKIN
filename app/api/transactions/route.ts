@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
       escrowAmount: offer.price,
       status: 'WAITING_TRADE',
       startedAt: new Date().toISOString()
-    }]).select('*,Offer(*),buyer(*)').single();
+    }]).select('*,Offer(*),User:buyerId(*)').single();
     if (transactionError) {
       console.log('ERREUR: transactionError', transactionError);
       return NextResponse.json({ error: transactionError.message }, { status: 500 });
@@ -79,16 +79,16 @@ export async function GET(req: NextRequest) {
     // 1. Transactions où l'utilisateur est acheteur
     const { data: buyerTx, error: buyerTxError } = await supabase
       .from('Transaction')
-      .select('*,Offer(*),buyer(*)')
+      .select('*,Offer(*),User:buyerId(*)')
       .eq('buyerId', user.id)
       .order('startedAt', { ascending: false });
     // 2. Transactions où l'utilisateur est vendeur (via offerId.sellerId)
     const { data: sellerTx, error: sellerTxError } = await supabase
       .from('Transaction')
-      .select('*,Offer(*),buyer(*)')
+      .select('*,Offer(*),User:buyerId(*)')
       .order('startedAt', { ascending: false });
     // On filtre côté JS pour sellerId
-    const sellerTxFiltered = (sellerTx || []).filter(t => t.offer?.sellerId === user.id);
+    const sellerTxFiltered = (sellerTx || []).filter(t => t.Offer?.sellerId === user.id);
     // On fusionne et on déduplique
     const allTx = [...(buyerTx || []), ...sellerTxFiltered].filter((tx, idx, arr) =>
       arr.findIndex(t => t.id === tx.id) === idx
@@ -105,10 +105,10 @@ export async function GET(req: NextRequest) {
         startedAt: t.startedAt,
         completedAt: t.completedAt,
         cancelledAt: t.cancelledAt,
-        offer: t.offer || null, // retourne l'objet complet de l'offre
-        buyer: t.buyer || null, // retourne l'objet complet du buyer
+        offer: t.Offer || null, // retourne l'objet complet de l'offre
+        buyer: t.User || null, // retourne l'objet complet du buyer
         isBuyer: t.buyerId === user.id,
-        isSeller: t.offer?.sellerId === user.id
+        isSeller: t.Offer?.sellerId === user.id
       }))
     });
   } catch (error: any) {
