@@ -16,24 +16,25 @@ export default function HistoryPage() {
   const [transactions, setTransactions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchTransactions = async () => {
-      setLoading(true);
-      try {
-        const response = await fetch(`/api/transactions`);
-        const data = await response.json();
-        console.log('API /api/transactions:', data); // DEBUG
-        if (data.transactions) {
-          setTransactions(data.transactions);
-        } else {
-          setTransactions([]);
-        }
-      } catch (error) {
+  const fetchTransactions = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(`/api/transactions`);
+      const data = await response.json();
+      console.log('API /api/transactions:', data); // DEBUG
+      if (data.transactions) {
+        setTransactions(data.transactions);
+      } else {
         setTransactions([]);
-      } finally {
-        setLoading(false);
       }
-    };
+    } catch (error) {
+      setTransactions([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchTransactions();
   }, []);
 
@@ -120,18 +121,29 @@ export default function HistoryPage() {
                     <div>
                       <span className="font-semibold">Rôle:</span> {tx.isBuyer ? 'Acheteur' : 'Vendeur'}
                     </div>
-                    {tx.isSeller && tx.offer?.transaction?.buyer && (
+                    {tx.isSeller && tx.buyer?.name && (
                       <div>
-                        <span className="font-semibold">Acheteur:</span> {tx.offer.transaction.buyer.name}
+                        <span className="font-semibold">Acheteur:</span> {tx.buyer.name}
                       </div>
                     )}
-                    {tx.isBuyer && tx.offer?.seller && (
+                    {tx.isBuyer && tx.offer?.sellerId && (
                       <div>
-                        <span className="font-semibold">Vendeur:</span> {tx.offer.seller.name}
+                        <span className="font-semibold">Vendeur:</span> {tx.offer.sellerId}
                       </div>
                     )}
                   </div>
                   {getInstructions(tx)}
+                  {/* Bouton tradelink côté vendeur */}
+                  {tx.isSeller && tx.buyer?.tradeUrl && (
+                    <a
+                      href={tx.buyer.tradeUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn-opnskin mt-2 inline-block"
+                    >
+                      Lancer l’échange Steam
+                    </a>
+                  )}
                 </div>
               </div>
             </CardContent>
@@ -149,6 +161,10 @@ export default function HistoryPage() {
             <h1 className="text-2xl md:text-3xl font-bold font-rajdhani">{t('history.title')}</h1>
             <p className="text-white/70 text-base md:text-lg">{t('history.subtitle')}</p>
           </div>
+          {/* Bouton Rafraîchir */}
+          <Button onClick={fetchTransactions} className="ml-2">
+            Rafraîchir
+          </Button>
         </div>
         <Tabs defaultValue="all">
           <TabsList className="bg-black/40 border border-white/10 flex flex-wrap md:flex-nowrap">
@@ -164,5 +180,5 @@ export default function HistoryPage() {
         </Tabs>
       </div>
     </div>
-  )
+  );
 }
