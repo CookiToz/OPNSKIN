@@ -105,10 +105,10 @@ export async function GET(req: NextRequest) {
         startedAt: t.startedAt,
         completedAt: t.completedAt,
         cancelledAt: t.cancelledAt,
-        offer: t.offerId, // pour compatibilité frontend
-        buyer: t.buyerId, // pour compatibilité frontend
+        offer: t.offer || null, // retourne l'objet complet de l'offre
+        buyer: t.buyer || null, // retourne l'objet complet du buyer
         isBuyer: t.buyerId === user.id,
-        isSeller: t.offerId?.sellerId === user.id
+        isSeller: t.offer?.sellerId === user.id
       }))
     });
   } catch (error: any) {
