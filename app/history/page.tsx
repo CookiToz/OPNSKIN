@@ -22,6 +22,7 @@ export default function HistoryPage() {
       try {
         const response = await fetch(`/api/transactions`);
         const data = await response.json();
+        console.log('API /api/transactions:', data); // DEBUG
         if (data.transactions) {
           setTransactions(data.transactions);
         } else {
