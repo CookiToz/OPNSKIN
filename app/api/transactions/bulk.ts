@@ -50,26 +50,10 @@ export async function POST(req: NextRequest) {
       }
       // Mettre à jour le statut de l'offre
       await supabase.from('Offer').update({ status: 'PENDING_TRADE_OFFER' }).eq('id', offer.id);
-      // Notification vendeur
-      await supabase.from('Notification').insert([{
-        userId: offer.sellerId,
-        type: 'NEW_SALE',
-        title: 'Nouvelle vente à traiter',
-        message: `Un acheteur a acheté votre skin ${offer.itemName || offer.itemId}. Veuillez procéder à l'échange Steam.`
-      }]);
       results.push({ offerId: offer.id, success: true });
     }
     // Débiter le solde total de l'utilisateur
     await supabase.from('User').update({ walletBalance: buyer.walletBalance - total }).eq('id', buyer.id);
-    // Supprimer les items du panier correspondant aux offres achetées
-    await supabase.from('CartItem').delete().match({ userId: buyer.id }).in('offerId', offerIds);
-    // Notification acheteur (une seule fois)
-    await supabase.from('Notification').insert([{
-      userId: buyer.id,
-      type: 'PAYMENT_CONFIRMED',
-      title: 'Paiement validé',
-      message: `Votre paiement a bien été pris en compte. Attendez l'envoi du skin par le vendeur.`
-    }]);
     return NextResponse.json({ results });
   } catch (error: any) {
     console.error('ERREUR BULK TRANSACTION:', error);

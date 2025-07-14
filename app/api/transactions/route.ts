@@ -88,7 +88,7 @@ export async function GET(req: NextRequest) {
       .select('*,offer(*),buyer(*)')
       .order('startedAt', { ascending: false });
     // On filtre côté JS pour sellerId
-    const sellerTxFiltered = (sellerTx || []).filter(t => t.offerId?.sellerId === user.id);
+    const sellerTxFiltered = (sellerTx || []).filter(t => t.offer?.sellerId === user.id);
     // On fusionne et on déduplique
     const allTx = [...(buyerTx || []), ...sellerTxFiltered].filter((tx, idx, arr) =>
       arr.findIndex(t => t.id === tx.id) === idx
