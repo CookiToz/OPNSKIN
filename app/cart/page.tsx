@@ -8,12 +8,14 @@ import { useCryptoRatesStore } from '@/hooks/use-currency-store';
 import { formatPrice } from '@/lib/utils';
 import { cryptoIcons } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
+import { useUser } from '@/components/UserProvider';
 
 export default function CartPage() {
   const { items, remove, clear, total, syncWithBackend } = useCartStore();
   const currency = useCurrencyStore((state) => state.currency);
   const cryptoRates = useCryptoRatesStore();
   const { toast } = useToast();
+  const { user } = useUser();
 
   return (
     <div className="container py-12 min-h-screen">
@@ -55,6 +57,15 @@ export default function CartPage() {
             className="btn-opnskin w-full mt-4"
             onClick={async () => {
               if (items.length === 0) return;
+              // Vérification du tradeUrl
+              if (!user?.tradeUrl || !user.tradeUrl.startsWith('https://steamcommunity.com/tradeoffer/new/')) {
+                toast({
+                  title: 'Lien Steam manquant',
+                  description: 'Merci de renseigner votre tradelink Steam dans votre profil pour finaliser l\'achat.',
+                  variant: 'destructive',
+                });
+                return;
+              }
               try {
                 const offerIds = items.map((skin) => skin.id);
                 const res = await fetch('/api/transactions/bulk', {

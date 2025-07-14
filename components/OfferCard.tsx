@@ -176,6 +176,13 @@ export const OfferCard: React.FC<OfferCardProps> = ({ offer, currentUserId, onOf
             </AlertDialog>
           )}
         </div>
+        {/* Instructions dynamiques vendeur */}
+        {offer.status === "PENDING_TRADE_OFFER" && currentUserId === offer.sellerId && offer.transaction && offer.transaction.buyer && offer.transaction.buyer.tradeUrl && (
+          <div className="text-blue-400 text-xs mt-2">Envoyez le skin à l’acheteur via Steam. Cliquez sur « Lancer l’échange Steam ». L’argent sera libéré automatiquement dès que le skin sera détecté dans l’inventaire de l’acheteur.</div>
+        )}
+        {offer.status === "COMPLETED" && currentUserId === offer.sellerId && (
+          <div className="text-green-400 text-xs mt-2">Transaction terminée. Le skin a été livré et l’argent a été libéré.</div>
+        )}
       </div>
     </div>
   );

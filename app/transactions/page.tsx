@@ -131,6 +131,29 @@ export default function Transactions() {
     );
   };
 
+  const getInstructions = (transaction: any) => {
+    if (transaction.isBuyer) {
+      if (transaction.status === 'WAITING_TRADE') {
+        return <div className="text-yellow-400 text-sm mt-2">En attente d’envoi du skin par le vendeur. Vous recevrez une notification dès que le skin sera livré.</div>;
+      }
+      if (transaction.status === 'DONE') {
+        return <div className="text-green-400 text-sm mt-2">Transaction terminée. Le skin a été livré et l’argent a été libéré.</div>;
+      }
+    } else if (transaction.isSeller) {
+      if (transaction.status === 'WAITING_TRADE') {
+        if (transaction.offer && transaction.offer.buyer && transaction.offer.buyer.tradeUrl) {
+          return <div className="text-blue-400 text-sm mt-2">Vous devez envoyer le skin à l’acheteur via Steam. Cliquez sur « Lancer l’échange Steam » pour ouvrir son tradelink. L’argent sera libéré automatiquement dès que le skin sera détecté dans l’inventaire de l’acheteur.</div>;
+        } else {
+          return <div className="text-yellow-400 text-sm mt-2">L’acheteur n’a pas encore renseigné son tradelink Steam. Attendez qu’il le fasse pour pouvoir envoyer le skin.</div>;
+        }
+      }
+      if (transaction.status === 'DONE') {
+        return <div className="text-green-400 text-sm mt-2">Transaction terminée. Le skin a été livré et l’argent a été libéré.</div>;
+      }
+    }
+    return null;
+  };
+
   return (
     <div className="min-h-screen">
       <div className="container mx-auto p-3 md:p-6">
@@ -203,6 +226,7 @@ export default function Transactions() {
                           </div>
                         )}
                       </div>
+                      {getInstructions(transaction)}
                     </div>
                     
                     <div className="flex gap-2">
