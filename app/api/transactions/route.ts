@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
       escrowAmount: offer.price,
       status: 'WAITING_TRADE',
       startedAt: new Date().toISOString()
-    }]).select('*,offer(*),buyer(*)').single();
+    }]).select('*,Offer(*),buyer(*)').single();
     if (transactionError) {
       console.log('ERREUR: transactionError', transactionError);
       return NextResponse.json({ error: transactionError.message }, { status: 500 });
@@ -79,13 +79,13 @@ export async function GET(req: NextRequest) {
     // 1. Transactions où l'utilisateur est acheteur
     const { data: buyerTx, error: buyerTxError } = await supabase
       .from('Transaction')
-      .select('*,offer(*),buyer(*)')
+      .select('*,Offer(*),buyer(*)')
       .eq('buyerId', user.id)
       .order('startedAt', { ascending: false });
     // 2. Transactions où l'utilisateur est vendeur (via offerId.sellerId)
     const { data: sellerTx, error: sellerTxError } = await supabase
       .from('Transaction')
-      .select('*,offer(*),buyer(*)')
+      .select('*,Offer(*),buyer(*)')
       .order('startedAt', { ascending: false });
     // On filtre côté JS pour sellerId
     const sellerTxFiltered = (sellerTx || []).filter(t => t.offer?.sellerId === user.id);
