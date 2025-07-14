@@ -26,7 +26,7 @@ async function getSteamInventory(steamId: string) {
   return data;
 }
 
-async function releaseEscrow(transactionId: string, sellerId: string, amount: number) {
+async function releaseEscrow(transactionId: string, sellerId: string, amount: number, buyerId: string) {
   // 1. Mettre à jour la transaction
   await supabase.from('Transaction').update({ status: 'DONE', completedAt: new Date().toISOString() }).eq('id', transactionId);
   // 2. Crédite le vendeur
@@ -34,6 +34,24 @@ async function releaseEscrow(transactionId: string, sellerId: string, amount: nu
   if (seller) {
     await supabase.from('User').update({ walletBalance: (seller.walletBalance || 0) + amount }).eq('id', sellerId);
   }
+  // 3. Notifier le vendeur
+  await supabase.from('Notification').insert([
+    {
+      userId: sellerId,
+      type: 'ESCROW_RELEASED',
+      title: 'Paiement libéré',
+      message: 'Le skin a bien été livré. Les fonds ont été ajoutés à votre solde.'
+    }
+  ]);
+  // 4. Notifier l'acheteur
+  await supabase.from('Notification').insert([
+    {
+      userId: buyerId,
+      type: 'ESCROW_RELEASED',
+      title: 'Achat confirmé',
+      message: 'Vous avez bien reçu le skin. La transaction est terminée.'
+    }
+  ]);
 }
 
 async function main() {
@@ -49,7 +67,7 @@ async function main() {
       const inv = await getSteamInventory(steamId);
       const found = (inv.descriptions || []).some((item: any) => item.market_hash_name === market_hash_name);
       if (found) {
-        await releaseEscrow(tx.id, sellerId, tx.escrowAmount);
+        await releaseEscrow(tx.id, sellerId, tx.escrowAmount, buyer.id);
         console.log(`✅ Transaction ${tx.id} : skin trouvé, escrow libéré.`);
       } else {
         console.log(`⏳ Transaction ${tx.id} : skin non trouvé, en attente.`);
