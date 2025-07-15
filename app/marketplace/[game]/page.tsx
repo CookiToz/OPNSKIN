@@ -16,7 +16,7 @@ import SkinCard from '@/components/SkinCard';
 import { useUser } from "@/components/UserProvider";
 import { useCartStore } from '@/hooks/use-cart-store';
 import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogClose } from '@/components/ui/dialog';
-import FilterSidebarCS2, { CS2Filters, DEFAULT_FILTERS } from '@/components/FilterSidebar';
+import FilterSidebarOPNSKIN, { OPNSKINFilters, DEFAULT_OPNSKIN_FILTERS } from '@/components/FilterSidebarOPNSKIN';
 
 const currentUserId = "user_simule_123";
 
@@ -52,14 +52,16 @@ export default function MarketplaceGamePage() {
   const [selectedOffer, setSelectedOffer] = useState<any>(null);
 
   // Filtres avancés CS2
-  const [filters, setFilters] = useState<CS2Filters>(DEFAULT_FILTERS);
+  const [filters, setFilters] = useState<OPNSKINFilters>(DEFAULT_OPNSKIN_FILTERS);
   // Extraire dynamiquement la liste des collections à partir des offres
   const collections = Array.from(new Set(offers.map((o) => o.collection).filter(Boolean)));
   // Fonction de filtrage côté frontend (à remplacer par filtrage API si besoin)
   const filteredOffers = offers.filter((offer) => {
-    if (!offer) return false; // Sécurité supplémentaire
+    if (!offer) return false;
     // Prix
-    if (offer.price < filters.priceMin || offer.price > filters.priceMax) return false;
+    if (offer.price < filters.price[0] || offer.price > filters.price[1]) return false;
+    // Float (optionnel)
+    if (filters.float && typeof offer.float === 'number' && (offer.float < filters.float[0] || offer.float > filters.float[1])) return false;
     // Wear (extraction robuste depuis le nom)
     let skinName = offer.itemName || offer.itemId || '';
     let wearMatch = skinName.match(/\((.*?)\)/);
@@ -355,7 +357,7 @@ export default function MarketplaceGamePage() {
         <div className="flex flex-col md:flex-row gap-8">
           {/* Sidebar filtres pour CS2 */}
           {game === 'cs2' && (
-            <FilterSidebarCS2 filters={filters} setFilters={setFilters} collections={collections} />
+            <FilterSidebarOPNSKIN filters={filters} setFilters={setFilters} collections={collections} showFloat={true} />
           )}
           {/* Liste des offres */}
           <div className="flex-1">
