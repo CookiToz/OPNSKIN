@@ -20,7 +20,14 @@ const Slider = React.forwardRef<
     <SliderPrimitive.Track className="relative h-2 w-full grow overflow-hidden rounded-full bg-secondary">
       <SliderPrimitive.Range className="absolute h-full bg-primary" />
     </SliderPrimitive.Track>
-    <SliderPrimitive.Thumb className="block h-5 w-5 rounded-full border-2 border-primary bg-background ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50" />
+    {Array.isArray(props.value) && props.value.length === 2 ? (
+      <>
+        <SliderPrimitive.Thumb className="block h-5 w-5 rounded-full border-2 border-opnskin-accent bg-background shadow-[0_0_8px_#00ffe7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-opnskin-accent focus-visible:ring-offset-2 transition-all duration-150 hover:scale-110" />
+        <SliderPrimitive.Thumb className="block h-5 w-5 rounded-full border-2 border-opnskin-accent bg-background shadow-[0_0_8px_#00ffe7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-opnskin-accent focus-visible:ring-offset-2 transition-all duration-150 hover:scale-110" />
+      </>
+    ) : (
+      <SliderPrimitive.Thumb className="block h-5 w-5 rounded-full border-2 border-opnskin-accent bg-background shadow-[0_0_8px_#00ffe7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-opnskin-accent focus-visible:ring-offset-2 transition-all duration-150 hover:scale-110" />
+    )}
   </SliderPrimitive.Root>
 ))
 Slider.displayName = SliderPrimitive.Root.displayName
