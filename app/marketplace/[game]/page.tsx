@@ -16,6 +16,7 @@ import SkinCard from '@/components/SkinCard';
 import { useUser } from "@/components/UserProvider";
 import { useCartStore } from '@/hooks/use-cart-store';
 import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogClose } from '@/components/ui/dialog';
+import FilterSidebarCS2, { CS2Filters, DEFAULT_FILTERS } from '@/components/FilterSidebar';
 
 const currentUserId = "user_simule_123";
 
@@ -49,6 +50,35 @@ export default function MarketplaceGamePage() {
   // Hooks modaux (déplacés ici AVANT tout return/condition)
   const [showDetails, setShowDetails] = useState(false);
   const [selectedOffer, setSelectedOffer] = useState<any>(null);
+
+  // Filtres avancés CS2
+  const [filters, setFilters] = useState<CS2Filters>(DEFAULT_FILTERS);
+  // Extraire dynamiquement la liste des collections à partir des offres
+  const collections = Array.from(new Set(offers.map((o) => o.collection).filter(Boolean)));
+  // Fonction de filtrage côté frontend (à remplacer par filtrage API si besoin)
+  const filteredOffers = offers.filter((offer) => {
+    // Prix
+    if (offer.price < filters.priceMin || offer.price > filters.priceMax) return false;
+    // Wear
+    if (filters.wear.length > 0 && !filters.wear.includes(offer.wear || offer.itemWear || '')) return false;
+    // Rareté
+    if (filters.rarity.length > 0 && !filters.rarity.includes(offer.rarity || offer.itemRarity || '')) return false;
+    // Type
+    if (filters.type.length > 0 && !filters.type.includes(offer.type || offer.itemType || '')) return false;
+    // StatTrak
+    if (filters.stattrak !== null) {
+      const isStatTrak = (offer.itemName || '').toLowerCase().includes('stattrak');
+      if (filters.stattrak !== isStatTrak) return false;
+    }
+    // Collection
+    if (filters.collection && offer.collection !== filters.collection) return false;
+    // Trade hold (simulé)
+    if (filters.tradeHold !== null) {
+      const isTradeHold = offer.tradeHold === true;
+      if (filters.tradeHold !== isTradeHold) return false;
+    }
+    return true;
+  });
 
   // Fonction pour charger les offres
   const fetchOffers = async (showLoading = true) => {
@@ -318,112 +348,121 @@ export default function MarketplaceGamePage() {
         </div>
 
         {/* Liste des offres */}
-        {loading || userLoading ? (
-          <div className="flex items-center justify-center py-12">
-            <Loader2 className="animate-spin h-8 w-8 text-opnskin-primary" />
-          </div>
-        ) : offers.length === 0 ? (
-          <div className="text-center py-12">
-            <Store className="h-16 w-16 text-opnskin-text-secondary/30 mx-auto mb-4" />
-            <h3 className="text-xl font-bold text-opnskin-text-primary mb-2">
-              Aucune offre disponible
-            </h3>
-            <p className="text-opnskin-text-secondary mb-4">
-              Il n'y a actuellement aucune offre pour {gameInfo.name}.
-            </p>
-            <Link href="/inventory">
-              <Button className="btn-opnskin">
-                Vendre mes items
-              </Button>
-            </Link>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {offers.map((offer) => {
-              const isMine = user && user.loggedIn && offer.sellerId === user.id;
-              
-              // Extraire les infos du skin depuis le nom (ex: "AK-47 | Fire Serpent (Factory New)")
-              const skinName = offer.itemName || offer.itemId || 'Skin inconnu';
-              const wearMatch = skinName.match(/\((.*?)\)/);
-              const wear = wearMatch ? wearMatch[1] : undefined;
-              
-              // Simuler StatTrak (à remplacer par les vraies données)
-              const isStatTrak = skinName.toLowerCase().includes('stattrak') || skinName.toLowerCase().includes('stat trak');
-              
-              // Calculer la vraie présence du vendeur
-              let isSellerOnline = false;
-              let lastSeen = undefined;
-              if (offer.seller && offer.seller.last_seen) {
-                // Forcer parsing UTC (ajoute 'Z' si pas déjà présent)
-                const lastSeenStr = offer.seller.last_seen.endsWith('Z') ? offer.seller.last_seen : offer.seller.last_seen + 'Z';
-                lastSeen = Date.parse(lastSeenStr);
-                isSellerOnline = Date.now() - lastSeen < 30 * 1000;
-              }
-              
-              // Simuler le float (à remplacer par les vraies données)
-              const float = offer.float ?? undefined;
-              
-              // DEBUG mapping présence
-              console.log('[PRESENCE DEBUG]', {
-                userId: user?.id,
-                offerSellerId: offer.sellerId,
-                offerSellerObjId: offer.seller?.id,
-                last_seen: offer.seller?.last_seen,
-                isSellerOnline
-              });
-              
-              return (
-                <SkinCard
-                  key={offer.id || offer.itemId}
-                  name={skinName}
-                  image={offer.itemImage || '/placeholder.svg'}
-                  price={offer.price || 0}
-                  rarityLabel={offer.status || 'Disponible'}
-                  currency={currency}
-                  wear={wear}
-                  float={float}
-                  statTrak={isStatTrak}
-                  isSellerOnline={isSellerOnline}
-                  last_seen={offer.seller?.last_seen}
-                  lastSeenDiff={lastSeen ? Date.now() - lastSeen : undefined}
-                  actionButton={
-                    isMine ? (
-                      <div className="w-full mt-3 text-center text-xs text-opnskin-accent font-bold">Mon offre</div>
-                    ) : cartOfferIds.includes(offer.id) ? (
-                      <Button className="w-full btn-opnskin mt-3" disabled>
-                        Déjà dans le panier
-                      </Button>
-                    ) : (
-                      <div className="flex flex-col gap-2">
-                        <Button
-                          className="w-full btn-opnskin mt-3"
-                          onClick={() => handleAddToCart(offer.id)}
-                          disabled={addingId === offer.id}
-                        >
-                          {addingId === offer.id ? (
-                            <>
-                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                              Ajout...
-                            </>
-                          ) : (
-                            "Ajouter au panier"
-                          )}
-                        </Button>
-                        <Button
-                          className="w-full btn-opnskin-secondary"
-                          variant="outline"
-                          onClick={() => { setSelectedOffer(offer); setShowDetails(true); }}
-                        >
-                          Détail
-                        </Button>
-                      </div>
-                    )
+        <div className="flex flex-col md:flex-row gap-8">
+          {/* Sidebar filtres pour CS2 */}
+          {game === 'cs2' && (
+            <FilterSidebarCS2 filters={filters} setFilters={setFilters} collections={collections} />
+          )}
+          {/* Liste des offres */}
+          <div className="flex-1">
+            {loading || userLoading ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="animate-spin h-8 w-8 text-opnskin-primary" />
+              </div>
+            ) : filteredOffers.length === 0 ? (
+              <div className="text-center py-12">
+                <Store className="h-16 w-16 text-opnskin-text-secondary/30 mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-opnskin-text-primary mb-2">
+                  Aucune offre disponible
+                </h3>
+                <p className="text-opnskin-text-secondary mb-4">
+                  Il n'y a actuellement aucune offre pour {gameInfo.name} avec ces filtres.
+                </p>
+                <Link href="/inventory">
+                  <Button className="btn-opnskin">
+                    Vendre mes items
+                  </Button>
+                </Link>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {filteredOffers.map((offer) => {
+                  const isMine = user && user.loggedIn && offer.sellerId === user.id;
+                  
+                  // Extraire les infos du skin depuis le nom (ex: "AK-47 | Fire Serpent (Factory New)")
+                  const skinName = offer.itemName || offer.itemId || 'Skin inconnu';
+                  const wearMatch = skinName.match(/\((.*?)\)/);
+                  const wear = wearMatch ? wearMatch[1] : undefined;
+                  
+                  // Simuler StatTrak (à remplacer par les vraies données)
+                  const isStatTrak = skinName.toLowerCase().includes('stattrak') || skinName.toLowerCase().includes('stat trak');
+                  
+                  // Calculer la vraie présence du vendeur
+                  let isSellerOnline = false;
+                  let lastSeen = undefined;
+                  if (offer.seller && offer.seller.last_seen) {
+                    // Forcer parsing UTC (ajoute 'Z' si pas déjà présent)
+                    const lastSeenStr = offer.seller.last_seen.endsWith('Z') ? offer.seller.last_seen : offer.seller.last_seen + 'Z';
+                    lastSeen = Date.parse(lastSeenStr);
+                    isSellerOnline = Date.now() - lastSeen < 30 * 1000;
                   }
-                />
-              );
-            })}
+                  
+                  // Simuler le float (à remplacer par les vraies données)
+                  const float = offer.float ?? undefined;
+                  
+                  // DEBUG mapping présence
+                  console.log('[PRESENCE DEBUG]', {
+                    userId: user?.id,
+                    offerSellerId: offer.sellerId,
+                    offerSellerObjId: offer.seller?.id,
+                    last_seen: offer.seller?.last_seen,
+                    isSellerOnline
+                  });
+                  
+                  return (
+                    <SkinCard
+                      key={offer.id || offer.itemId}
+                      name={skinName}
+                      image={offer.itemImage || '/placeholder.svg'}
+                      price={offer.price || 0}
+                      rarityLabel={offer.status || 'Disponible'}
+                      currency={currency}
+                      wear={wear}
+                      float={float}
+                      statTrak={isStatTrak}
+                      isSellerOnline={isSellerOnline}
+                      last_seen={offer.seller?.last_seen}
+                      lastSeenDiff={lastSeen ? Date.now() - lastSeen : undefined}
+                      actionButton={
+                        isMine ? (
+                          <div className="w-full mt-3 text-center text-xs text-opnskin-accent font-bold">Mon offre</div>
+                        ) : cartOfferIds.includes(offer.id) ? (
+                          <Button className="w-full btn-opnskin mt-3" disabled>
+                            Déjà dans le panier
+                          </Button>
+                        ) : (
+                          <div className="flex flex-col gap-2">
+                            <Button
+                              className="w-full btn-opnskin mt-3"
+                              onClick={() => handleAddToCart(offer.id)}
+                              disabled={addingId === offer.id}
+                            >
+                              {addingId === offer.id ? (
+                                <>
+                                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                  Ajout...
+                                </>
+                              ) : (
+                                "Ajouter au panier"
+                              )}
+                            </Button>
+                            <Button
+                              className="w-full btn-opnskin-secondary"
+                              variant="outline"
+                              onClick={() => { setSelectedOffer(offer); setShowDetails(true); }}
+                            >
+                              Détail
+                            </Button>
+                          </div>
+                        )
+                      }
+                    />
+                  );
+                })}
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
       {/* Modal détail skin */}
       <Dialog open={showDetails} onOpenChange={setShowDetails}>
