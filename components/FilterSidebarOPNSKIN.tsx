@@ -67,9 +67,15 @@ export default function FilterSidebarOPNSKIN({
       {/* Résumé des filtres actifs */}
       {activeBadges.length > 0 && (
         <div className="flex flex-wrap gap-2 mb-2">
-          {activeBadges.map((b, i) => (
-            <Badge key={i} className="bg-kalpix-violet/90 text-white cursor-pointer shadow" onClick={b.onRemove}>{b.label} ✕</Badge>
-          ))}
+          {activeBadges.map((b, i) => {
+            let badgeClass = "bg-kalpix-violet/90 text-white cursor-pointer shadow";
+            if (b.label.toLowerCase().includes('stattrak')) badgeClass = "bg-[#ff9800] text-[#ff9800] font-bold border border-[#ff9800]/60 px-3 py-1 rounded text-xs shadow-none";
+            else if (b.label.toLowerCase().includes('souvenir')) badgeClass = "bg-[#ffe066] text-[#ffe066] font-bold border border-[#ffe066]/60 px-3 py-1 rounded text-xs shadow-none";
+            else if (b.label.toLowerCase().includes('normal')) badgeClass = "bg-[#23272f] text-white font-bold border border-[#23272f]/60 px-3 py-1 rounded text-xs shadow-none";
+            return (
+              <Badge key={i} className={badgeClass} onClick={b.onRemove}>{b.label} ✕</Badge>
+            );
+          })}
         </div>
       )}
       {/* Prix */}
