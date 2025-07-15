@@ -75,6 +75,7 @@ export default function FilterSidebarOPNSKIN({
       {/* Prix */}
       <div>
         <div className="font-semibold mb-1 text-opnskin-text-secondary">Prix (€)</div>
+        <div className="text-xs text-opnskin-text-secondary mb-1">Prix: {filters.price[0]}€ - {filters.price[1]}€</div>
         <div className="flex items-center gap-2">
           <input
             type="number"
@@ -107,6 +108,12 @@ export default function FilterSidebarOPNSKIN({
           value={filters.price}
           onValueChange={vals => setFilters({ ...filters, price: vals as [number, number] })}
           className="mt-2"
+          style={{
+            // Dégradé dynamique du noir vers le bleu selon la position du thumb
+            background: `linear-gradient(90deg, #181a20 0%, #00ffe7 ${(filters.price[1] / priceMax) * 100}%)`,
+            borderRadius: '8px',
+            height: '8px',
+          }}
         />
       </div>
       {/* Float (optionnel) */}
@@ -120,6 +127,11 @@ export default function FilterSidebarOPNSKIN({
             value={filters.float || [0, 1]}
             onValueChange={vals => setFilters({ ...filters, float: vals as [number, number] })}
             className="mt-2"
+            style={{
+              background: `linear-gradient(90deg, #181a20 0%, #00ffe7 ${((filters.float ? filters.float[1] : 1) / 1) * 100}%)`,
+              borderRadius: '8px',
+              height: '8px',
+            }}
           />
           <div className="flex items-center gap-2 mt-1">
             <input
