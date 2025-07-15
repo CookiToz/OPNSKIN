@@ -23,6 +23,9 @@ import {
 } from "@/components/ui/tooltip";
 import { usePathname } from 'next/navigation';
 import { useCartStore } from '@/hooks/use-cart-store';
+import React, { useState } from "react";
+import CartDrawer from "@/components/CartDrawer";
+import { ShoppingCart } from "lucide-react";
 
 export function Header() {
   const { t } = useTranslation('common');
@@ -57,6 +60,7 @@ export function Header() {
   const searchQuery = useSearchStore((state) => state.searchQuery);
   const setSearchQuery = useSearchStore((state) => state.setSearchQuery);
   const pathname = usePathname();
+  const [cartOpen, setCartOpen] = useState(false);
 
   const handleLogout = () => {
     fetch('/api/logout').then(() => {
@@ -173,21 +177,18 @@ export function Header() {
 
             <Tooltip>
               <TooltipTrigger asChild>
-                <Link href="/cart">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="relative text-opnskin-text-secondary hover:text-opnskin-text-primary"
-                  >
-                    <ShoppingCart className="h-5 w-5" />
-                    {cartItems.length > 0 && (
-                      <span className="absolute -top-1 -right-1 bg-opnskin-accent text-white text-xs rounded-full px-1.5 py-0.5 min-w-[20px] text-center">
-                        {cartItems.length}
-                      </span>
-                    )}
-                    <span className="sr-only">{t('header.cart')}</span>
-                  </Button>
-                </Link>
+                <button
+                  className="relative"
+                  onClick={() => setCartOpen(true)}
+                  aria-label="Ouvrir le panier"
+                >
+                  <ShoppingCart className="h-5 w-5" />
+                  {cartItems.length > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-opnskin-accent text-white text-xs rounded-full px-1.5 py-0.5 min-w-[20px] text-center">
+                      {cartItems.length}
+                    </span>
+                  )}
+                </button>
               </TooltipTrigger>
               <TooltipContent>
                 <p>Voir votre panier</p>
@@ -255,6 +256,7 @@ export function Header() {
             )}
           </div>
         </div>
+        <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
       </header>
     </TooltipProvider>
   );
