@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Bell, Search, ShoppingCart, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -23,9 +22,8 @@ import {
 } from "@/components/ui/tooltip";
 import { usePathname } from 'next/navigation';
 import { useCartStore } from '@/hooks/use-cart-store';
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import CartDrawer from "@/components/CartDrawer";
-import { ShoppingCart } from "lucide-react";
 
 export function Header() {
   const { t } = useTranslation('common');
