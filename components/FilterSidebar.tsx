@@ -54,6 +54,8 @@ const DEFAULT_FILTERS: CS2Filters = {
   tradeHold: null,
 };
 
+export { DEFAULT_FILTERS };
+
 export default function FilterSidebarCS2({
   filters,
   setFilters,

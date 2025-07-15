@@ -57,17 +57,21 @@ export default function MarketplaceGamePage() {
   const collections = Array.from(new Set(offers.map((o) => o.collection).filter(Boolean)));
   // Fonction de filtrage côté frontend (à remplacer par filtrage API si besoin)
   const filteredOffers = offers.filter((offer) => {
+    if (!offer) return false; // Sécurité supplémentaire
     // Prix
     if (offer.price < filters.priceMin || offer.price > filters.priceMax) return false;
-    // Wear
-    if (filters.wear.length > 0 && !filters.wear.includes(offer.wear || offer.itemWear || '')) return false;
+    // Wear (extraction robuste depuis le nom)
+    let skinName = offer.itemName || offer.itemId || '';
+    let wearMatch = skinName.match(/\((.*?)\)/);
+    let wear = wearMatch ? wearMatch[1] : (offer.wear || offer.itemWear || '');
+    if (filters.wear.length > 0 && !filters.wear.includes(wear)) return false;
     // Rareté
     if (filters.rarity.length > 0 && !filters.rarity.includes(offer.rarity || offer.itemRarity || '')) return false;
     // Type
     if (filters.type.length > 0 && !filters.type.includes(offer.type || offer.itemType || '')) return false;
     // StatTrak
     if (filters.stattrak !== null) {
-      const isStatTrak = (offer.itemName || '').toLowerCase().includes('stattrak');
+      const isStatTrak = (skinName || '').toLowerCase().includes('stattrak');
       if (filters.stattrak !== isStatTrak) return false;
     }
     // Collection
