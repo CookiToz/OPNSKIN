@@ -36,11 +36,13 @@ export default function FilterSidebarOPNSKIN({
   setFilters,
   collections,
   showFloat = false,
+  priceMax = 1000,
 }: {
   filters: OPNSKINFilters;
   setFilters: (f: OPNSKINFilters) => void;
   collections: string[];
   showFloat?: boolean;
+  priceMax?: number;
 }) {
   // Filtres actifs (badges closables)
   const activeBadges = [
@@ -79,25 +81,31 @@ export default function FilterSidebarOPNSKIN({
             min={0}
             max={filters.price[1]}
             value={filters.price[0]}
-            onChange={e => setFilters({ ...filters, price: [Number(e.target.value), filters.price[1]] })}
+            onChange={e => {
+              let min = Math.max(0, Math.min(Number(e.target.value), filters.price[1]));
+              setFilters({ ...filters, price: [min, filters.price[1]] });
+            }}
             className="w-20 rounded bg-opnskin-bg-card border px-2 py-1"
           />
           <span>-</span>
           <input
             type="number"
             min={filters.price[0]}
-            max={10000}
+            max={priceMax}
             value={filters.price[1]}
-            onChange={e => setFilters({ ...filters, price: [filters.price[0], Number(e.target.value)] })}
+            onChange={e => {
+              let max = Math.max(filters.price[0], Math.min(Number(e.target.value), priceMax));
+              setFilters({ ...filters, price: [filters.price[0], max] });
+            }}
             className="w-20 rounded bg-opnskin-bg-card border px-2 py-1"
           />
         </div>
         <Slider
           min={0}
-          max={1000}
+          max={priceMax}
           step={1}
-          values={filters.price}
-          onChange={vals => setFilters({ ...filters, price: vals as [number, number] })}
+          value={filters.price}
+          onValueChange={vals => setFilters({ ...filters, price: vals as [number, number] })}
           className="mt-2"
         />
       </div>
@@ -109,8 +117,8 @@ export default function FilterSidebarOPNSKIN({
             min={0}
             max={1}
             step={0.001}
-            values={filters.float || [0, 1]}
-            onChange={vals => setFilters({ ...filters, float: vals as [number, number] })}
+            value={filters.float || [0, 1]}
+            onValueChange={vals => setFilters({ ...filters, float: vals as [number, number] })}
             className="mt-2"
           />
           <div className="flex items-center gap-2 mt-1">
@@ -216,28 +224,6 @@ export default function FilterSidebarOPNSKIN({
             <option key={c} value={c}>{c}</option>
           ))}
         </select>
-      </div>
-      {/* Trade Hold */}
-      <div>
-        <div className="font-semibold mb-1 text-opnskin-text-secondary">Trade Hold</div>
-        <div className="flex gap-2">
-          <Button
-            size="sm"
-            variant={filters.tradeHold === true ? "default" : "outline"}
-            className={filters.tradeHold === true ? "bg-kalpix-violet text-white" : ""}
-            onClick={() => setFilters({ ...filters, tradeHold: filters.tradeHold === true ? null : true })}
-          >
-            Oui
-          </Button>
-          <Button
-            size="sm"
-            variant={filters.tradeHold === false ? "default" : "outline"}
-            className={filters.tradeHold === false ? "bg-kalpix-violet text-white" : ""}
-            onClick={() => setFilters({ ...filters, tradeHold: filters.tradeHold === false ? null : false })}
-          >
-            Non
-          </Button>
-        </div>
       </div>
     </aside>
   );

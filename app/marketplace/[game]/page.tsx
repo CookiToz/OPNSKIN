@@ -86,6 +86,9 @@ export default function MarketplaceGamePage() {
     return true;
   });
 
+  // Calcul du prix max dynamique
+  const priceMax = offers.length > 0 ? Math.max(...offers.map(o => o.price || 0)) : 1000;
+
   // Fonction pour charger les offres
   const fetchOffers = async (showLoading = true) => {
     if (!game || !isClient) return;
@@ -340,24 +343,11 @@ export default function MarketplaceGamePage() {
           </Card>
         </div>
 
-        {/* Filtres (placeholder) */}
-        <div className="mb-6">
-          <div className="bg-opnskin-bg-card/50 border border-opnskin-bg-secondary rounded-lg p-4">
-            <div className="flex items-center gap-2 text-opnskin-text-secondary">
-              <span className="text-sm">🔧 Filtres avancés à venir</span>
-              <Badge variant="outline" className="text-xs">Bientôt</Badge>
-            </div>
-            <p className="text-xs text-opnskin-text-secondary mt-1">
-              Rareté, prix, état, StatTrak, etc.
-            </p>
-          </div>
-        </div>
-
         {/* Liste des offres */}
         <div className="flex flex-col md:flex-row gap-8">
           {/* Sidebar filtres pour CS2 */}
           {game === 'cs2' && (
-            <FilterSidebarOPNSKIN filters={filters} setFilters={setFilters} collections={collections} showFloat={true} />
+            <FilterSidebarOPNSKIN filters={filters} setFilters={setFilters} collections={collections} showFloat={true} priceMax={priceMax} />
           )}
           {/* Liste des offres */}
           <div className="flex-1">
