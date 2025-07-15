@@ -57,10 +57,10 @@ export default function FilterSidebarOPNSKIN({
   ];
 
   return (
-    <aside className="w-80 max-w-full bg-[#181a20] rounded-2xl p-6 shadow-2xl flex flex-col gap-7 sticky top-24 border border-opnskin-primary/20">
+    <aside className="w-80 max-w-full bg-[#101c2c] rounded-3xl p-7 shadow-2xl flex flex-col gap-8 sticky top-24 border border-[#00ffe7]/40 backdrop-blur-md">
       <div className="flex items-center justify-between mb-2">
-        <h2 className="text-2xl font-rajdhani font-bold text-opnskin-accent drop-shadow-[0_0_8px_#00ffe7] tracking-wide">Filtres avancés</h2>
-        <Button variant="ghost" size="sm" onClick={() => setFilters(DEFAULT_OPNSKIN_FILTERS)}>
+        <h2 className="text-3xl font-rajdhani font-bold text-[#00ffe7] drop-shadow-[0_0_8px_#00ffe7] tracking-wide">Filtres avancés</h2>
+        <Button variant="ghost" size="sm" className="text-[#00ffe7] hover:bg-[#00ffe7]/10 font-bold" onClick={() => setFilters(DEFAULT_OPNSKIN_FILTERS)}>
           Réinitialiser
         </Button>
       </div>
@@ -68,15 +68,18 @@ export default function FilterSidebarOPNSKIN({
       {activeBadges.length > 0 && (
         <div className="flex flex-wrap gap-2 mb-2">
           {activeBadges.map((b, i) => (
-            <Badge key={i} className="bg-kalpix-violet/90 text-white cursor-pointer shadow" onClick={b.onRemove}>{b.label} ✕</Badge>
+            <Badge key={i} className={cn(
+              b.label.includes('StatTrak') ? 'bg-[#00c97b]/90 text-white shadow-[0_0_8px_#00c97b]' : 'bg-[#287CFA]/90 text-white shadow-[0_0_8px_#00ffe7]',
+              'cursor-pointer font-bold px-3 py-1 rounded-lg text-xs border border-[#00ffe7]/30 hover:scale-105 transition')}
+              onClick={b.onRemove}>{b.label} ✕</Badge>
           ))}
         </div>
       )}
       {/* Prix */}
       <div>
-        <div className="font-semibold mb-1 text-opnskin-text-secondary">Prix (€)</div>
-        <div className="text-xs text-opnskin-text-secondary mb-1">Prix: {filters.price[0]}€ - {filters.price[1]}€</div>
-        <div className="flex items-center gap-2">
+        <div className="font-semibold mb-1 text-[#00ffe7] text-lg font-rajdhani drop-shadow-[0_0_4px_#00ffe7]">Prix (€)</div>
+        <div className="text-xs text-[#00ffe7]/80 mb-1">Prix: {filters.price[0]}€ - {filters.price[1]}€</div>
+        <div className="flex items-center gap-2 mb-2">
           <input
             type="number"
             min={0}
@@ -86,9 +89,9 @@ export default function FilterSidebarOPNSKIN({
               let min = Math.max(0, Math.min(Number(e.target.value), filters.price[1]));
               setFilters({ ...filters, price: [min, filters.price[1]] });
             }}
-            className="w-20 rounded bg-opnskin-bg-card border px-2 py-1"
+            className="w-20 rounded-lg bg-[#181a20] border border-[#00ffe7]/30 px-2 py-1 text-[#00ffe7] font-bold shadow-inner"
           />
-          <span>-</span>
+          <span className="text-[#00ffe7]/60">-</span>
           <input
             type="number"
             min={filters.price[0]}
@@ -98,7 +101,7 @@ export default function FilterSidebarOPNSKIN({
               let max = Math.max(filters.price[0], Math.min(Number(e.target.value), priceMax));
               setFilters({ ...filters, price: [filters.price[0], max] });
             }}
-            className="w-20 rounded bg-opnskin-bg-card border px-2 py-1"
+            className="w-20 rounded-lg bg-[#181a20] border border-[#00ffe7]/30 px-2 py-1 text-[#00ffe7] font-bold shadow-inner"
           />
         </div>
         <Slider
@@ -109,8 +112,7 @@ export default function FilterSidebarOPNSKIN({
           onValueChange={vals => setFilters({ ...filters, price: vals as [number, number] })}
           className="mt-2"
           style={{
-            // Dégradé dynamique du noir (0%) vers le bleu (thumb) puis noir (après thumb)
-            background: `linear-gradient(90deg, #181a20 0%, #181a20 ${(filters.price[1] / priceMax) * 100}%, #00ffe7 ${(filters.price[1] / priceMax) * 100}%, #00ffe7 100%)`,
+            background: `linear-gradient(90deg, #101c2c 0%, #101c2c ${(filters.price[1] / priceMax) * 100}%, #00ffe7 ${(filters.price[1] / priceMax) * 100}%, #00ffe7 100%)`,
             borderRadius: '8px',
             height: '8px',
           }}
@@ -119,7 +121,8 @@ export default function FilterSidebarOPNSKIN({
       {/* Float (optionnel) */}
       {showFloat && (
         <div>
-          <div className="font-semibold mb-1 text-opnskin-text-secondary">Float</div>
+          <div className="font-semibold mb-1 text-[#00ffe7] text-lg font-rajdhani drop-shadow-[0_0_4px_#00ffe7]">Float</div>
+          <div className="text-xs text-[#00ffe7]/80 mb-1">Float: {filters.float ? filters.float[0] : 0} - {filters.float ? filters.float[1] : 1}</div>
           <Slider
             min={0}
             max={1}
@@ -128,42 +131,25 @@ export default function FilterSidebarOPNSKIN({
             onValueChange={vals => setFilters({ ...filters, float: vals as [number, number] })}
             className="mt-2"
             style={{
-              background: `linear-gradient(90deg, #181a20 0%, #181a20 ${((filters.float ? filters.float[1] : 1) / 1) * 100}%, #00ffe7 ${((filters.float ? filters.float[1] : 1) / 1) * 100}%, #00ffe7 100%)`,
+              background: `linear-gradient(90deg, #101c2c 0%, #101c2c ${((filters.float ? filters.float[1] : 1) / 1) * 100}%, #00ffe7 ${((filters.float ? filters.float[1] : 1) / 1) * 100}%, #00ffe7 100%)`,
               borderRadius: '8px',
               height: '8px',
             }}
           />
-          <div className="flex items-center gap-2 mt-1">
-            <input
-              type="number"
-              min={0}
-              max={filters.float ? filters.float[1] : 1}
-              step={0.001}
-              value={filters.float ? filters.float[0] : 0}
-              onChange={e => setFilters({ ...filters, float: [Number(e.target.value), filters.float ? filters.float[1] : 1] })}
-              className="w-20 rounded bg-opnskin-bg-card border px-2 py-1"
-            />
-            <span>-</span>
-            <input
-              type="number"
-              min={filters.float ? filters.float[0] : 0}
-              max={1}
-              step={0.001}
-              value={filters.float ? filters.float[1] : 1}
-              onChange={e => setFilters({ ...filters, float: [filters.float ? filters.float[0] : 0, Number(e.target.value)] })}
-              className="w-20 rounded bg-opnskin-bg-card border px-2 py-1"
-            />
-          </div>
         </div>
       )}
       {/* État (Wear) */}
       <div>
-        <div className="font-semibold mb-1 text-opnskin-text-secondary">État</div>
+        <div className="font-semibold mb-1 text-[#00ffe7] text-lg font-rajdhani drop-shadow-[0_0_4px_#00ffe7]">État</div>
         <div className="flex flex-wrap gap-2">
           {WEAR.map(w => (
             <Badge
               key={w}
-              className={cn("cursor-pointer px-3 py-1 text-xs font-bold border transition-all duration-150", filters.wear.includes(w) ? "bg-kalpix-violet text-white border-kalpix-violet/80 shadow" : "bg-opnskin-bg-card text-opnskin-text-secondary border-opnskin-bg-secondary/60")}
+              className={cn(
+                filters.wear.includes(w)
+                  ? 'bg-[#287CFA] text-white border border-[#00ffe7]/40 shadow-[0_0_8px_#00ffe7]'
+                  : 'bg-[#181a20] text-[#00ffe7]/70 border border-[#00ffe7]/10',
+                'cursor-pointer px-3 py-1 text-xs font-bold rounded-lg transition-all duration-150 hover:scale-105')}
               onClick={() => setFilters({ ...filters, wear: filters.wear.includes(w) ? filters.wear.filter(x => x !== w) : [...filters.wear, w] })}
             >
               {w}
@@ -173,12 +159,16 @@ export default function FilterSidebarOPNSKIN({
       </div>
       {/* Rareté */}
       <div>
-        <div className="font-semibold mb-1 text-opnskin-text-secondary">Rareté</div>
+        <div className="font-semibold mb-1 text-[#00ffe7] text-lg font-rajdhani drop-shadow-[0_0_4px_#00ffe7]">Rareté</div>
         <div className="flex flex-wrap gap-2">
           {RARITIES.map(r => (
             <Badge
               key={r}
-              className={cn("cursor-pointer px-3 py-1 text-xs font-bold border transition-all duration-150", filters.rarity.includes(r) ? "bg-kalpix-violet text-white border-kalpix-violet/80 shadow" : "bg-opnskin-bg-card text-opnskin-text-secondary border-opnskin-bg-secondary/60")}
+              className={cn(
+                filters.rarity.includes(r)
+                  ? 'bg-[#287CFA] text-white border border-[#00ffe7]/40 shadow-[0_0_8px_#00ffe7]'
+                  : 'bg-[#181a20] text-[#00ffe7]/70 border border-[#00ffe7]/10',
+                'cursor-pointer px-3 py-1 text-xs font-bold rounded-lg transition-all duration-150 hover:scale-105')}
               onClick={() => setFilters({ ...filters, rarity: filters.rarity.includes(r) ? filters.rarity.filter(x => x !== r) : [...filters.rarity, r] })}
             >
               {r}
@@ -188,12 +178,16 @@ export default function FilterSidebarOPNSKIN({
       </div>
       {/* Type */}
       <div>
-        <div className="font-semibold mb-1 text-opnskin-text-secondary">Type</div>
+        <div className="font-semibold mb-1 text-[#00ffe7] text-lg font-rajdhani drop-shadow-[0_0_4px_#00ffe7]">Type</div>
         <div className="flex flex-wrap gap-2">
           {TYPES.map(t => (
             <Badge
               key={t}
-              className={cn("cursor-pointer px-3 py-1 text-xs font-bold border transition-all duration-150", filters.type.includes(t) ? "bg-kalpix-violet text-white border-kalpix-violet/80 shadow" : "bg-opnskin-bg-card text-opnskin-text-secondary border-opnskin-bg-secondary/60")}
+              className={cn(
+                filters.type.includes(t)
+                  ? 'bg-[#287CFA] text-white border border-[#00ffe7]/40 shadow-[0_0_8px_#00ffe7]'
+                  : 'bg-[#181a20] text-[#00ffe7]/70 border border-[#00ffe7]/10',
+                'cursor-pointer px-3 py-1 text-xs font-bold rounded-lg transition-all duration-150 hover:scale-105')}
               onClick={() => setFilters({ ...filters, type: filters.type.includes(t) ? filters.type.filter(x => x !== t) : [...filters.type, t] })}
             >
               {t}
@@ -203,12 +197,12 @@ export default function FilterSidebarOPNSKIN({
       </div>
       {/* StatTrak */}
       <div>
-        <div className="font-semibold mb-1 text-opnskin-text-secondary">StatTrak™</div>
+        <div className="font-semibold mb-1 text-[#00ffe7] text-lg font-rajdhani drop-shadow-[0_0_4px_#00ffe7]">StatTrak™</div>
         <div className="flex gap-2">
           <Button
             size="sm"
             variant={filters.stattrak === true ? "default" : "outline"}
-            className={filters.stattrak === true ? "bg-kalpix-violet text-white" : ""}
+            className={filters.stattrak === true ? "bg-[#00c97b] text-white border border-[#00ffe7]/40 shadow-[0_0_8px_#00c97b] font-bold" : "border border-[#00ffe7]/20 text-[#00ffe7] font-bold"}
             onClick={() => setFilters({ ...filters, stattrak: filters.stattrak === true ? null : true })}
           >
             Oui
@@ -216,7 +210,7 @@ export default function FilterSidebarOPNSKIN({
           <Button
             size="sm"
             variant={filters.stattrak === false ? "default" : "outline"}
-            className={filters.stattrak === false ? "bg-kalpix-violet text-white" : ""}
+            className={filters.stattrak === false ? "bg-[#287CFA] text-white border border-[#00ffe7]/40 shadow-[0_0_8px_#00ffe7] font-bold" : "border border-[#00ffe7]/20 text-[#00ffe7] font-bold"}
             onClick={() => setFilters({ ...filters, stattrak: filters.stattrak === false ? null : false })}
           >
             Non
@@ -225,9 +219,9 @@ export default function FilterSidebarOPNSKIN({
       </div>
       {/* Collection */}
       <div>
-        <div className="font-semibold mb-1 text-opnskin-text-secondary">Collection</div>
+        <div className="font-semibold mb-1 text-[#00ffe7] text-lg font-rajdhani drop-shadow-[0_0_4px_#00ffe7]">Collection</div>
         <select
-          className="w-full rounded bg-opnskin-bg-card border px-2 py-1"
+          className="w-full rounded-lg bg-[#181a20] border border-[#00ffe7]/30 px-2 py-1 text-[#00ffe7] font-bold shadow-inner"
           value={filters.collection}
           onChange={e => setFilters({ ...filters, collection: e.target.value })}
         >
