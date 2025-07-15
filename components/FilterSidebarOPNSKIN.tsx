@@ -109,8 +109,8 @@ export default function FilterSidebarOPNSKIN({
           onValueChange={vals => setFilters({ ...filters, price: vals as [number, number] })}
           className="mt-2"
           style={{
-            // Dégradé dynamique du noir vers le bleu selon la position du thumb
-            background: `linear-gradient(90deg, #181a20 0%, #00ffe7 ${(filters.price[1] / priceMax) * 100}%)`,
+            // Dégradé dynamique du noir (0%) vers le bleu (thumb) puis noir (après thumb)
+            background: `linear-gradient(90deg, #181a20 0%, #181a20 ${(filters.price[1] / priceMax) * 100}%, #00ffe7 ${(filters.price[1] / priceMax) * 100}%, #00ffe7 100%)`,
             borderRadius: '8px',
             height: '8px',
           }}
@@ -128,7 +128,7 @@ export default function FilterSidebarOPNSKIN({
             onValueChange={vals => setFilters({ ...filters, float: vals as [number, number] })}
             className="mt-2"
             style={{
-              background: `linear-gradient(90deg, #181a20 0%, #00ffe7 ${((filters.float ? filters.float[1] : 1) / 1) * 100}%)`,
+              background: `linear-gradient(90deg, #181a20 0%, #181a20 ${((filters.float ? filters.float[1] : 1) / 1) * 100}%, #00ffe7 ${((filters.float ? filters.float[1] : 1) / 1) * 100}%, #00ffe7 100%)`,
               borderRadius: '8px',
               height: '8px',
             }}
