@@ -22,11 +22,11 @@ const Slider = React.forwardRef<
     </SliderPrimitive.Track>
     {Array.isArray(props.value) && props.value.length === 2 ? (
       <>
-        <SliderPrimitive.Thumb className="block h-5 w-5 rounded-full border-2 border-[#00ffe7] bg-[#00ffe7] shadow-[0_0_4px_#00ffe7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00ffe7] focus-visible:ring-offset-2 transition-all duration-150 hover:scale-110" />
-        <SliderPrimitive.Thumb className="block h-5 w-5 rounded-full border-2 border-[#00ffe7] bg-[#00ffe7] shadow-[0_0_4px_#00ffe7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00ffe7] focus-visible:ring-offset-2 transition-all duration-150 hover:scale-110" />
+        <SliderPrimitive.Thumb className="block h-5 w-5 rounded-full border-2 border-[#00ffe7] bg-[#00ffe7] transition-all duration-150 hover:scale-110" />
+        <SliderPrimitive.Thumb className="block h-5 w-5 rounded-full border-2 border-[#00ffe7] bg-[#00ffe7] transition-all duration-150 hover:scale-110" />
       </>
     ) : (
-      <SliderPrimitive.Thumb className="block h-5 w-5 rounded-full border-2 border-[#00ffe7] bg-[#00ffe7] shadow-[0_0_4px_#00ffe7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00ffe7] focus-visible:ring-offset-2 transition-all duration-150 hover:scale-110" />
+      <SliderPrimitive.Thumb className="block h-5 w-5 rounded-full border-2 border-[#00ffe7] bg-[#00ffe7] transition-all duration-150 hover:scale-110" />
     )}
   </SliderPrimitive.Root>
 ))

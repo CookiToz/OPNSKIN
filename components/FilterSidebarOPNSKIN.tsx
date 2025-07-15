@@ -59,7 +59,7 @@ export default function FilterSidebarOPNSKIN({
   return (
     <aside className="w-80 max-w-full bg-[#181a20] rounded-2xl p-6 shadow-2xl flex flex-col gap-7 sticky top-24 border border-opnskin-primary/20">
       <div className="flex items-center justify-between mb-2">
-        <h2 className="text-2xl font-rajdhani font-bold text-opnskin-accent drop-shadow-[0_0_2px_#00ffe7] tracking-wide">Filtres avancés</h2>
+        <h2 className="text-2xl font-rajdhani font-bold text-opnskin-accent tracking-wide">Filtres avancés</h2>
         <Button variant="ghost" size="sm" onClick={() => setFilters(DEFAULT_OPNSKIN_FILTERS)}>
           Réinitialiser
         </Button>
