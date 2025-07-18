@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabaseClient';
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseAdmin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
 // Créer une nouvelle transaction (acheter une offre)
 export async function POST(req: NextRequest) {
@@ -13,7 +18,7 @@ export async function POST(req: NextRequest) {
     console.log('--- ACHAT DEBUG ---');
     console.log('offerId reçu:', offerId);
     // Récupérer l'acheteur
-    const { data: buyer, error: buyerError } = await supabase.from('User').select('*').eq('steamId', steamId).single();
+    const { data: buyer, error: buyerError } = await supabaseAdmin.from('User').select('*').eq('steamId', steamId).single();
     console.log('buyer:', buyer, 'Erreur:', buyerError);
     if (buyerError || !buyer) {
       console.log('ERREUR: User not found', buyerError, buyer);
@@ -21,7 +26,7 @@ export async function POST(req: NextRequest) {
     }
     // Récupérer l'offre
     console.log('offerId envoyé:', offerId, typeof offerId);
-    const { data: offer, error: offerError } = await supabase
+    const { data: offer, error: offerError } = await supabaseAdmin
       .from('Offer')
       .select('*')
       .eq('id', String(offerId).trim())
@@ -44,7 +49,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Insufficient wallet balance' }, { status: 400 });
     }
     // Créer la transaction
-    const { data: transaction, error: transactionError } = await supabase.from('Transaction').insert([{
+    const { data: transaction, error: transactionError } = await supabaseAdmin.from('Transaction').insert([{
       offerId,
       buyerId: buyer.id,
       escrowAmount: offer.price,
@@ -71,19 +76,19 @@ export async function GET(req: NextRequest) {
     if (!steamId) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
-    const { data: user, error: userError } = await supabase.from('User').select('*').eq('steamId', steamId).single();
+    const { data: user, error: userError } = await supabaseAdmin.from('User').select('*').eq('steamId', steamId).single();
     if (userError || !user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
     // Correction : on fait deux requêtes séparées pour éviter l'erreur de parsing
     // 1. Transactions où l'utilisateur est acheteur
-    const { data: buyerTx, error: buyerTxError } = await supabase
+    const { data: buyerTx, error: buyerTxError } = await supabaseAdmin
       .from('Transaction')
       .select('*,Offer(*),User:buyerId(id,name,tradeUrl,avatar)')
       .eq('buyerId', user.id)
       .order('startedAt', { ascending: false });
     // 2. Transactions où l'utilisateur est vendeur (via offerId.sellerId)
-    const { data: sellerTx, error: sellerTxError } = await supabase
+    const { data: sellerTx, error: sellerTxError } = await supabaseAdmin
       .from('Transaction')
       .select('*,Offer(*),User:buyerId(id,name,tradeUrl,avatar)')
       .order('startedAt', { ascending: false });

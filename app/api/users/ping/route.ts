@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabaseClient';
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseAdmin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
 export async function POST(req: NextRequest) {
   try {
@@ -9,7 +14,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Not authenticated', debug: { steamId } }, { status: 401 });
     }
 
-    const { data: user, error: userError } = await supabase
+    const { data: user, error: userError } = await supabaseAdmin
       .from('User')
       .select('id, steamId')
       .eq('steamId', steamId)
@@ -22,7 +27,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Mettre à jour last_seen
-    const { error } = await supabase
+    const { error } = await supabaseAdmin
       .from('User')
       .update({ last_seen: new Date().toISOString() })
       .eq('id', user.id);

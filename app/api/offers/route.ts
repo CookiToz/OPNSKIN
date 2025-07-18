@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabaseClient';
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseAdmin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
 // Créer une nouvelle offre
 export async function POST(req: NextRequest) {
@@ -13,12 +18,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid offer data' }, { status: 400 });
     }
     // Récupérer l'utilisateur
-    const { data: user, error: userError } = await supabase.from('User').select('*').eq('steamId', steamId).single();
+    const { data: user, error: userError } = await supabaseAdmin.from('User').select('*').eq('steamId', steamId).single();
     if (userError || !user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
     // Vérifier qu'il n'existe pas déjà une offre active pour ce skin
-    const { data: existingOffer } = await supabase
+    const { data: existingOffer } = await supabaseAdmin
       .from('Offer')
       .select('*')
       .eq('itemId', itemId)
@@ -36,7 +41,7 @@ export async function POST(req: NextRequest) {
       offerGame = 'cs2';
     }
     // Créer l'offre
-    const { data: offer, error: offerError } = await supabase.from('Offer').insert([{
+    const { data: offer, error: offerError } = await supabaseAdmin.from('Offer').insert([{
       sellerId: user.id,
       itemId,
       itemName: itemName || `Item ${itemId}`,
@@ -50,7 +55,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: offerError.message }, { status: 500 });
     }
     // Créer une notification pour le vendeur
-    await supabase.from('Notification').insert([{
+    await supabaseAdmin.from('Notification').insert([{
       userId: user.id,
       type: 'OFFER_CREATED',
       title: 'Offre créée',
@@ -89,7 +94,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Récupérer les offres avec jointure sur le vendeur
-    let query = supabase
+    let query = supabaseAdmin
       .from('Offer')
       .select('*, seller:User(id, name, last_seen)', { count: 'exact' })
       .eq('status', 'AVAILABLE');

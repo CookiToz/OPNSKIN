@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabaseClient';
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseAdmin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
 export async function POST(req: NextRequest) {
   try {
@@ -12,12 +17,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Aucune offre à acheter.' }, { status: 400 });
     }
     // Récupérer l'utilisateur
-    const { data: buyer, error: buyerError } = await supabase.from('User').select('*').eq('steamId', steamId).single();
+    const { data: buyer, error: buyerError } = await supabaseAdmin.from('User').select('*').eq('steamId', steamId).single();
     if (buyerError || !buyer) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
     // Récupérer toutes les offres
-    const { data: offers, error: offersError } = await supabase
+    const { data: offers, error: offersError } = await supabaseAdmin
       .from('Offer')
       .select('*')
       .in('id', offerIds);
@@ -37,7 +42,7 @@ export async function POST(req: NextRequest) {
         continue;
       }
       // Créer la transaction
-      const { data: transaction, error: transactionError } = await supabase.from('Transaction').insert([{
+      const { data: transaction, error: transactionError } = await supabaseAdmin.from('Transaction').insert([{
         offerId: offer.id,
         buyerId: buyer.id,
         escrowAmount: offer.price,
@@ -49,9 +54,9 @@ export async function POST(req: NextRequest) {
         continue;
       }
       // Mettre à jour le statut de l'offre
-      await supabase.from('Offer').update({ status: 'PENDING_TRADE_OFFER' }).eq('id', offer.id);
+      await supabaseAdmin.from('Offer').update({ status: 'PENDING_TRADE_OFFER' }).eq('id', offer.id);
       // Notification vendeur
-      await supabase.from('Notification').insert([{
+      await supabaseAdmin.from('Notification').insert([{
         userId: offer.sellerId,
         type: 'NEW_SALE',
         title: 'Nouvelle vente à traiter',
@@ -60,11 +65,11 @@ export async function POST(req: NextRequest) {
       results.push({ offerId: offer.id, success: true });
     }
     // Débiter le solde total de l'utilisateur
-    await supabase.from('User').update({ walletBalance: buyer.walletBalance - total }).eq('id', buyer.id);
+    await supabaseAdmin.from('User').update({ walletBalance: buyer.walletBalance - total }).eq('id', buyer.id);
     // Supprimer les items du panier correspondant aux offres achetées
-    await supabase.from('CartItem').delete().match({ userId: buyer.id }).in('offerId', offerIds);
+    await supabaseAdmin.from('CartItem').delete().match({ userId: buyer.id }).in('offerId', offerIds);
     // Notification acheteur (une seule fois)
-    await supabase.from('Notification').insert([{
+    await supabaseAdmin.from('Notification').insert([{
       userId: buyer.id,
       type: 'PAYMENT_CONFIRMED',
       title: 'Paiement validé',

@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabaseClient';
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseAdmin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
 // Récupérer les notifications de l'utilisateur
 export async function GET(req: NextRequest) {
@@ -8,14 +13,14 @@ export async function GET(req: NextRequest) {
     if (!steamId) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
-    const { data: user, error: userError } = await supabase.from('User').select('*').eq('steamId', steamId).single();
+    const { data: user, error: userError } = await supabaseAdmin.from('User').select('*').eq('steamId', steamId).single();
     if (userError || !user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
     const { searchParams } = new URL(req.url);
     const unreadOnly = searchParams.get('unread') === 'true';
     const limit = parseInt(searchParams.get('limit') || '50');
-    let query = supabase.from('Notification').select('*').eq('userId', user.id);
+    let query = supabaseAdmin.from('Notification').select('*').eq('userId', user.id);
     if (unreadOnly) query = query.eq('read', false);
     query = query.order('createdAt', { ascending: false }).limit(limit);
     const { data: notifications, error: notifError } = await query;
@@ -48,17 +53,17 @@ export async function PUT(req: NextRequest) {
     if (!notificationId) {
       return NextResponse.json({ error: 'Notification ID required' }, { status: 400 });
     }
-    const { data: user, error: userError } = await supabase.from('User').select('*').eq('steamId', steamId).single();
+    const { data: user, error: userError } = await supabaseAdmin.from('User').select('*').eq('steamId', steamId).single();
     if (userError || !user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
     // Vérifier que la notification appartient à l'utilisateur
-    const { data: notification, error: notifError } = await supabase.from('Notification').select('*').eq('id', notificationId).eq('userId', user.id).single();
+    const { data: notification, error: notifError } = await supabaseAdmin.from('Notification').select('*').eq('id', notificationId).eq('userId', user.id).single();
     if (notifError || !notification) {
       return NextResponse.json({ error: 'Notification not found' }, { status: 404 });
     }
     // Marquer comme lue
-    const { error: updateError } = await supabase.from('Notification').update({ read: true }).eq('id', notificationId);
+    const { error: updateError } = await supabaseAdmin.from('Notification').update({ read: true }).eq('id', notificationId);
     if (updateError) {
       return NextResponse.json({ error: updateError.message }, { status: 500 });
     }
