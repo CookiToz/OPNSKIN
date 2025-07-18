@@ -53,12 +53,16 @@ export async function GET(req: NextRequest) {
         profileUrl: `https://steamcommunity.com/profiles/${steamId}`
       };
       const apiKey = process.env.STEAM_API_KEY;
+      console.log('[STEAM OPENID] API KEY:', apiKey ? 'OK' : 'MISSING');
       if (apiKey) {
         try {
           const steamApiUrl = `https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key=${apiKey}&steamids=${steamId}`;
+          console.log('[STEAM OPENID] Fetching Steam profile:', steamApiUrl);
           const res = await fetch(steamApiUrl);
+          console.log('[STEAM OPENID] Steam API response status:', res.status);
           if (res.ok) {
             const data = await res.json();
+            console.log('[STEAM OPENID] Steam API data:', JSON.stringify(data));
             const player = data?.response?.players?.[0];
             if (player) {
               steamInfo = {
@@ -66,12 +70,23 @@ export async function GET(req: NextRequest) {
                 avatar: player.avatarfull,
                 profileUrl: player.profileurl
               };
+              console.log('[STEAM OPENID] Player found:', steamInfo);
+            } else {
+              console.log('[STEAM OPENID] No player found in API response');
             }
+          } else {
+            console.log('[STEAM OPENID] Steam API call failed');
           }
-        } catch {}
+        } catch (err) {
+          console.error('[STEAM OPENID] Error fetching Steam profile:', err);
+        }
       }
-      await supabase.from('User').insert([{ steamId, name: steamInfo.name, avatar: steamInfo.avatar, profileUrl: steamInfo.profileUrl }]);
-      console.log('[STEAM OPENID] New user created for SteamID:', steamId, steamInfo);
+      const { error: insertError } = await supabase.from('User').insert([{ steamId, name: steamInfo.name, avatar: steamInfo.avatar, profileUrl: steamInfo.profileUrl }]);
+      if (insertError) {
+        console.error('[STEAM OPENID] Error inserting user:', insertError);
+      } else {
+        console.log('[STEAM OPENID] New user created for SteamID:', steamId, steamInfo);
+      }
     }
 
     // Récupération du domaine depuis les headers de la requête
