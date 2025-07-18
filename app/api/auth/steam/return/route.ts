@@ -39,7 +39,7 @@ export async function GET(req: NextRequest) {
     const steamId = steamIdMatch[1];
     console.log('[STEAM OPENID] Successfully extracted SteamID:', steamId);
 
-    // Création automatique de l'utilisateur si inexistant
+    // Création automatique de l'utilisateur si inexistant, avec infos Steam enrichies
     const { data: user, error } = await supabase
       .from('User')
       .select('id')
@@ -47,8 +47,31 @@ export async function GET(req: NextRequest) {
       .single();
 
     if (!user) {
-      await supabase.from('User').insert([{ steamId }]);
-      console.log('[STEAM OPENID] New user created for SteamID:', steamId);
+      let steamInfo = {
+        name: `Steam User (${steamId})`,
+        avatar: `https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/default/${steamId.slice(-1)}.jpg`,
+        profileUrl: `https://steamcommunity.com/profiles/${steamId}`
+      };
+      const apiKey = process.env.STEAM_API_KEY;
+      if (apiKey) {
+        try {
+          const steamApiUrl = `https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key=${apiKey}&steamids=${steamId}`;
+          const res = await fetch(steamApiUrl);
+          if (res.ok) {
+            const data = await res.json();
+            const player = data?.response?.players?.[0];
+            if (player) {
+              steamInfo = {
+                name: player.personaname,
+                avatar: player.avatarfull,
+                profileUrl: player.profileurl
+              };
+            }
+          }
+        } catch {}
+      }
+      await supabase.from('User').insert([{ steamId, name: steamInfo.name, avatar: steamInfo.avatar, profileUrl: steamInfo.profileUrl }]);
+      console.log('[STEAM OPENID] New user created for SteamID:', steamId, steamInfo);
     }
 
     // Récupération du domaine depuis les headers de la requête
