@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { supabase } from '@/lib/supabaseClient';
 
 export async function GET(req: NextRequest) {
   try {
@@ -37,6 +38,18 @@ export async function GET(req: NextRequest) {
 
     const steamId = steamIdMatch[1];
     console.log('[STEAM OPENID] Successfully extracted SteamID:', steamId);
+
+    // Création automatique de l'utilisateur si inexistant
+    const { data: user, error } = await supabase
+      .from('User')
+      .select('id')
+      .eq('steamId', steamId)
+      .single();
+
+    if (!user) {
+      await supabase.from('User').insert([{ steamId }]);
+      console.log('[STEAM OPENID] New user created for SteamID:', steamId);
+    }
 
     // Récupération du domaine depuis les headers de la requête
     const host = req.headers.get('host');
