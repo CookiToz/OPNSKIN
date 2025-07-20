@@ -1,14 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
-
-// GET : récupérer le panier de l'utilisateur connecté
 export async function GET(req: NextRequest) {
   try {
+    const supabaseAdmin = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
     const steamId = req.cookies.get('steamid')?.value;
     if (!steamId) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
@@ -36,9 +34,12 @@ export async function GET(req: NextRequest) {
   }
 }
 
-// POST : ajouter une offre au panier
 export async function POST(req: NextRequest) {
   try {
+    const supabaseAdmin = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
     const steamId = req.cookies.get('steamid')?.value;
     if (!steamId) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
@@ -80,9 +81,12 @@ export async function POST(req: NextRequest) {
   }
 }
 
-// DELETE : vider le panier de l'utilisateur
 export async function DELETE(req: NextRequest) {
   try {
+    const supabaseAdmin = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
     const steamId = req.cookies.get('steamid')?.value;
     if (!steamId) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });

@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabaseClient';
+import { createClient } from '@supabase/supabase-js';
 
 export async function GET(req: NextRequest) {
   try {
+    const supabaseAdmin = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
     const url = new URL(req.url);
     const searchParams = url.searchParams;
 
@@ -29,7 +33,7 @@ export async function GET(req: NextRequest) {
     console.log('[STEAM OPENID] Successfully extracted SteamID:', steamId);
 
     // Création automatique de l'utilisateur si inexistant, avec infos Steam enrichies
-    const { data: user, error } = await supabase
+    const { data: user, error } = await supabaseAdmin
       .from('User')
       .select('id')
       .eq('steamId', steamId)
@@ -70,7 +74,7 @@ export async function GET(req: NextRequest) {
           console.error('[STEAM OPENID] Error fetching Steam profile:', err);
         }
       }
-      const { error: insertError } = await supabase.from('User').insert([{ steamId, name: steamInfo.name, avatar: steamInfo.avatar, profileUrl: steamInfo.profileUrl }]);
+      const { error: insertError } = await supabaseAdmin.from('User').insert([{ steamId, name: steamInfo.name, avatar: steamInfo.avatar, profileUrl: steamInfo.profileUrl }]);
       if (insertError) {
         console.error('[STEAM OPENID] Error inserting user:', insertError);
       } else {
