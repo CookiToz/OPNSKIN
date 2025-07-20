@@ -1,8 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabaseClient';
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseAdmin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
 export async function GET(req: NextRequest) {
   try {
+    console.log('SERVICE_ROLE_KEY:', process.env.SUPABASE_SERVICE_ROLE_KEY?.slice(0, 10));
     const steamId = req.cookies.get('steamid')?.value;
     if (!steamId) {
       return NextResponse.json({ 
@@ -12,7 +18,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Chercher l'utilisateur par steamId
-    let { data: user, error } = await supabase
+    let { data: user, error } = await supabaseAdmin
       .from('User')
       .select('*')
       .eq('steamId', steamId)
@@ -47,7 +53,7 @@ export async function GET(req: NextRequest) {
           }
         } catch {}
       }
-      const { data: createdUser, error: createError } = await supabase
+      const { data: createdUser, error: createError } = await supabaseAdmin
         .from('User')
         .insert([{ steamId, name: steamInfo.name, avatar: steamInfo.avatar, profileUrl: steamInfo.profileUrl }])
         .select()
@@ -60,9 +66,9 @@ export async function GET(req: NextRequest) {
 
     // Récupérer les offres, transactions, notifications
     const [offersResult, transactionsResult, notificationsResult] = await Promise.all([
-      supabase.from('Offer').select('*').eq('sellerId', user.id).order('createdAt', { ascending: false }),
-      supabase.from('Transaction').select('*,offer(*)').or(`buyerId.eq.${user.id},offer.sellerId.eq.${user.id}`).order('startedAt', { ascending: false }),
-      supabase.from('Notification').select('*').eq('userId', user.id).eq('read', false).order('createdAt', { ascending: false })
+      supabaseAdmin.from('Offer').select('*').eq('sellerId', user.id).order('createdAt', { ascending: false }),
+      supabaseAdmin.from('Transaction').select('*,offer(*)').or(`buyerId.eq.${user.id},offer.sellerId.eq.${user.id}`).order('startedAt', { ascending: false }),
+      supabaseAdmin.from('Notification').select('*').eq('userId', user.id).eq('read', false).order('createdAt', { ascending: false })
     ]);
 
     // Gérer les erreurs de requête
@@ -108,7 +114,7 @@ export async function PUT(req: NextRequest) {
       }, { status: 400 });
     }
     // Mettre à jour l'utilisateur
-    const { data: user, error } = await supabase
+    const { data: user, error } = await supabaseAdmin
       .from('User')
       .update({ tradeUrl })
       .eq('steamId', steamId)
