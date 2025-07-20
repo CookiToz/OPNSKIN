@@ -159,7 +159,11 @@ export default function Profile() {
                 <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-4 mb-3 md:mb-4">
                   <div className="text-center">
                     <p className="text-white/70 text-xs md:text-sm">{t('profile.member_since')}</p>
-                    <p className="font-mono text-sm md:text-base">21/04/2025</p>
+                    <p className="font-mono text-sm md:text-base">{
+                      user?.createdAt
+                        ? new Date(user.createdAt).toLocaleDateString('fr-FR')
+                        : '—'
+                    }</p>
                   </div>
                   <div className="text-center">
                     <p className="text-white/70 text-xs md:text-sm">{t('profile.steam_id')}</p>
@@ -239,7 +243,17 @@ export default function Profile() {
               <CardContent className="p-4 md:p-6">
                 <h3 className="text-lg md:text-xl font-bold font-rajdhani mb-3 md:mb-4">Lien d'échange Steam</h3>
                 <form onSubmit={handleTradeUrlSubmit} className="flex flex-col gap-3 max-w-lg">
-                  <label htmlFor="tradeUrl" className="text-sm text-white/70">Votre Steam Trade URL</label>
+                  <div className="flex items-center justify-between">
+                    <label htmlFor="tradeUrl" className="text-sm text-white/70">Votre Steam Trade URL</label>
+                    <a
+                      href="https://steamcommunity.com/my/tradeoffers/privacy#trade_offer_access_url"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-kalpix-blue underline font-semibold hover:text-kalpix-violet transition-colors text-sm ml-2"
+                    >
+                      Steam URL
+                    </a>
+                  </div>
                   <input
                     id="tradeUrl"
                     type="text"

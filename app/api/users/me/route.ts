@@ -87,7 +87,8 @@ export async function GET(req: NextRequest) {
         walletBalance: user.walletBalance,
         offersCount: offers.length,
         transactionsCount: transactions.length,
-        unreadNotificationsCount: notifications.length
+        unreadNotificationsCount: notifications.length,
+        createdAt: user.createdAt // Ajout du champ createdAt
       }
     });
   } catch (error: any) {
