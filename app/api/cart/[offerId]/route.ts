@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabaseClient';
+import { createClient } from '@supabase/supabase-js';
 
-// DELETE /api/cart/[offerId] : retirer une offre du panier
 export async function DELETE(req: NextRequest, { params }: { params: { offerId: string } }) {
+  const supabaseAdmin = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
   const steamId = req.cookies.get('steamid')?.value;
   if (!steamId) {
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
@@ -12,12 +15,12 @@ export async function DELETE(req: NextRequest, { params }: { params: { offerId: 
     return NextResponse.json({ error: 'offerId requis' }, { status: 400 });
   }
   // Récupérer l'utilisateur
-  const { data: user, error: userError } = await supabase.from('User').select('id').eq('steamId', steamId).single();
+  const { data: user, error: userError } = await supabaseAdmin.from('User').select('id').eq('steamId', steamId).single();
   if (userError || !user) {
     return NextResponse.json({ error: 'User not found' }, { status: 404 });
   }
   // Supprimer l'item du panier
-  const { error: delError } = await supabase.from('CartItem').delete().eq('userId', user.id).eq('offerId', offerId);
+  const { error: delError } = await supabaseAdmin.from('CartItem').delete().eq('userId', user.id).eq('offerId', offerId);
   if (delError) {
     return NextResponse.json({ error: delError.message }, { status: 500 });
   }

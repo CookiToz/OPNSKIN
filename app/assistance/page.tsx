@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { ChevronDown, ChevronUp, Mail, Send } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import SupportChat from '@/components/SupportChat';
 
 export default function AssistancePage() {
   const { t } = useTranslation('common');
@@ -79,73 +80,8 @@ export default function AssistancePage() {
         </CardContent>
       </Card>
 
-      {!showForm && !sent && (
-        <Button className="btn-opnskin mb-6 md:mb-8 w-full max-w-2xl text-base md:text-lg py-3 md:py-4" size="lg" onClick={() => setShowForm(true)}>
-          <Mail className="w-5 h-5 mr-2" /> {t('assistance.contact_btn', "Contacter l'assistance")}
-        </Button>
-      )}
-
-      {showForm && !sent && (
-        <Card className="w-full max-w-2xl bg-opnskin-bg-card border-opnskin-bg-secondary mb-6 md:mb-8">
-          <CardContent className="py-4 md:py-6">
-            <h2 className="text-lg md:text-xl font-bold font-rajdhani text-opnskin-primary mb-3 md:mb-4">{t('assistance.form_title', 'Formulaire de contact')}</h2>
-            <form onSubmit={handleSend} className="space-y-3 md:space-y-4">
-              <div>
-                <label className="block text-xs md:text-sm text-opnskin-text-secondary mb-1">{t('assistance.form_subject', 'Objet')}</label>
-                <Input
-                  type="text"
-                  placeholder={t('assistance.form_subject_placeholder', 'Sujet de votre demande')}
-                  value={subject}
-                  onChange={e => setSubject(e.target.value)}
-                  required
-                  className="bg-opnskin-bg-secondary border-opnskin-bg-secondary text-opnskin-text-primary"
-                />
-              </div>
-              <div>
-                <label className="block text-xs md:text-sm text-opnskin-text-secondary mb-1">{t('assistance.form_message', 'Votre message')}</label>
-                <Textarea
-                  placeholder={t('assistance.form_message_placeholder', 'Expliquez votre problème...')}
-                  value={message}
-                  onChange={e => {
-                    if (e.target.value.length <= 350) setMessage(e.target.value);
-                  }}
-                  required
-                  className="bg-opnskin-bg-secondary border-opnskin-bg-secondary text-opnskin-text-primary"
-                  rows={5}
-                />
-                <div className="text-xs text-opnskin-text-secondary text-right mt-1">{message.length}/350 {t('assistance.form_chars', 'caractères')}</div>
-              </div>
-              <div>
-                <label className="block text-xs md:text-sm text-opnskin-text-secondary mb-1">{t('assistance.form_email', 'Votre email')}</label>
-                <Input
-                  type="email"
-                  placeholder={t('assistance.form_email_placeholder', 'votre@email.com')}
-                  value={email}
-                  onChange={e => setEmail(e.target.value)}
-                  required
-                  className="bg-opnskin-bg-secondary border-opnskin-bg-secondary text-opnskin-text-primary"
-                />
-              </div>
-              <Button type="submit" className="btn-opnskin w-full flex items-center justify-center mt-2 text-base md:text-lg py-3 md:py-4">
-                <Send className="w-4 h-4 mr-2" /> {t('assistance.form_send', 'Envoyer')}
-              </Button>
-            </form>
-            <div className="text-xs md:text-sm text-opnskin-text-secondary mt-4 text-center">
-              {t('assistance.form_delay', 'Nous répondons sous 24h-48h.')}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {sent && (
-        <Card className="w-full max-w-2xl bg-opnskin-bg-card border-opnskin-bg-secondary">
-          <CardContent className="py-6 md:py-8 flex flex-col items-center">
-            <Badge className="bg-opnskin-accent/10 text-opnskin-accent border-opnskin-accent/30 mb-3 md:mb-4 text-base md:text-lg">{t('assistance.form_sent_badge', 'Message envoyé !')}</Badge>
-            <div className="text-opnskin-text-primary text-base md:text-lg mb-2">{t('assistance.form_sent_thanks', 'Merci pour votre message.')}</div>
-            <div className="text-opnskin-text-secondary text-xs md:text-sm text-center">{t('assistance.form_sent_info', "Notre équipe vous répondra sous 24h-48h à l'adresse indiquée.")}</div>
-          </CardContent>
-        </Card>
-      )}
+      {/* Remplacer le formulaire par le chat support */}
+      <SupportChat />
     </div>
   );
 } 

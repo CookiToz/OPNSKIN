@@ -69,7 +69,7 @@ export const OfferCard: React.FC<OfferCardProps> = ({ offer, currentUserId, onOf
         },
       });
       const data = await response.json().catch(() => ({}));
-      if (response.ok) {
+      if (response.ok || (response.status === 404 && (data.error === 'Offer not found' || data.error === 'Offre introuvable'))) {
         toast({
           title: "Offre retirée",
           description: data.message || "Votre offre a été retirée avec succès.",

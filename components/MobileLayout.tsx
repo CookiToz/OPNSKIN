@@ -3,17 +3,21 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { Drawer, DrawerTrigger, DrawerContent } from '@/components/ui/drawer';
-import { OPNSKINLogo } from '@/components/kalpix-logo';
-import { Menu, X } from 'lucide-react';
+import { OPNSKINLogo } from '@/components/opnskin-logo';
+import { Menu, X, Search } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useTranslation } from 'next-i18next';
 import SteamAuthStatus from '@/components/SteamAuthStatus';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
+import { Input } from '@/components/ui/input';
+import { useSearchStore } from '@/hooks/use-search-store';
 
 export default function MobileLayout({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   const [langMenuOpen, setLangMenuOpen] = useState(false);
   const pathname = usePathname();
+  const searchQuery = useSearchStore((state) => state.searchQuery);
+  const setSearchQuery = useSearchStore((state) => state.setSearchQuery);
   const { t, i18n } = useTranslation('common');
   const languages = [
     { code: 'fr', label: 'Français', flag: '🇫🇷' },
@@ -45,6 +49,19 @@ export default function MobileLayout({ children }: { children: React.ReactNode }
           <OPNSKINLogo className="h-8 w-8 text-opnskin-primary" />
           <span className="font-satoshi-bold text-lg text-opnskin-text-primary">OPN<span className="text-opnskin-primary">SKIN</span></span>
         </Link>
+        {/* Barre de recherche uniquement sur /marketplace et /inventory */}
+        {(pathname.startsWith('/marketplace') || pathname.startsWith('/inventory')) && (
+          <div className="relative w-40 flex-shrink-0 ml-2">
+            <Search className="absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 text-opnskin-text-secondary" />
+            <Input
+              type="search"
+              placeholder={t('header.search_placeholder')}
+              className="w-full pl-8 bg-opnskin-bg-secondary/50 border-opnskin-bg-secondary text-opnskin-text-secondary focus:border-opnskin-primary focus:bg-opnskin-bg-secondary text-xs py-1.5"
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+            />
+          </div>
+        )}
         <div className="flex items-center gap-2">
           {/* Sélecteur de langue rapide (icône globe ou flag) */}
           <Popover open={langMenuOpen} onOpenChange={setLangMenuOpen}>

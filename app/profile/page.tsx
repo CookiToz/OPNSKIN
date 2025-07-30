@@ -46,14 +46,51 @@ export default function Profile() {
   const [tradeUrl, setTradeUrl] = useState<string>("");
   const [tradeUrlLoading, setTradeUrlLoading] = useState(false);
   const [tradeUrlMessage, setTradeUrlMessage] = useState<string | null>(null);
+  const [email, setEmail] = useState<string>("");
+  const [emailLoading, setEmailLoading] = useState(false);
+  const [emailMessage, setEmailMessage] = useState<string | null>(null);
+  const [inventoryError, setInventoryError] = useState<string | null>(null);
 
   useEffect(() => {
     if (user && user.tradeUrl) setTradeUrl(user.tradeUrl);
+    if (user && user.email) setEmail(user.email);
   }, [user]);
 
   function isValidTradeUrl(url: string) {
     return url.startsWith('https://steamcommunity.com/tradeoffer/new/');
   }
+
+  function isValidEmail(email: string) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  }
+
+  const handleEmailSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setEmailMessage(null);
+    if (!isValidEmail(email)) {
+      setEmailMessage("Veuillez entrer une adresse email valide");
+      return;
+    }
+    setEmailLoading(true);
+    try {
+      const res = await fetch('/api/users/me', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setEmailMessage("Adresse email mise à jour !");
+      } else {
+        setEmailMessage(data.error || "Erreur lors de la mise à jour.");
+      }
+    } catch (err) {
+      setEmailMessage("Erreur réseau ou serveur.");
+    } finally {
+      setEmailLoading(false);
+    }
+  };
 
   const handleTradeUrlSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -82,14 +119,25 @@ export default function Profile() {
     }
   };
 
-  const fetchInventory = () => {
+  const fetchInventory = async () => {
     setLoadingInventory(true);
-    fetch(`/api/inventory?currency=${currency}`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.items) setInventory(data.items);
-        setLoadingInventory(false);
-      });
+    setInventoryError(null);
+    try {
+      const res = await fetch(`/api/inventory?currency=${currency}`);
+      if (!res.ok) throw new Error('Erreur lors du chargement de l\'inventaire');
+      const data = await res.json();
+      if (data.items) {
+        setInventory(data.items);
+      } else {
+        setInventory([]);
+        setInventoryError('Aucun item trouvé dans votre inventaire.');
+      }
+    } catch (err) {
+      setInventory([]);
+      setInventoryError('Erreur lors du chargement de l\'inventaire. Cliquez pour réessayer.');
+    } finally {
+      setLoadingInventory(false);
+    }
   };
 
   if (isLoading) {
@@ -125,14 +173,13 @@ export default function Profile() {
     <div className="min-h-screen">
       <div className="container mx-auto p-3 md:p-6">
         <div className="mb-4 md:mb-6">
-          <h1 className="text-2xl md:text-3xl font-bold font-rajdhani">{t('profile.title')}</h1>
+          <h1 className="text-2xl md:text-3xl font-bold font-rajdhani">Mon Profil</h1>
           <p className="text-white/70 text-base md:text-lg">{t('profile.subtitle')}</p>
         </div>
 
         <Tabs defaultValue="stats">
           <TabsList className="bg-black/40 border border-white/10 mb-3 md:mb-4 flex flex-wrap md:flex-nowrap">
-            <TabsTrigger value="stats">{t('profile.tab_stats')}</TabsTrigger>
-            <TabsTrigger value="inventory">{t('profile.tab_inventory')}</TabsTrigger>
+            <TabsTrigger value="stats">Profil</TabsTrigger>
             <TabsTrigger value="settings">{t('profile.tab_settings')}</TabsTrigger>
           </TabsList>
 
@@ -196,48 +243,6 @@ export default function Profile() {
             </Card>
           </TabsContent>
 
-          <TabsContent value="inventory">
-            <Card className="bg-black/40 border-white/5">
-              <CardContent className="p-4 md:p-6">
-                <h3 className="text-lg md:text-xl font-bold font-rajdhani mb-3 md:mb-4">{t('profile.inventory_value')}</h3>
-                <Button onClick={fetchInventory} disabled={loadingInventory} className="mb-3 md:mb-4 w-full max-w-xs mx-auto text-base md:text-lg">
-                  {loadingInventory ? t('profile.loading') : t('inventory.refresh', 'Mettre à jour mon inventaire')}
-                </Button>
-                {loadingInventory ? (
-                  <p className="text-white text-base md:text-lg">{t('profile.loading')}</p>
-                ) : inventory.length === 0 ? (
-                  <div className="text-center text-white/70 text-base md:text-lg">
-                    {t('profile.no_item')}
-                  </div>
-                ) : (
-                  <>
-                    <p className="text-2xl md:text-3xl font-bold font-mono text-kalpix-green mb-3 md:mb-4">
-                      {cryptoIcons[currency] && <img src={cryptoIcons[currency]!} alt={currency} className="inline w-5 h-5 mr-1 align-middle" />}
-                      {cryptoRates[currency] ? formatPrice(totalValue, currency, cryptoRates) : <span>...</span>}
-                    </p>
-                    <div className="space-y-3 md:space-y-4">
-                      {inventory.map((item) => (
-                        <div
-                          key={item.id}
-                          className="flex flex-col sm:flex-row justify-between items-center border-b border-white/10 pb-2 gap-2 md:gap-4"
-                        >
-                          <div className="flex items-center gap-3 md:gap-4">
-                            <img src={item.icon} alt={item.name} className="w-10 h-10 md:w-12 md:h-12 rounded" />
-                            <span className="text-sm md:text-base">{item.name}</span>
-                          </div>
-                          <span className="font-mono text-kalpix-green text-sm md:text-base">
-                            {cryptoIcons[currency] && <img src={cryptoIcons[currency]!} alt={currency} className="inline w-5 h-5 mr-1 align-middle" />}
-                            {cryptoRates[currency] ? formatPrice(item.marketPrice, currency, cryptoRates) : <span>...</span>}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-
           <TabsContent value="settings">
             <Card className="bg-black/40 border-white/5 mb-4 md:mb-6">
               <CardContent className="p-4 md:p-6">
@@ -267,6 +272,29 @@ export default function Profile() {
                   </Button>
                   {tradeUrlMessage && (
                     <div className={`text-sm mt-1 ${tradeUrlMessage.includes('mis à jour') ? 'text-green-400' : 'text-red-400'}`}>{tradeUrlMessage}</div>
+                  )}
+                </form>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-black/40 border-white/5 mb-4 md:mb-6">
+              <CardContent className="p-4 md:p-6">
+                <h3 className="text-lg md:text-xl font-bold font-rajdhani mb-3 md:mb-4">Adresse Email</h3>
+                <form onSubmit={handleEmailSubmit} className="flex flex-col gap-3 max-w-lg">
+                  <label htmlFor="email" className="text-sm text-white/70">Votre adresse email</label>
+                  <input
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={e => setEmail(e.target.value)}
+                    className="bg-opnskin-bg-secondary border border-opnskin-bg-secondary text-opnskin-text-primary rounded px-3 py-2 text-base"
+                    placeholder="votre@email.com"
+                  />
+                  <Button type="submit" className="w-fit" disabled={emailLoading}>
+                    {emailLoading ? "Mise à jour..." : "Mettre à jour"}
+                  </Button>
+                  {emailMessage && (
+                    <div className={`text-sm mt-1 ${emailMessage.includes('mise à jour') ? 'text-green-400' : 'text-red-400'}`}>{emailMessage}</div>
                   )}
                 </form>
               </CardContent>

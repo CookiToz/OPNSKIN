@@ -72,9 +72,7 @@ export default function Listings() {
 
   const sections = [
     { key: "AVAILABLE", label: "Actives" },
-    { key: "PENDING_TRADE_OFFER", label: "En cours d'échange" },
-    { key: "COMPLETED", label: "Terminées" },
-    { key: "EXPIRED", label: "Expirées / Annulées" },
+    // Les autres sections sont supprimées
   ];
 
   const handleOfferCancelled = () => {

@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Store, Package, ListOrdered, Wallet, History, User, Settings, ChevronRight, Home, Globe, ChevronDown, Phone } from "lucide-react"
-import { OPNSKINLogo } from "@/components/kalpix-logo"
+import { OPNSKINLogo } from "@/components/opnskin-logo"
 import { useTranslation } from 'next-i18next'
 
 function SidebarContent() {
@@ -104,10 +104,16 @@ function SidebarContent() {
             <Link
               key={item.href}
               href={item.href}
-              className={cn("nav-item", pathname === item.href ? "nav-item-active" : "nav-item-inactive")}
+              className={cn("nav-item h-12 flex items-center", pathname === item.href ? "nav-item-active" : "nav-item-inactive")}
               aria-current={pathname === item.href ? "page" : undefined}
             >
-              <item.icon className="h-5 w-5" />
+              {expanded ? (
+                <item.icon className="h-5 w-5" />
+              ) : (
+                <span className="sidebar-icon flex items-center justify-center w-10 h-10">
+                  <item.icon className="h-5 w-5" />
+                </span>
+              )}
               <span
                 className={cn(
                   "inline-block transition-all duration-300",
@@ -123,18 +129,22 @@ function SidebarContent() {
         </nav>
 
         <div className="mt-6 pt-6 border-t border-opnskin-bg-secondary">
-          <h3 className={cn("px-3 text-xs font-semibold text-opnskin-text-secondary uppercase mb-2", !expanded && "sr-only")}>
-            {t('sidebar.profile')}
-          </h3>
+          <h3 className={cn("px-3 text-xs font-semibold text-opnskin-text-secondary uppercase mb-2", !expanded && "sr-only")}>Compte & Support</h3>
           <nav className="space-y-1 px-2">
             {accountItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className={cn("nav-item", pathname === item.href ? "nav-item-active" : "nav-item-inactive")}
+                className={cn("nav-item h-12 flex items-center", pathname === item.href ? "nav-item-active" : "nav-item-inactive")}
                 aria-current={pathname === item.href ? "page" : undefined}
               >
-                <item.icon className="h-5 w-5" />
+                {expanded ? (
+                  <item.icon className="h-5 w-5" />
+                ) : (
+                  <span className="sidebar-icon flex items-center justify-center w-10 h-10">
+                    <item.icon className="h-5 w-5" />
+                  </span>
+                )}
                 <span
                   className={cn(
                     "inline-block transition-all duration-300",
@@ -150,13 +160,19 @@ function SidebarContent() {
             <div className="relative">
               <button
                 className={cn(
-                  "nav-item w-full text-left flex items-center gap-2",
+                  "nav-item w-full text-left flex items-center gap-2 h-12", // hauteur fixe
                   showLangs ? "nav-item-active" : "nav-item-inactive"
                 )}
                 onClick={() => setShowLangs(v => !v)}
                 aria-expanded={showLangs}
               >
-                <Globe className="h-5 w-5" />
+                {expanded ? (
+                  <Globe className="h-5 w-5" />
+                ) : (
+                  <span className="sidebar-icon flex items-center justify-center w-10 h-10">
+                    <Globe className="h-5 w-5" />
+                  </span>
+                )}
                 <span
                   className={cn(
                     "inline-block transition-all duration-300",

@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabaseClient';
+import { createClient } from '@supabase/supabase-js';
 
 // Récupérer une offre spécifique
 export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const { data: offer, error } = await supabase
+    const supabaseAdmin = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+    const { data: offer, error } = await supabaseAdmin
       .from('Offer')
       .select('*')
       .eq('id', params.id)
@@ -22,16 +26,20 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 // Annuler une offre (seulement le vendeur)
 export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
   try {
+    const supabaseAdmin = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
     const steamId = req.cookies.get('steamid')?.value;
     if (!steamId) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
-    const { data: user, error: userError } = await supabase.from('User').select('*').eq('steamId', steamId).single();
+    const { data: user, error: userError } = await supabaseAdmin.from('User').select('*').eq('steamId', steamId).single();
     if (userError || !user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
     console.log('Suppression offre : ID reçu', params.id, typeof params.id);
-    const { data: offer, error: offerError } = await supabase.from('Offer').select('*').eq('id', String(params.id).trim()).single();
+    const { data: offer, error: offerError } = await supabaseAdmin.from('Offer').select('*').eq('id', String(params.id).trim()).single();
     console.log('Offre récupérée pour suppression:', offer);
     if (offerError || !offer) {
       console.error('Suppression offre : ID non trouvé', params.id);
@@ -45,8 +53,8 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
     if (offer.status !== 'AVAILABLE') {
       return NextResponse.json({ error: 'Cannot cancel offer that is not available' }, { status: 400 });
     }
-    await supabase.from('Offer').delete().eq('id', params.id);
-    await supabase.from('Notification').insert([{
+    await supabaseAdmin.from('Offer').delete().eq('id', params.id);
+    await supabaseAdmin.from('Notification').insert([{
       userId: user.id,
       type: 'OFFRE_CANCELLED',
       title: 'Offre annulée',
@@ -61,16 +69,20 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
 // Confirmer une transaction (vendeur confirme l'échange)
 export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
   try {
+    const supabaseAdmin = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
     const steamId = req.cookies.get('steamid')?.value;
     if (!steamId) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
     const { action } = await req.json();
-    const { data: user, error: userError } = await supabase.from('User').select('*').eq('steamId', steamId).single();
+    const { data: user, error: userError } = await supabaseAdmin.from('User').select('*').eq('steamId', steamId).single();
     if (userError || !user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
-    const { data: offer, error: offerError } = await supabase.from('Offer').select('*,transaction(buyer(id,steamId,name))').eq('id', params.id).single();
+    const { data: offer, error: offerError } = await supabaseAdmin.from('Offer').select('*,transaction(buyer(id,steamId,name))').eq('id', params.id).single();
     if (offerError || !offer) {
       return NextResponse.json({ error: 'Offer not found' }, { status: 404 });
     }

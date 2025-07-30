@@ -55,34 +55,54 @@ export default function MarketplaceGamePage() {
   const [filters, setFilters] = useState<OPNSKINFilters>(DEFAULT_OPNSKIN_FILTERS);
   // Extraire dynamiquement la liste des collections à partir des offres
   const collections = Array.from(new Set(offers.map((o) => o.collection).filter(Boolean)));
+  
   // Fonction de filtrage côté frontend (à remplacer par filtrage API si besoin)
   const filteredOffers = offers.filter((offer) => {
     if (!offer) return false;
+    
+    // Recherche textuelle
+    if (filters.search) {
+      const searchLower = filters.search.toLowerCase();
+      const itemName = (offer.itemName || '').toLowerCase();
+      const itemId = (offer.itemId || '').toLowerCase();
+      if (!itemName.includes(searchLower) && !itemId.includes(searchLower)) {
+        return false;
+      }
+    }
+    
     // Prix
     if (offer.price < filters.price[0] || offer.price > filters.price[1]) return false;
+    
     // Float (optionnel)
     if (filters.float && typeof offer.float === 'number' && (offer.float < filters.float[0] || offer.float > filters.float[1])) return false;
+    
     // Wear (extraction robuste depuis le nom)
     let skinName = offer.itemName || offer.itemId || '';
     let wearMatch = skinName.match(/\((.*?)\)/);
     let wear = wearMatch ? wearMatch[1] : (offer.wear || offer.itemWear || '');
     if (filters.wear.length > 0 && !filters.wear.includes(wear)) return false;
+    
     // Rareté
     if (filters.rarity.length > 0 && !filters.rarity.includes(offer.rarity || offer.itemRarity || '')) return false;
+    
     // Type
     if (filters.type.length > 0 && !filters.type.includes(offer.type || offer.itemType || '')) return false;
+    
     // StatTrak
     if (filters.stattrak !== null) {
       const isStatTrak = (skinName || '').toLowerCase().includes('stattrak');
       if (filters.stattrak !== isStatTrak) return false;
     }
+    
     // Collection
     if (filters.collection && offer.collection !== filters.collection) return false;
+    
     // Trade hold (simulé)
     if (filters.tradeHold !== null) {
       const isTradeHold = offer.tradeHold === true;
       if (filters.tradeHold !== isTradeHold) return false;
     }
+    
     return true;
   });
 
@@ -260,10 +280,10 @@ export default function MarketplaceGamePage() {
   const SUPPORTED_CRYPTOS = ['ETH', 'GMC', 'BTC', 'SOL', 'XRP', 'LTC', 'TRX'];
 
   return (
-    <div className="min-h-screen">
-      <div className="container mx-auto p-3 md:p-6">
+    <div className="min-h-screen bg-opnskin-bg-primary">
+      <div className="container mx-auto px-4 py-6">
         {/* Header avec navigation */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
             <Link href="/marketplace">
               <Button variant="outline" size="sm" className="border-opnskin-primary/30 text-opnskin-primary hover:bg-opnskin-primary/10">
@@ -292,65 +312,15 @@ export default function MarketplaceGamePage() {
           </Button>
         </div>
 
-        {/* Statistiques */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <Card className="bg-opnskin-bg-card border-opnskin-bg-secondary">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2">
-                <Store className="w-5 h-5 text-opnskin-accent" />
-                <span className="text-opnskin-text-secondary">Offres disponibles</span>
-              </div>
-              <p className="text-2xl font-bold text-opnskin-text-primary mt-1">
-                {loading ? "..." : offers.length}
-              </p>
-            </CardContent>
-          </Card>
-          
-          <Card className="bg-opnskin-bg-card border-opnskin-bg-secondary">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2">
-                <span className="text-opnskin-text-secondary">Prix moyen</span>
-              </div>
-              <p className="text-2xl font-bold text-opnskin-accent mt-1">
-                {loading ? "..." : offers.length > 0 
-                  ? formatPrice(
-                      offers.reduce((sum, offer) => sum + offer.price, 0) / offers.length,
-                      currency,
-                      cryptoRates as unknown as Record<string, import('@/hooks/use-currency-store').CryptoRate>
-                    )
-                  : "N/A"
-                }
-              </p>
-            </CardContent>
-          </Card>
-          
-          <Card className="bg-opnskin-bg-card border-opnskin-bg-secondary">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2">
-                <span className="text-opnskin-text-secondary">Valeur totale</span>
-              </div>
-              <p className="text-2xl font-bold text-opnskin-accent mt-1">
-                {loading ? "..." : offers.length > 0 
-                  ? formatPrice(
-                      offers.reduce((sum, offer) => sum + offer.price, 0),
-                      currency,
-                      cryptoRates as unknown as Record<string, import('@/hooks/use-currency-store').CryptoRate>
-                    )
-                  : "N/A"
-                }
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Liste des offres */}
-        <div className="flex flex-col md:flex-row gap-8">
+        {/* Liste des offres avec filtres */}
+        <div className="flex flex-col lg:flex-row gap-8">
           {/* Sidebar filtres pour CS2 */}
           {game === 'cs2' && (
             <FilterSidebarOPNSKIN filters={filters} setFilters={setFilters} collections={collections} showFloat={true} priceMax={priceMax} />
           )}
+          
           {/* Liste des offres */}
-          <div className="flex-1">
+          <div className="flex-1 min-w-0">
             {loading || userLoading ? (
               <div className="flex items-center justify-center py-12">
                 <Loader2 className="animate-spin h-8 w-8 text-opnskin-primary" />
@@ -371,7 +341,7 @@ export default function MarketplaceGamePage() {
                 </Link>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
                 {filteredOffers.map((offer) => {
                   const isMine = user && user.loggedIn && offer.sellerId === user.id;
                   
@@ -460,6 +430,7 @@ export default function MarketplaceGamePage() {
           </div>
         </div>
       </div>
+      
       {/* Modal détail skin */}
       <Dialog open={showDetails} onOpenChange={setShowDetails}>
         <DialogContent>

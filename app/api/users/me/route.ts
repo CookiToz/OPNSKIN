@@ -84,6 +84,7 @@ export async function GET(req: NextRequest) {
         avatar: user.avatar,
         profileUrl: user.profileUrl,
         tradeUrl: user.tradeUrl,
+        email: user.email,
         walletBalance: user.walletBalance,
         offersCount: offers.length,
         transactionsCount: transactions.length,
@@ -111,16 +112,21 @@ export async function PUT(req: NextRequest) {
         error: 'No Steam ID found'
       }, { status: 401 });
     }
-    const { tradeUrl } = await req.json();
+    const { tradeUrl, email } = await req.json();
     if (tradeUrl && !tradeUrl.startsWith('https://steamcommunity.com/tradeoffer/new/')) {
       return NextResponse.json({ 
         error: 'Invalid Steam Trade URL format'
       }, { status: 400 });
     }
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return NextResponse.json({ 
+        error: 'Invalid email format'
+      }, { status: 400 });
+    }
     // Mettre à jour l'utilisateur
     const { data: user, error } = await supabaseAdmin
       .from('User')
-      .update({ tradeUrl })
+      .update({ tradeUrl, email })
       .eq('steamId', steamId)
       .select()
       .single();
@@ -136,6 +142,7 @@ export async function PUT(req: NextRequest) {
         avatar: user.avatar,
         profileUrl: user.profileUrl,
         tradeUrl: user.tradeUrl,
+        email: user.email,
         walletBalance: user.walletBalance
       }
     });
