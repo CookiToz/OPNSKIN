@@ -1,15 +1,13 @@
 "use client";
 
 import Link from 'next/link';
-import { Bell, Search, ShoppingCart, LogOut } from 'lucide-react';
+import { Bell, ShoppingCart, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { useCurrencyStore } from '@/hooks/use-currency-store';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useCryptoRates } from '@/hooks/use-crypto-rates';
 import { cryptoIcons } from '@/lib/utils';
-import { useSearchStore } from '@/hooks/use-search-store';
 import { useTranslation } from 'next-i18next';
 import { useCryptoRatesStore } from '@/hooks/use-currency-store';
 import { formatPrice } from '@/lib/utils';
@@ -55,8 +53,6 @@ export function Header() {
   const { currency, setCurrency } = useCurrencyStore();
   const rawCryptoRates = useCryptoRates();
   const cryptoRates = typeof rawCryptoRates === 'object' && rawCryptoRates !== null ? rawCryptoRates : { ETH: 0, GMC: 0, BTC: 0, SOL: 0, XRP: 0, LTC: 0, TRX: 0 };
-  const searchQuery = useSearchStore((state) => state.searchQuery);
-  const setSearchQuery = useSearchStore((state) => state.setSearchQuery);
   const pathname = usePathname();
   const [cartOpen, setCartOpen] = useState(false);
 
@@ -75,20 +71,8 @@ export function Header() {
       <header className="sticky top-0 z-50 w-full bg-opnskin-bg-primary/80 shadow-[0_2px_8px_rgba(40,124,250,0.04)]">
         <div className="flex items-center justify-between px-4" style={{ height: 80, minHeight: 80, maxHeight: 80 }}>
           <div className="flex-1 flex items-center space-x-4">
-            {(pathname.startsWith('/inventory') || pathname.startsWith('/marketplace')) && (
-              <div className="relative w-96">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-opnskin-text-secondary" />
-                <Input
-                  type="search"
-                  placeholder={t('header.search_placeholder')}
-                  className="w-full pl-10 bg-opnskin-bg-secondary/50 border-opnskin-bg-secondary text-opnskin-text-secondary focus:border-opnskin-primary focus:bg-opnskin-bg-secondary"
-                  value={searchQuery}
-                  onChange={e => setSearchQuery(e.target.value)}
-                />
-              </div>
-            )}
             <Select value={currency} onValueChange={setCurrency}>
-              <SelectTrigger className="w-24 ml-4 bg-opnskin-bg-secondary border-opnskin-primary/30 text-opnskin-accent font-bold">
+              <SelectTrigger className="w-24 bg-opnskin-bg-secondary border-opnskin-primary/30 text-opnskin-accent font-bold">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="bg-opnskin-bg-card border-opnskin-primary/30 max-h-60 overflow-y-auto">
