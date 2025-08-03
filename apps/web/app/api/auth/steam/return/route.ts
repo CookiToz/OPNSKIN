@@ -3,16 +3,19 @@ import { createClient } from '@supabase/supabase-js';
 
 export async function GET(req: NextRequest) {
   try {
-    // Vérification des variables d'environnement
-    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    // Vérification des variables d'environnement avec gestion de la faute de frappe
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERCE_ROLE_KEY;
+    
+    if (!supabaseUrl || !supabaseKey) {
       console.error('[STEAM OPENID] Missing Supabase environment variables');
+      console.error('[STEAM OPENID] NEXT_PUBLIC_SUPABASE_URL:', supabaseUrl ? 'OK' : 'MISSING');
+      console.error('[STEAM OPENID] SUPABASE_SERVICE_ROLE_KEY:', process.env.SUPABASE_SERVICE_ROLE_KEY ? 'OK' : 'MISSING');
+      console.error('[STEAM OPENID] SUPABASE_SERCE_ROLE_KEY:', process.env.SUPABASE_SERCE_ROLE_KEY ? 'OK' : 'MISSING');
       return NextResponse.redirect(new URL('/login?error=config', req.url));
     }
 
-    const supabaseAdmin = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL,
-      process.env.SUPABASE_SERVICE_ROLE_KEY
-    );
+    const supabaseAdmin = createClient(supabaseUrl, supabaseKey);
     const url = new URL(req.url);
     const searchParams = url.searchParams;
 

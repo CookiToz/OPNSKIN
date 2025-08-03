@@ -1,12 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
+// Fonction helper pour créer le client Supabase avec gestion de la faute de frappe
+function createSupabaseClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERCE_ROLE_KEY;
+  
+  if (!supabaseUrl || !supabaseKey) {
+    console.error('[USERS API] Missing Supabase environment variables');
+    console.error('[USERS API] NEXT_PUBLIC_SUPABASE_URL:', supabaseUrl ? 'OK' : 'MISSING');
+    console.error('[USERS API] SUPABASE_SERVICE_ROLE_KEY:', process.env.SUPABASE_SERVICE_ROLE_KEY ? 'OK' : 'MISSING');
+    console.error('[USERS API] SUPABASE_SERCE_ROLE_KEY:', process.env.SUPABASE_SERCE_ROLE_KEY ? 'OK' : 'MISSING');
+    throw new Error('supabaseKey is required.');
+  }
+  
+  return createClient(supabaseUrl, supabaseKey);
+}
+
 export async function GET(req: NextRequest) {
   try {
-    const supabaseAdmin = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    );
+    const supabaseAdmin = createSupabaseClient();
     console.log('SERVICE_ROLE_KEY:', process.env.SUPABASE_SERVICE_ROLE_KEY?.slice(0, 10));
     const steamId = req.cookies.get('steamid')?.value;
     if (!steamId) {
@@ -103,10 +116,7 @@ export async function GET(req: NextRequest) {
 
 export async function PUT(req: NextRequest) {
   try {
-    const supabaseAdmin = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    );
+    const supabaseAdmin = createSupabaseClient();
     const steamId = req.cookies.get('steamid')?.value;
     if (!steamId) {
       return NextResponse.json({ 
