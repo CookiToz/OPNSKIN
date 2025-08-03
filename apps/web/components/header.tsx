@@ -8,7 +8,7 @@ import { useCurrencyStore } from '@/hooks/use-currency-store';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useCryptoRates } from '@/hooks/use-crypto-rates';
 import { cryptoIcons } from '@/lib/utils';
-import { useTranslation } from 'next-i18next';
+import { useTranslation } from 'react-i18next';
 import { useCryptoRatesStore } from '@/hooks/use-currency-store';
 import { formatPrice } from '@/lib/utils';
 import { useUser } from "@/components/UserProvider";

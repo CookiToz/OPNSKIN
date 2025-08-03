@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Store, Package, ListOrdered, Wallet, History, User, Settings, ChevronRight, Home, Globe, ChevronDown, Phone, Shield, MessageCircle } from "lucide-react"
 import { OPNSKINLogo } from "@/components/opnskin-logo"
-import { useTranslation } from 'next-i18next'
+import { useTranslation } from 'react-i18next'
 import { useUser } from "@/components/UserProvider"
 
 function SidebarContent() {

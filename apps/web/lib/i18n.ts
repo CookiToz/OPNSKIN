@@ -22,6 +22,8 @@ if (!i18n.isInitialized) {
       backend: {
         loadPath: "/locales/{{lng}}/{{ns}}.json",
       },
+      debug: process.env.NODE_ENV === 'development',
+      initImmediate: false,
     });
 }
 

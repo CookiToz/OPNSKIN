@@ -3,9 +3,15 @@ import { createClient } from '@supabase/supabase-js';
 
 export async function GET(req: NextRequest) {
   try {
+    // Vérification des variables d'environnement
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+      console.error('[STEAM OPENID] Missing Supabase environment variables');
+      return NextResponse.redirect(new URL('/login?error=config', req.url));
+    }
+
     const supabaseAdmin = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
+      process.env.NEXT_PUBLIC_SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_ROLE_KEY
     );
     const url = new URL(req.url);
     const searchParams = url.searchParams;
@@ -18,7 +24,7 @@ export async function GET(req: NextRequest) {
     
     if (!claimedId) {
       console.error('[STEAM OPENID] Missing openid.claimed_id parameter');
-      return NextResponse.redirect('/login?error=missing_params');
+      return NextResponse.redirect(new URL('/login?error=missing_params', req.url));
     }
 
     // Extraction du SteamID avec validation selon le format Steam : https://steamcommunity.com/openid/id/<steamid>
@@ -26,7 +32,7 @@ export async function GET(req: NextRequest) {
     
     if (!steamIdMatch || !steamIdMatch[1]) {
       console.error('[STEAM OPENID] SteamID not found in claimed_id:', claimedId);
-      return NextResponse.redirect('/login?error=nosteamid');
+      return NextResponse.redirect(new URL('/login?error=nosteamid', req.url));
     }
 
     const steamId = steamIdMatch[1];
@@ -84,11 +90,11 @@ export async function GET(req: NextRequest) {
 
     // Récupération du domaine depuis les headers de la requête
     const host = req.headers.get('host');
-    const protocol = req.headers.get('x-forwarded-proto') || 'https';
+    const protocol = req.headers.get('x-forwarded-proto') || 'http';
     const baseUrl = `${protocol}://${host}`;
 
     // Redirection vers le domaine Vercel après authentification réussie
-    const response = NextResponse.redirect(`${baseUrl}/`);
+    const response = NextResponse.redirect(new URL('/', baseUrl));
 
     // Configuration du cookie pour le domaine Vercel
     response.cookies.set('steamid', steamId, {
@@ -104,6 +110,6 @@ export async function GET(req: NextRequest) {
 
   } catch (error) {
     console.error('[STEAM OPENID] Unexpected error:', error);
-    return NextResponse.redirect('/login?error=internal');
+    return NextResponse.redirect(new URL('/login?error=internal', req.url));
   }
 }

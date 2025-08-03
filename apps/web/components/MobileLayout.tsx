@@ -6,7 +6,7 @@ import { Drawer, DrawerTrigger, DrawerContent } from '@/components/ui/drawer';
 import { OPNSKINLogo } from '@/components/opnskin-logo';
 import { Menu, X, Search } from 'lucide-react';
 import { usePathname } from 'next/navigation';
-import { useTranslation } from 'next-i18next';
+import { useTranslation } from 'react-i18next';
 import SteamAuthStatus from '@/components/SteamAuthStatus';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 import { Input } from '@/components/ui/input';
