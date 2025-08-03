@@ -1,0 +1,168 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                   String         @id @default(uuid()) @db.Uuid
+  steamId              String         @unique
+  name                 String?
+  avatar               String?
+  profileUrl           String?
+  email                String?        @unique
+  walletBalance        Float          @default(0)
+  bannedUntil          DateTime?
+  tradeUrl             String?
+  createdAt            DateTime       @default(now())
+  updatedAt            DateTime       @default(now()) @updatedAt
+  last_seen            DateTime?
+  cartItems            CartItem[]
+  notifications        Notification[]
+  offers               Offer[]
+  transactionsAsBuyer  Transaction[]  @relation("Buyer")
+  transactionsAsSeller Transaction[]  @relation("Seller")
+  isSoftBanned         Boolean        @default(false)
+  bannedAt             DateTime?
+  supportTickets       SupportTicket[]
+  supportMessages      SupportMessage[]
+}
+
+model Offer {
+  id          String       @id @default(uuid()) @db.Uuid
+  sellerId    String       @db.Uuid
+  itemId      String
+  itemName    String?
+  itemImage   String?
+  rarityCode  String?
+  game        String?
+  price       Float
+  status      OfferStatus  @default(AVAILABLE)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @default(now()) @updatedAt
+  expiresAt   DateTime?
+  cartItems   CartItem[]
+  seller      User         @relation(fields: [sellerId], references: [id])
+  transaction Transaction?
+}
+
+model Transaction {
+  id             String            @id @default(uuid()) @db.Uuid
+  offerId        String            @unique @db.Uuid
+  buyerId        String            @db.Uuid
+  sellerId       String            @db.Uuid
+  status         TransactionStatus
+  escrowUntil    DateTime?
+  escrowReleased Boolean           @default(false)
+  refunded       Boolean           @default(false)
+  refundReason   String?
+  bannedSeller   Boolean           @default(false)
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @default(now()) @updatedAt
+
+  offer      Offer       @relation(fields: [offerId], references: [id])
+  buyer      User        @relation("Buyer", fields: [buyerId], references: [id])
+  seller     User        @relation("Seller", fields: [sellerId], references: [id])
+  escrowLogs EscrowLog[]
+}
+
+model EscrowLog {
+  id            String      @id @default(uuid()) @db.Uuid
+  transactionId String      @db.Uuid
+  action        String
+  details       String?
+  createdAt     DateTime    @default(now())
+  transaction   Transaction @relation(fields: [transactionId], references: [id])
+}
+
+model Notification {
+  id        String           @id @default(uuid()) @db.Uuid
+  userId    String           @db.Uuid
+  type      NotificationType
+  title     String
+  message   String
+  read      Boolean          @default(false)
+  createdAt DateTime         @default(now())
+  user      User             @relation(fields: [userId], references: [id])
+}
+
+model CartItem {
+  id      String   @id @default(uuid()) @db.Uuid
+  userId  String   @db.Uuid
+  offerId String   @db.Uuid
+  addedAt DateTime @default(now())
+  user    User     @relation(fields: [userId], references: [id])
+  offer   Offer    @relation(fields: [offerId], references: [id])
+
+  @@index([offerId])
+  @@index([userId])
+}
+
+model SupportTicket {
+  id          String           @id @default(uuid()) @db.Uuid
+  userId      String           @db.Uuid
+  subject     String
+  status      TicketStatus     @default(OPEN)
+  priority    TicketPriority   @default(MEDIUM)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @default(now()) @updatedAt
+  messages    SupportMessage[]
+  user        User             @relation(fields: [userId], references: [id])
+}
+
+model SupportMessage {
+  id          String           @id @default(uuid()) @db.Uuid
+  ticketId    String           @db.Uuid
+  senderId    String           @db.Uuid
+  senderRole  SupportRole      // 'USER' ou 'ADMIN'
+  content     String
+  createdAt   DateTime         @default(now())
+  ticket      SupportTicket    @relation(fields: [ticketId], references: [id])
+  sender      User             @relation(fields: [senderId], references: [id])
+}
+
+enum OfferStatus {
+  AVAILABLE
+  PENDING_TRADE_OFFER
+  COMPLETED
+  EXPIRED
+}
+
+enum TransactionStatus {
+  PENDING
+  IN_ESCROW
+  RELEASED
+  REFUNDED
+  CANCELLED
+}
+
+enum NotificationType {
+  OFFER_CREATED
+  OFFER_SOLD
+  OFFRE_CANCELLED
+  TRANSACTION_STARTED
+  TRANSACTION_COMPLETED
+  REMINDER
+  PENALTY
+  CONFIRM
+}
+
+enum TicketStatus {
+  OPEN
+  RESOLVED
+  CLOSED
+}
+
+enum TicketPriority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum SupportRole {
+  USER
+  ADMIN
+}
