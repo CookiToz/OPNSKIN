@@ -12,11 +12,11 @@ const badgeVariants = cva(
         secondary: "border-transparent bg-secondary text-secondary-foreground shadow-[0_0_5px_rgba(155,81,224,0.3)]",
         destructive: "border-transparent bg-destructive text-destructive-foreground",
         outline: "text-foreground",
-        success: "border-transparent bg-kalpix-green text-success-foreground shadow-[0_0_5px_rgba(0,255,163,0.3)]",
-        neon: "border-kalpix-green/50 bg-kalpix-green/10 text-kalpix-green shadow-[0_0_5px_rgba(0,255,163,0.3)]",
+        success: "border-transparent bg-opnskin-green text-success-foreground shadow-[0_0_5px_rgba(0,255,163,0.3)]",
+        neon: "border-opnskin-green/50 bg-opnskin-green/10 text-opnskin-green shadow-[0_0_5px_rgba(0,255,163,0.3)]",
         neonViolet:
-          "border-kalpix-violet/50 bg-kalpix-violet/10 text-kalpix-violet shadow-[0_0_5px_rgba(155,81,224,0.3)]",
-        neonBlue: "border-kalpix-blue/50 bg-kalpix-blue/10 text-kalpix-blue shadow-[0_0_5px_rgba(81,167,194,0.3)]",
+          "border-opnskin-violet/50 bg-opnskin-violet/10 text-opnskin-violet shadow-[0_0_5px_rgba(155,81,224,0.3)]",
+        neonBlue: "border-opnskin-blue/50 bg-opnskin-blue/10 text-opnskin-blue shadow-[0_0_5px_rgba(81,167,194,0.3)]",
       },
     },
     defaultVariants: {

@@ -154,7 +154,7 @@ export default function Profile() {
           <p className="text-white/70 mb-4 md:mb-6 max-w-md mx-auto text-base md:text-lg">{t('profile.login_desc')}</p>
           <Button
             onClick={() => (window.location.href = '/api/auth/steam')}
-            className="bg-kalpix-blue hover:bg-kalpix-blue/80 text-white px-4 md:px-6 py-3 rounded flex items-center gap-2 w-full max-w-xs mx-auto text-base md:text-lg"
+            className="bg-opnskin-blue hover:bg-opnskin-blue/80 text-white px-4 md:px-6 py-3 rounded flex items-center gap-2 w-full max-w-xs mx-auto text-base md:text-lg"
           >
             <img
               src="/icons8-steam-128.png"
@@ -186,11 +186,11 @@ export default function Profile() {
           <TabsContent value="stats">
             <Card className="bg-black/40 border-white/5 mb-4 md:mb-6">
               <CardContent className="p-4 md:p-6 flex flex-col items-center">
-                <Avatar className="h-20 w-20 md:h-24 md:w-24 border-2 border-kalpix-violet mb-3 md:mb-4">
+                <Avatar className="h-20 w-20 md:h-24 md:w-24 border-2 border-opnskin-violet mb-3 md:mb-4">
                   {user ? (
                     <img src={user.avatar} alt="Avatar Steam" className="rounded-full" />
                   ) : (
-                    <AvatarFallback className="bg-kalpix-violet/20 text-kalpix-violet font-rajdhani text-2xl">
+                    <AvatarFallback className="bg-opnskin-violet/20 text-opnskin-violet font-rajdhani text-2xl">
                       ?
                     </AvatarFallback>
                   )}
@@ -199,7 +199,7 @@ export default function Profile() {
                 <h2 className="text-lg md:text-2xl font-bold font-rajdhani mb-1">
                   {user?.name || t('profile.user')}
                 </h2>
-                <Badge className="bg-kalpix-violet/20 text-kalpix-violet border-kalpix-violet/30 mb-3 md:mb-4 text-xs md:text-base">
+                <Badge className="bg-opnskin-violet/20 text-opnskin-violet border-opnskin-violet/30 mb-3 md:mb-4 text-xs md:text-base">
                   {t('profile.level_0')}
                 </Badge>
 
@@ -220,11 +220,11 @@ export default function Profile() {
 
                 <div className="w-full space-y-2 mb-3 md:mb-4">
                   <div className="flex items-center gap-2">
-                    <Shield className="h-4 w-4 text-kalpix-green" />
+                    <Shield className="h-4 w-4 text-opnskin-green" />
                     <span className="text-xs md:text-sm">{t('profile.verified_account')}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Wallet className="h-4 w-4 text-kalpix-blue" />
+                    <Wallet className="h-4 w-4 text-opnskin-blue" />
                     <span className="text-xs md:text-sm">{t('profile.wallet_connected')}</span>
                   </div>
                 </div>
@@ -254,7 +254,7 @@ export default function Profile() {
                       href="https://steamcommunity.com/my/tradeoffers/privacy#trade_offer_access_url"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-kalpix-blue underline font-semibold hover:text-kalpix-violet transition-colors text-sm ml-2"
+                      className="text-opnskin-blue underline font-semibold hover:text-opnskin-violet transition-colors text-sm ml-2"
                     >
                       Steam URL
                     </a>

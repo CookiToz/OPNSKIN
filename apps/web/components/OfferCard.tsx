@@ -128,7 +128,7 @@ export const OfferCard: React.FC<OfferCardProps> = ({ offer, currentUserId, onOf
               rel="noopener noreferrer"
               className="flex-1"
             >
-              <Button className="w-full bg-kalpix-blue hover:bg-kalpix-blue/80 text-white">
+              <Button className="w-full bg-opnskin-blue hover:bg-opnskin-blue/80 text-white">
                 Lancer l'échange Steam
               </Button>
             </a>

@@ -88,7 +88,7 @@ export default function FilterSidebarCS2({
       {activeBadges.length > 0 && (
         <div className="flex flex-wrap gap-2 mb-2">
           {activeBadges.map((b, i) => (
-            <Badge key={i} className="bg-kalpix-violet/80 text-white cursor-pointer" onClick={b.onRemove}>{b.label} ✕</Badge>
+            <Badge key={i} className="bg-opnskin-violet/80 text-white cursor-pointer" onClick={b.onRemove}>{b.label} ✕</Badge>
           ))}
         </div>
       )}
@@ -122,7 +122,7 @@ export default function FilterSidebarCS2({
           {CS2_WEAR.map(w => (
             <Badge
               key={w}
-              className={cn("cursor-pointer px-3 py-1", filters.wear.includes(w) ? "bg-kalpix-violet text-white" : "bg-opnskin-bg-card text-opnskin-text-secondary")}
+              className={cn("cursor-pointer px-3 py-1", filters.wear.includes(w) ? "bg-opnskin-violet text-white" : "bg-opnskin-bg-card text-opnskin-text-secondary")}
               onClick={() => setFilters({ ...filters, wear: filters.wear.includes(w) ? filters.wear.filter(x => x !== w) : [...filters.wear, w] })}
             >
               {w}
@@ -137,7 +137,7 @@ export default function FilterSidebarCS2({
           {CS2_RARITY.map(r => (
             <Badge
               key={r}
-              className={cn("cursor-pointer px-3 py-1", filters.rarity.includes(r) ? "bg-kalpix-violet text-white" : "bg-opnskin-bg-card text-opnskin-text-secondary")}
+              className={cn("cursor-pointer px-3 py-1", filters.rarity.includes(r) ? "bg-opnskin-violet text-white" : "bg-opnskin-bg-card text-opnskin-text-secondary")}
               onClick={() => setFilters({ ...filters, rarity: filters.rarity.includes(r) ? filters.rarity.filter(x => x !== r) : [...filters.rarity, r] })}
             >
               {r}
@@ -152,7 +152,7 @@ export default function FilterSidebarCS2({
           {CS2_TYPE.map(t => (
             <Badge
               key={t}
-              className={cn("cursor-pointer px-3 py-1", filters.type.includes(t) ? "bg-kalpix-violet text-white" : "bg-opnskin-bg-card text-opnskin-text-secondary")}
+              className={cn("cursor-pointer px-3 py-1", filters.type.includes(t) ? "bg-opnskin-violet text-white" : "bg-opnskin-bg-card text-opnskin-text-secondary")}
               onClick={() => setFilters({ ...filters, type: filters.type.includes(t) ? filters.type.filter(x => x !== t) : [...filters.type, t] })}
             >
               {t}
@@ -167,7 +167,7 @@ export default function FilterSidebarCS2({
           <Button
             size="sm"
             variant={filters.stattrak === true ? "default" : "outline"}
-            className={filters.stattrak === true ? "bg-kalpix-violet text-white" : ""}
+            className={filters.stattrak === true ? "bg-opnskin-violet text-white" : ""}
             onClick={() => setFilters({ ...filters, stattrak: filters.stattrak === true ? null : true })}
           >
             Oui
@@ -175,7 +175,7 @@ export default function FilterSidebarCS2({
           <Button
             size="sm"
             variant={filters.stattrak === false ? "default" : "outline"}
-            className={filters.stattrak === false ? "bg-kalpix-violet text-white" : ""}
+            className={filters.stattrak === false ? "bg-opnskin-violet text-white" : ""}
             onClick={() => setFilters({ ...filters, stattrak: filters.stattrak === false ? null : false })}
           >
             Non
@@ -203,7 +203,7 @@ export default function FilterSidebarCS2({
           <Button
             size="sm"
             variant={filters.tradeHold === true ? "default" : "outline"}
-            className={filters.tradeHold === true ? "bg-kalpix-violet text-white" : ""}
+            className={filters.tradeHold === true ? "bg-opnskin-violet text-white" : ""}
             onClick={() => setFilters({ ...filters, tradeHold: filters.tradeHold === true ? null : true })}
           >
             Oui
@@ -211,7 +211,7 @@ export default function FilterSidebarCS2({
           <Button
             size="sm"
             variant={filters.tradeHold === false ? "default" : "outline"}
-            className={filters.tradeHold === false ? "bg-kalpix-violet text-white" : ""}
+            className={filters.tradeHold === false ? "bg-opnskin-violet text-white" : ""}
             onClick={() => setFilters({ ...filters, tradeHold: filters.tradeHold === false ? null : false })}
           >
             Non

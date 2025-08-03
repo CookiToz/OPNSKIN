@@ -128,7 +128,7 @@
   },
   "profile": {
     "login_title": "通过 Steam 登录",
-    "login_desc": "您必须登录才能访问您的 Kalpix 个人资料。",
+    "login_desc": "您必须登录才能访问您的 OPNSKIN 个人资料。",
     "login_button": "通过 Steam 登录",
     "title": "我的资料",
     "subtitle": "查看和管理您的资料、统计和奖励",
@@ -167,7 +167,7 @@
     "no_history_desc": "完成购买或出售后，您的交易将显示在此处。",
     "payment_methods": "支付方式",
     "purchase_history": "购买历史",
-    "kalpix_balance": "Kalpix余额",
+    "opnskin_balance": "OPNSKIN余额",
     "default_payment_method": "默认支付方式",
     "crypto_supported": "Ethereum, USDT, Bitcoin",
     "withdraw_funds": "提现",

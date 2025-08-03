@@ -25,9 +25,9 @@ export function AnimatedText({
 
   const colorClasses = {
     default: "text-foreground",
-    green: "text-kalpix-green",
-    blue: "text-kalpix-blue",
-    violet: "text-kalpix-violet",
+      green: "text-opnskin-green",
+  blue: "text-opnskin-blue",
+  violet: "text-opnskin-violet",
   }
 
   useEffect(() => {

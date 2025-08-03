@@ -32,15 +32,15 @@ export default function WalletPage() {
   // Méthodes de paiement (fiat/crypto)
   const fiatMethods = [
     {
-      icon: <CreditCard className="h-6 w-6 text-kalpix-blue" />, label: t('wallet.card_payment', 'Carte bancaire'), desc: 'Visa, Mastercard, AMEX',
+      icon: <CreditCard className="h-6 w-6 text-opnskin-blue" />, label: t('wallet.card_payment', 'Carte bancaire'), desc: 'Visa, Mastercard, AMEX',
     },
     {
-      icon: <Landmark className="h-6 w-6 text-kalpix-green" />, label: t('wallet.bank_transfer', 'Virement bancaire'), desc: t('wallet.bank_transfer_desc', 'Dépôt direct depuis votre banque'),
+      icon: <Landmark className="h-6 w-6 text-opnskin-green" />, label: t('wallet.bank_transfer', 'Virement bancaire'), desc: t('wallet.bank_transfer_desc', 'Dépôt direct depuis votre banque'),
     },
   ];
   const cryptoMethods = [
     {
-      icon: <Bitcoin className="h-6 w-6 text-kalpix-violet" />, label: t('wallet.crypto_wallet', 'Wallet crypto'), desc: t('wallet.crypto_supported', 'ETH, USDT, etc.'),
+      icon: <Bitcoin className="h-6 w-6 text-opnskin-violet" />, label: t('wallet.crypto_wallet', 'Wallet crypto'), desc: t('wallet.crypto_supported', 'ETH, USDT, etc.'),
     },
   ];
 
@@ -61,8 +61,8 @@ export default function WalletPage() {
               <Card className="rounded-2xl shadow-md bg-black/60 border-white/5 mb-3 md:mb-4">
                 <CardContent className="p-4 md:p-6 flex flex-col gap-3 md:gap-4">
                   <div className="flex items-center gap-3 md:gap-4">
-                    <div className="h-16 w-16 md:h-20 md:w-20 rounded-xl bg-kalpix-green/20 flex items-center justify-center">
-                      <Wallet className="h-8 w-8 md:h-10 md:w-10 text-kalpix-green" />
+                    <div className="h-16 w-16 md:h-20 md:w-20 rounded-xl bg-opnskin-green/20 flex items-center justify-center">
+                      <Wallet className="h-8 w-8 md:h-10 md:w-10 text-opnskin-green" />
                     </div>
                     <div>
                       <div className="text-white/80 text-sm md:text-base mb-1">{t('wallet.balance_available')}</div>
@@ -75,12 +75,12 @@ export default function WalletPage() {
                     </div>
                   </div>
                   <div className="flex flex-col sm:flex-row gap-2 mt-1">
-                    <Button className="flex-1 bg-kalpix-green hover:bg-kalpix-green/80 text-base md:text-lg py-4 md:py-5 transition-all" size="lg">
+                    <Button className="flex-1 bg-opnskin-green hover:bg-opnskin-green/80 text-base md:text-lg py-4 md:py-5 transition-all" size="lg">
                       <PlusCircle className="mr-2 h-5 w-5" />
                       {t('wallet.add_funds')}
                     </Button>
                     <Button
-                      className="flex-1 bg-kalpix-blue/90 hover:bg-kalpix-blue text-base md:text-lg py-4 md:py-5 transition-all"
+                      className="flex-1 bg-opnskin-blue/90 hover:bg-opnskin-blue text-base md:text-lg py-4 md:py-5 transition-all"
                       size="lg"
                     >
                       <Wallet className="mr-2 h-5 w-5" />
@@ -88,7 +88,7 @@ export default function WalletPage() {
                     </Button>
                   </div>
                   <Button
-                    className="w-full mt-2 bg-muted/10 text-base md:text-lg py-4 md:py-5 transition-all flex items-center justify-center gap-2 border border-kalpix-violet/40 text-kalpix-violet hover:bg-kalpix-violet/10"
+                    className="w-full mt-2 bg-muted/10 text-base md:text-lg py-4 md:py-5 transition-all flex items-center justify-center gap-2 border border-opnskin-violet/40 text-opnskin-violet hover:bg-opnskin-violet/10"
                     size="lg"
                     disabled
                     onClick={() => toast({
@@ -106,8 +106,8 @@ export default function WalletPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-3 mb-3 md:mb-4">
                 <Card className="rounded-xl bg-black/40 border-white/5 transition-all">
                   <CardContent className="p-3 md:p-4 flex items-center gap-2 md:gap-3">
-                    <div className="h-8 w-8 md:h-10 md:w-10 rounded-lg bg-kalpix-blue/20 flex items-center justify-center">
-                      <Clock className="h-5 w-5 text-kalpix-blue" />
+                    <div className="h-8 w-8 md:h-10 md:w-10 rounded-lg bg-opnskin-blue/20 flex items-center justify-center">
+                      <Clock className="h-5 w-5 text-opnskin-blue" />
                     </div>
                     <div>
                       <h3 className="font-rajdhani font-bold text-sm md:text-base">{t('wallet.instant_deposits')}</h3>
@@ -117,8 +117,8 @@ export default function WalletPage() {
                 </Card>
                 <Card className="rounded-xl bg-black/40 border-white/5 transition-all">
                   <CardContent className="p-3 md:p-4 flex items-center gap-2 md:gap-3">
-                    <div className="h-8 w-8 md:h-10 md:w-10 rounded-lg bg-kalpix-green/20 flex items-center justify-center">
-                      <Shield className="h-5 w-5 text-kalpix-green" />
+                    <div className="h-8 w-8 md:h-10 md:w-10 rounded-lg bg-opnskin-green/20 flex items-center justify-center">
+                      <Shield className="h-5 w-5 text-opnskin-green" />
                     </div>
                     <div>
                       <h3 className="font-rajdhani font-bold text-sm md:text-base">{t('wallet.secure_transactions')}</h3>
@@ -128,8 +128,8 @@ export default function WalletPage() {
                 </Card>
                 <Card className="rounded-xl bg-black/40 border-white/5 transition-all">
                   <CardContent className="p-3 md:p-4 flex items-center gap-2 md:gap-3">
-                    <div className="h-8 w-8 md:h-10 md:w-10 rounded-lg bg-kalpix-violet/20 flex items-center justify-center">
-                      <Coins className="h-5 w-5 text-kalpix-violet" />
+                    <div className="h-8 w-8 md:h-10 md:w-10 rounded-lg bg-opnskin-violet/20 flex items-center justify-center">
+                      <Coins className="h-5 w-5 text-opnskin-violet" />
                     </div>
                     <div>
                       <h3 className="font-rajdhani font-bold text-sm md:text-base">{t('wallet.multi_currencies')}</h3>
@@ -139,8 +139,8 @@ export default function WalletPage() {
                 </Card>
                 <Card className="rounded-xl bg-black/40 border-white/5 transition-all">
                   <CardContent className="p-3 md:p-4 flex items-center gap-2 md:gap-3">
-                    <div className="h-8 w-8 md:h-10 md:w-10 rounded-lg bg-kalpix-blue/20 flex items-center justify-center">
-                      <Headphones className="h-5 w-5 text-kalpix-blue" />
+                    <div className="h-8 w-8 md:h-10 md:w-10 rounded-lg bg-opnskin-blue/20 flex items-center justify-center">
+                      <Headphones className="h-5 w-5 text-opnskin-blue" />
                     </div>
                     <div>
                       <h3 className="font-rajdhani font-bold text-sm md:text-base">{t('wallet.support_247')}</h3>
@@ -205,7 +205,7 @@ export default function WalletPage() {
                 <TabsList className="w-full bg-black/40 border border-white/10 mt-2">
                   <TabsTrigger
                     value="history"
-                    className="flex-1 data-[state=active]:bg-kalpix-blue/20 data-[state=active]:text-kalpix-blue"
+                    className="flex-1 data-[state=active]:bg-opnskin-blue/20 data-[state=active]:text-opnskin-blue"
                   >
                     {t('wallet.purchase_history')}
                   </TabsTrigger>

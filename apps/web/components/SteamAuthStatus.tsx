@@ -28,7 +28,7 @@ export default function SteamAuthStatus() {
           setIsRedirecting(true);
           window.location.href = '/api/auth/steam';
         }}
-        className="bg-kalpix-blue hover:bg-kalpix-blue/80 rounded-full p-2 flex items-center justify-center shadow focus:outline-none focus:ring-2 focus:ring-kalpix-blue/60 transition-all w-10 h-10"
+        className="bg-opnskin-blue hover:bg-opnskin-blue/80 rounded-full p-2 flex items-center justify-center shadow focus:outline-none focus:ring-2 focus:ring-opnskin-blue/60 transition-all w-10 h-10"
         aria-label="Se connecter avec Steam"
         disabled={isRedirecting}
       >

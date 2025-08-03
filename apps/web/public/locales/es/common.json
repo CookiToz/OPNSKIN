@@ -127,7 +127,7 @@
   },
   "profile": {
     "login_title": "Inicia sesión con Steam",
-    "login_desc": "Debes iniciar sesión para acceder a tu perfil de Kalpix.",
+    "login_desc": "Debes iniciar sesión para acceder a tu perfil de OPNSKIN.",
     "login_button": "Iniciar sesión con Steam",
     "title": "Mi Perfil",
     "subtitle": "Consulta y gestiona tu perfil, estadísticas y recompensas",
@@ -166,7 +166,7 @@
     "no_history_desc": "Tus transacciones aparecerán aquí una vez que hayas realizado compras o ventas.",
     "payment_methods": "Métodos de pago",
     "purchase_history": "Historial de compras",
-    "kalpix_balance": "Saldo Kalpix",
+    "opnskin_balance": "Saldo OPNSKIN",
     "default_payment_method": "Método de pago predeterminado",
     "crypto_supported": "Ethereum, USDT, Bitcoin",
     "withdraw_funds": "Retirar fondos",

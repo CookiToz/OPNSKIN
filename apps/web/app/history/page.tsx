@@ -93,7 +93,7 @@ export default function HistoryPage() {
           <History className="h-12 w-12 md:h-16 md:w-16 text-white/30 mb-3 md:mb-4" />
           <h2 className="text-xl md:text-2xl font-bold mb-2 font-rajdhani">Aucune transaction</h2>
           <p className="text-white/70 mb-4 md:mb-6 max-w-md text-base md:text-lg">Tu n'as pas de transactions dans cette catégorie.</p>
-          <Button className="bg-kalpix-violet hover:bg-kalpix-violet/80 w-full text-base md:text-lg">
+          <Button className="bg-opnskin-violet hover:bg-opnskin-violet/80 w-full text-base md:text-lg">
             <Store className="mr-2 h-4 w-4" />
             Explorer la marketplace
           </Button>
@@ -168,10 +168,10 @@ export default function HistoryPage() {
         </div>
         <Tabs defaultValue="all">
           <TabsList className="bg-black/40 border border-white/10 flex flex-wrap md:flex-nowrap">
-            <TabsTrigger value="all" className="data-[state=active]:bg-kalpix-blue/20 data-[state=active]:text-kalpix-blue">{t('history.tab_all')}</TabsTrigger>
-            <TabsTrigger value="purchases" className="data-[state=active]:bg-kalpix-blue/20 data-[state=active]:text-kalpix-blue">{t('history.tab_purchases')}</TabsTrigger>
-            <TabsTrigger value="sales" className="data-[state=active]:bg-kalpix-blue/20 data-[state=active]:text-kalpix-blue">{t('history.tab_sales')}</TabsTrigger>
-            <TabsTrigger value="pending" className="data-[state=active]:bg-kalpix-blue/20 data-[state=active]:text-kalpix-blue">{t('history.tab_pending')}</TabsTrigger>
+            <TabsTrigger value="all" className="data-[state=active]:bg-opnskin-blue/20 data-[state=active]:text-opnskin-blue">{t('history.tab_all')}</TabsTrigger>
+            <TabsTrigger value="purchases" className="data-[state=active]:bg-opnskin-blue/20 data-[state=active]:text-opnskin-blue">{t('history.tab_purchases')}</TabsTrigger>
+            <TabsTrigger value="sales" className="data-[state=active]:bg-opnskin-blue/20 data-[state=active]:text-opnskin-blue">{t('history.tab_sales')}</TabsTrigger>
+            <TabsTrigger value="pending" className="data-[state=active]:bg-opnskin-blue/20 data-[state=active]:text-opnskin-blue">{t('history.tab_pending')}</TabsTrigger>
           </TabsList>
           <TabsContent value="all" className="mt-4 md:mt-6">{renderTxList('all')}</TabsContent>
           <TabsContent value="purchases" className="mt-4 md:mt-6">{renderTxList('purchases')}</TabsContent>

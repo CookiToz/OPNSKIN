@@ -194,7 +194,7 @@ export default function SupportChat() {
             <div ref={chatRef} className="max-h-80 overflow-y-auto bg-opnskin-bg-secondary/40 rounded p-3 mb-3 space-y-2">
               {selected.messages.map(msg => (
                 <div key={msg.id} className={`flex ${msg.senderRole === 'USER' ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`rounded-lg px-3 py-2 max-w-xs text-sm shadow ${msg.senderRole === 'USER' ? 'bg-kalpix-blue text-white' : 'bg-white/80 text-black'}`}>
+                  <div className={`rounded-lg px-3 py-2 max-w-xs text-sm shadow ${msg.senderRole === 'USER' ? 'bg-opnskin-blue text-white' : 'bg-white/80 text-black'}`}>
                     {msg.content}
                     <div className="text-xs text-right text-white/60 mt-1">{new Date(msg.createdAt).toLocaleTimeString()}</div>
                   </div>

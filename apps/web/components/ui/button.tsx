@@ -10,15 +10,15 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-kalpix-blue text-primary-foreground hover:bg-kalpix-blue/80 shadow-[0_0_10px_rgba(81,167,194,0.2)]",
+          "bg-opnskin-blue text-primary-foreground hover:bg-opnskin-blue/80 shadow-[0_0_10px_rgba(81,167,194,0.2)]",
         destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
         outline: "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
         secondary:
-          "bg-kalpix-violet text-secondary-foreground hover:bg-kalpix-violet/80 shadow-[0_0_10px_rgba(155,81,224,0.2)]",
+          "bg-opnskin-violet text-secondary-foreground hover:bg-opnskin-violet/80 shadow-[0_0_10px_rgba(155,81,224,0.2)]",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
         success:
-          "bg-kalpix-green text-success-foreground hover:bg-kalpix-green/80 shadow-[0_0_10px_rgba(0,255,163,0.2)]",
+          "bg-opnskin-green text-success-foreground hover:bg-opnskin-green/80 shadow-[0_0_10px_rgba(0,255,163,0.2)]",
         terminal: "bg-black/40 border border-white/10 hover:bg-black/60 hover:border-white/20 backdrop-blur-sm",
       },
       size: {

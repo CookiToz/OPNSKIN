@@ -72,7 +72,7 @@ export default function CartDrawer({ open, onClose }: { open: boolean; onClose: 
 
   return (
     <Drawer open={open} onClose={onClose}>
-      <DrawerContent className="bg-opnskin-bg-card rounded-t-2xl shadow-2xl border-t-4 border-kalpix-violet animate-slide-up">
+      <DrawerContent className="bg-opnskin-bg-card rounded-t-2xl shadow-2xl border-t-4 border-opnskin-violet animate-slide-up">
         <DrawerHeader className="flex items-center justify-between px-6 pt-4 pb-2">
           <DrawerTitle className="flex items-center gap-2 text-2xl font-bold text-opnskin-accent">
             <ShoppingCart className="w-7 h-7" />
@@ -87,7 +87,7 @@ export default function CartDrawer({ open, onClose }: { open: boolean; onClose: 
         <div className="px-6 pb-6 pt-2 min-h-[200px] max-h-[60vh] overflow-y-auto">
           {items.length === 0 ? (
             <div className="text-center text-opnskin-text-secondary py-16">
-              <ShoppingCart className="mx-auto mb-4 w-12 h-12 text-kalpix-violet/60" />
+              <ShoppingCart className="mx-auto mb-4 w-12 h-12 text-opnskin-violet/60" />
               <div className="font-bold text-lg">Votre panier est vide.</div>
               <div className="text-sm mt-2">Ajoutez des skins depuis la marketplace !</div>
             </div>

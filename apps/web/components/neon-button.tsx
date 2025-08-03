@@ -11,10 +11,10 @@ interface NeonButtonProps extends React.ComponentProps<typeof Button> {
 export function NeonButton({ neonColor = "green", glitch = false, children, className, ...props }: NeonButtonProps) {
   const colorClasses = {
     green:
-      "border-kalpix-green text-kalpix-green hover:bg-kalpix-green/10 shadow-[0_0_10px_rgba(0,255,163,0.2)] hover:shadow-[0_0_20px_rgba(0,255,163,0.4)]",
-    blue: "border-kalpix-blue text-kalpix-blue hover:bg-kalpix-blue/10 shadow-[0_0_10px_rgba(81,167,194,0.2)] hover:shadow-[0_0_20px_rgba(81,167,194,0.4)]",
-    violet:
-      "border-kalpix-violet text-kalpix-violet hover:bg-kalpix-violet/10 shadow-[0_0_10px_rgba(155,81,224,0.2)] hover:shadow-[0_0_20px_rgba(155,81,224,0.4)]",
+          "border-opnskin-green text-opnskin-green hover:bg-opnskin-green/10 shadow-[0_0_10px_rgba(0,255,163,0.2)] hover:shadow-[0_0_20px_rgba(0,255,163,0.4)]",
+  blue: "border-opnskin-blue text-opnskin-blue hover:bg-opnskin-blue/10 shadow-[0_0_10px_rgba(81,167,194,0.2)] hover:shadow-[0_0_20px_rgba(81,167,194,0.4)]",
+  violet:
+    "border-opnskin-violet text-opnskin-violet hover:bg-opnskin-violet/10 shadow-[0_0_10px_rgba(155,81,224,0.2)] hover:shadow-[0_0_20px_rgba(155,81,224,0.4)]",
   }
 
   return (
