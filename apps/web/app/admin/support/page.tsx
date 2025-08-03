@@ -103,6 +103,7 @@ export default function AdminSupportPage() {
   const fetchTickets = async () => {
     setLoading(true);
     try {
+      console.log('🔍 Debug fetchTickets - Starting fetch...');
       const res = await fetch("/api/support/admin/tickets");
       console.log('🔍 Debug fetchTickets - status:', res.status);
       
@@ -113,11 +114,19 @@ export default function AdminSupportPage() {
       }
       
       const data = await res.json();
-      console.log('🔍 Debug fetchTickets - data received:', data.length, 'tickets');
-      setTickets(Array.isArray(data) ? data : []);
+      console.log('🔍 Debug fetchTickets - data received:', data);
+      console.log('🔍 Debug fetchTickets - tickets count:', data.length || 0);
+      
+      if (Array.isArray(data)) {
+        setTickets(data);
+        console.log('✅ Tickets set successfully:', data.length);
+      } else {
+        console.error('❌ Data is not an array:', typeof data);
+        setTickets([]);
+      }
     } catch (error) {
       console.error('❌ Error in fetchTickets:', error);
-      // Ne pas rediriger automatiquement, laisser l'utilisateur voir l'erreur
+      setTickets([]);
     } finally {
       setLoading(false);
     }

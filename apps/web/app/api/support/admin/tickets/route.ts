@@ -17,7 +17,7 @@ function createSupabaseClient() {
 export async function GET(req: NextRequest) {
   try {
     // Authentification admin
-    const steamId = req.cookies.get('steamId')?.value;
+    const steamId = req.cookies.get('steamid')?.value; // Corrigé : steamid au lieu de steamId
     console.log('🔍 Debug admin auth - steamId:', steamId);
     
     if (!steamId) {
@@ -66,6 +66,8 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Failed to fetch tickets' }, { status: 500 });
     }
     
+    console.log('📊 Tickets found:', tickets?.length || 0);
+    
     // Trier les messages par date de création et ajouter des priorités par défaut
     const ticketsWithPriority = tickets?.map(ticket => ({
       ...ticket,
@@ -86,7 +88,7 @@ export async function GET(req: NextRequest) {
 export async function PATCH(req: NextRequest) {
   try {
     // Authentification admin
-    const steamId = req.cookies.get('steamId')?.value;
+    const steamId = req.cookies.get('steamid')?.value; // Corrigé : steamid au lieu de steamId
     if (!steamId) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     
     const supabase = createSupabaseClient();
