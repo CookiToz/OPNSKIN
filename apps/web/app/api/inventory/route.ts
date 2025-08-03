@@ -10,10 +10,91 @@ const CACHE_DURATION = 1000 * 60 * 60; // 1 heure
 // Nouveau cache pour les prix Steam par devise
 const steamPriceCache = new Map<string, { [currency: string]: { price: number; timestamp: number } }>();
 const STEAM_CACHE_DURATION = 1000 * 60 * 60 * 6; // 6h
-const STEAM_THROTTLE_DELAY = 200; // 200ms entre requêtes
+const STEAM_THROTTLE_DELAY = 500; // 500ms entre requêtes (augmenté)
+
+// Cache pour les inventaires Steam
+const inventoryCache = new Map<string, { data: any; timestamp: number }>();
+const INVENTORY_CACHE_DURATION = 1000 * 60 * 5; // 5 minutes
+
+// Limitation de débit par utilisateur
+const userRateLimit = new Map<string, { lastRequest: number; requestCount: number }>();
+const RATE_LIMIT_WINDOW = 1000 * 60; // 1 minute
+const MAX_REQUESTS_PER_WINDOW = 3; // 3 requêtes max par minute par utilisateur
 
 let lastInventoryFetch = 0;
-const INVENTORY_MIN_INTERVAL = 5000; // 5 seconds between inventory fetches
+const INVENTORY_MIN_INTERVAL = 10000; // 10 seconds between inventory fetches (augmenté)
+
+// Fonction de limitation de débit par utilisateur
+function checkRateLimit(steamId: string): { allowed: boolean; retryAfter?: number } {
+  const now = Date.now();
+  const userLimit = userRateLimit.get(steamId);
+  
+  if (!userLimit) {
+    userRateLimit.set(steamId, { lastRequest: now, requestCount: 1 });
+    return { allowed: true };
+  }
+  
+  // Réinitialiser le compteur si la fenêtre est expirée
+  if (now - userLimit.lastRequest > RATE_LIMIT_WINDOW) {
+    userRateLimit.set(steamId, { lastRequest: now, requestCount: 1 });
+    return { allowed: true };
+  }
+  
+  // Vérifier si l'utilisateur a dépassé la limite
+  if (userLimit.requestCount >= MAX_REQUESTS_PER_WINDOW) {
+    const retryAfter = RATE_LIMIT_WINDOW - (now - userLimit.lastRequest);
+    return { allowed: false, retryAfter };
+  }
+  
+  // Incrémenter le compteur
+  userLimit.requestCount++;
+  return { allowed: true };
+}
+
+// Fonction pour récupérer l'inventaire avec cache
+async function getInventoryWithCache(steamId: string, appid: string, gameConfig: any): Promise<any> {
+  const cacheKey = `${steamId}-${appid}`;
+  const now = Date.now();
+  const cached = inventoryCache.get(cacheKey);
+  
+  // Retourner le cache si il est encore valide
+  if (cached && now - cached.timestamp < INVENTORY_CACHE_DURATION) {
+    console.log(`[INVENTORY] Using cached data for ${gameConfig.name}`);
+    return cached.data;
+  }
+  
+  // Sinon, faire la requête Steam
+  const url = `https://steamcommunity.com/inventory/${steamId}/${appid}/${gameConfig.contextid}?l=english&count=1000`;
+  
+  console.log(`[INVENTORY] Fetching ${gameConfig.name} inventory for SteamID: ${steamId}`);
+  
+  const response = await fetch(url, {
+    headers: {
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+      'Accept': 'application/json, text/plain, */*',
+      'Accept-Language': 'en-US,en;q=0.9',
+      'Accept-Encoding': 'gzip, deflate, br',
+      'DNT': '1',
+      'Connection': 'keep-alive',
+      'Sec-Fetch-Dest': 'empty',
+      'Sec-Fetch-Mode': 'cors',
+      'Sec-Fetch-Site': 'cross-site',
+      'Cache-Control': 'no-cache',
+      'Pragma': 'no-cache'
+    }
+  });
+  
+  if (!response.ok) {
+    throw new Error(`Steam API error: ${response.status} ${response.statusText}`);
+  }
+  
+  const data = await response.json();
+  
+  // Mettre en cache
+  inventoryCache.set(cacheKey, { data, timestamp: now });
+  
+  return data;
+}
 
 async function getMarketData(name: string): Promise<{ price: number; float?: number; link?: string }> {
   const now = Date.now();
@@ -119,16 +200,26 @@ async function getSteamMarketPrice(name: string, currency: string): Promise<numb
 }
 
 export async function GET(req: NextRequest) {
+  const steamId = req.cookies.get('steamid')?.value;
+  if (!steamId) {
+    return NextResponse.json({ error: 'Non connecté à Steam' }, { status: 401 });
+  }
+
+  // Vérifier la limitation de débit par utilisateur
+  const rateLimit = checkRateLimit(steamId);
+  if (!rateLimit.allowed) {
+    return NextResponse.json({ 
+      error: 'Rate limit exceeded. Please wait before retrying.',
+      retryAfter: rateLimit.retryAfter 
+    }, { status: 429 });
+  }
+
+  // Vérifier la limitation globale
   const now = Date.now();
   if (now - lastInventoryFetch < INVENTORY_MIN_INTERVAL) {
     return NextResponse.json({ error: 'Rate limit exceeded. Please wait before retrying.' }, { status: 429 });
   }
   lastInventoryFetch = now;
-
-  const steamId = req.cookies.get('steamid')?.value;
-  if (!steamId) {
-    return NextResponse.json({ error: 'Non connecté à Steam' }, { status: 401 });
-  }
 
   // Récupère la devise et l'appid demandés dans l'URL
   const { searchParams } = new URL(req.url);
@@ -148,54 +239,10 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Jeu non supporté' }, { status: 400 });
   }
 
-  const url = `https://steamcommunity.com/inventory/${steamId}/${appid}/${gameConfig.contextid}?l=english&count=1000`;
-
-  console.log(`[INVENTORY] Fetching ${gameConfig.name} inventory for SteamID: ${steamId}`);
-
   try {
-    const response = await fetch(url, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Accept': 'application/json, text/plain, */*',
-        'Accept-Language': 'en-US,en;q=0.9',
-        'Accept-Encoding': 'gzip, deflate, br',
-        'DNT': '1',
-        'Connection': 'keep-alive',
-        'Sec-Fetch-Dest': 'empty',
-        'Sec-Fetch-Mode': 'cors',
-        'Sec-Fetch-Site': 'cross-site',
-        'Cache-Control': 'no-cache',
-        'Pragma': 'no-cache'
-      }
-    });
+    // Utiliser la fonction avec cache
+    const data = await getInventoryWithCache(steamId, appid, gameConfig);
 
-    console.log(`[INVENTORY] Response status for ${gameConfig.name}:`, response.status, response.statusText);
-
-    if (!response.ok) {
-      console.error(`[INVENTORY] Steam API error for ${gameConfig.name}:`, response.status, response.statusText);
-      
-      // Gestion spécifique des erreurs Steam
-      if (response.status === 403) {
-        return NextResponse.json({ 
-          error: `Inventaire ${gameConfig.name} privé ou non accessible. Vérifiez que votre profil Steam est public.`,
-          game: gameConfig.name 
-        }, { status: 403 });
-      }
-      
-      if (response.status === 404) {
-        return NextResponse.json({ 
-          error: `Aucun inventaire ${gameConfig.name} trouvé pour ce compte Steam.`,
-          game: gameConfig.name 
-        }, { status: 404 });
-      }
-      
-      return NextResponse.json({ 
-        error: `Erreur Steam (${response.status}): ${response.statusText}`,
-        game: gameConfig.name 
-      }, { status: response.status });
-    }
-
-    const data = await response.json();
     console.log(`[INVENTORY] Data received for ${gameConfig.name}:`, {
       hasAssets: !!data?.assets,
       hasDescriptions: !!data?.descriptions,
@@ -261,11 +308,20 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    // Parallélisation contrôlée des fetchs de prix
-    const limit = pLimit(8); // 8 fetchs max en parallèle
+    // Parallélisation contrôlée des fetchs de prix avec délai augmenté
+    const limit = pLimit(4); // Réduit de 8 à 4 fetchs max en parallèle
     await Promise.all(
-      namesToFetch.map(name =>
-        limit(() => getSteamMarketPrice(name, currency).then(price => { priceMap[name] = price; }))
+      namesToFetch.map((name, index) =>
+        limit(() => 
+          new Promise(resolve => {
+            setTimeout(() => {
+              getSteamMarketPrice(name, currency).then(price => { 
+                priceMap[name] = price; 
+                resolve(undefined);
+              });
+            }, index * STEAM_THROTTLE_DELAY); // Délai progressif entre les requêtes
+          })
+        )
       )
     );
 
@@ -296,8 +352,24 @@ export async function GET(req: NextRequest) {
     });
 
     return NextResponse.json({ items });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Erreur lors du chargement de l'inventaire Steam", error);
+    
+    // Gestion spécifique des erreurs Steam
+    if (error.message?.includes('403')) {
+      return NextResponse.json({ 
+        error: `Inventaire ${gameConfig.name} privé ou non accessible. Vérifiez que votre profil Steam est public.`,
+        game: gameConfig.name 
+      }, { status: 403 });
+    }
+    
+    if (error.message?.includes('404')) {
+      return NextResponse.json({ 
+        error: `Aucun inventaire ${gameConfig.name} trouvé pour ce compte Steam.`,
+        game: gameConfig.name 
+      }, { status: 404 });
+    }
+    
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 }

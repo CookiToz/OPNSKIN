@@ -7,12 +7,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useTranslation } from 'next-i18next';
-import { useInventory } from "@/components/InventoryProvider";
+import { useTranslation } from 'react-i18next';
+import { useInventory } from "@/hooks/use-inventory";
 import { useFloat } from "@/components/FloatProvider";
 import SkinCard from '@/components/SkinCard';
 import { motion, AnimatePresence } from "framer-motion";
-import { RefreshCw, Tag, ExternalLink, Filter, X, Loader2 } from 'lucide-react';
+import { RefreshCw, Tag, ExternalLink, Filter, X, Loader2, AlertCircle } from 'lucide-react';
 import { useCurrencyStore } from '@/hooks/use-currency-store';
 import { useCryptoRatesStore } from '@/hooks/use-currency-store';
 import { formatPrice } from '@/lib/utils';
@@ -90,7 +90,13 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
   const { t } = useTranslation('common');
   const { toast } = useToast();
   const [hasRequestedLoad, setHasRequestedLoad] = useState(false);
-  const { items, isLoading, isError, errorMsg, refetch } = useInventory(hasRequestedLoad ? (game?.appid ? String(game.appid) : undefined) : undefined);
+  
+  // Utiliser le nouveau hook optimisé
+  const { items, loading: isLoading, error: errorMsg, refresh: refetch } = useInventory({
+    appid: hasRequestedLoad ? String(game?.appid) : undefined,
+    autoRefresh: false
+  });
+  
   const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
   const [sellDialogOpen, setSellDialogOpen] = useState(false);
   const [sellPrice, setSellPrice] = useState('');
@@ -443,46 +449,40 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
             </button>
           )}
         </div>
-      ) : isError ? (
+      ) : errorMsg ? (
         <div className="flex flex-col items-center justify-center py-16 space-y-6">
           <div className="text-red-500 text-lg font-bold text-center">
-            {errorMsg?.includes('Rate limit') ? (
-              <>
-                <div className="text-xl mb-2">⚠️ Limite de requêtes atteinte</div>
-                <div className="text-sm text-opnskin-text-secondary">
-                  Steam limite le nombre de requêtes. Veuillez attendre quelques minutes avant de réessayer.
+            <AlertCircle className="w-12 h-12 mx-auto mb-4" />
+            {errorMsg.includes('Limite de requêtes') ? (
+              <div className="space-y-2">
+                <div>⚠️ Trop de requêtes vers Steam</div>
+                <div className="text-sm text-gray-500">
+                  Steam limite le nombre de requêtes. Veuillez patienter avant de rafraîchir.
                 </div>
-              </>
+                <Button 
+                  onClick={() => refetch()} 
+                  variant="outline" 
+                  className="mt-4"
+                  disabled={isLoading}
+                >
+                  {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+                  Réessayer
+                </Button>
+              </div>
             ) : (
-              errorMsg || t('inventory.error_loading', "Erreur lors du chargement de l'inventaire")
-            )}
-          </div>
-          <div className="text-opnskin-text-secondary text-sm text-center max-w-md">
-            {errorMsg?.includes('privé') && (
-              <p>Votre inventaire Steam est privé. Allez dans les paramètres de votre profil Steam et rendez votre inventaire public.</p>
-            )}
-            {errorMsg?.includes('404') && (
-              <p>Vous n'avez pas d'inventaire pour ce jeu ou votre profil Steam n'est pas accessible.</p>
-            )}
-            {errorMsg?.includes('Rate limit') && (
-              <p>Cette erreur est temporaire. Steam limite les requêtes pour éviter la surcharge de leurs serveurs.</p>
-            )}
-          </div>
-          <div className="flex flex-col sm:flex-row gap-4">
-            <Button 
-              onClick={handleRefreshInventory} 
-              className="btn-opnskin"
-              disabled={errorMsg?.includes('Rate limit')}
-            >
-              {errorMsg?.includes('Rate limit') ? 'Attendre...' : t('inventory.retry')}
-            </Button>
-            {onBack && (
-              <button 
-                onClick={onBack} 
-                className="btn-opnskin-secondary flex items-center gap-2"
-              >
-                ← {t('inventory.back_to_games', 'Retour aux jeux')}
-              </button>
+              <div className="space-y-2">
+                <div>❌ Erreur de chargement</div>
+                <div className="text-sm text-gray-500">{errorMsg}</div>
+                <Button 
+                  onClick={() => refetch()} 
+                  variant="outline" 
+                  className="mt-4"
+                  disabled={isLoading}
+                >
+                  {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+                  Réessayer
+                </Button>
+              </div>
             )}
           </div>
         </div>
