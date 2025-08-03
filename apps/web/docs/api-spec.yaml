@@ -1,0 +1,361 @@
+openapi: 3.0.3
+info:
+  title: OPNSKIN API
+  description: API pour la marketplace de skins OPNSKIN
+  version: 1.0.0
+  contact:
+    name: Support OPNSKIN
+    email: support@opnskin.com
+
+servers:
+  - url: http://localhost:3000/api
+    description: Serveur de développement
+  - url: https://api.opnskin.com
+    description: Serveur de production
+
+security:
+  - cookieAuth: []
+
+paths:
+  /users/me:
+    get:
+      summary: Récupérer les informations de l'utilisateur connecté
+      description: Retourne les informations de l'utilisateur actuellement connecté
+      responses:
+        '200':
+          description: Informations utilisateur récupérées avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '401':
+          description: Utilisateur non authentifié
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    
+    put:
+      summary: Mettre à jour le profil utilisateur
+      description: Met à jour les informations du profil utilisateur
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tradeUrl:
+                  type: string
+                  format: uri
+                  description: URL Steam Trade
+                email:
+                  type: string
+                  format: email
+                  description: Adresse email
+      responses:
+        '200':
+          description: Profil mis à jour avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          description: Données invalides
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /offers:
+    get:
+      summary: Lister les offres
+      description: Récupère la liste des offres disponibles
+      parameters:
+        - name: game
+          in: query
+          description: Jeu pour filtrer les offres
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: Nombre maximum d'offres à retourner
+          schema:
+            type: integer
+            default: 50
+        - name: offset
+          in: query
+          description: Nombre d'offres à ignorer
+          schema:
+            type: integer
+            default: 0
+      responses:
+        '200':
+          description: Liste des offres récupérée avec succès
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Offer'
+    
+    post:
+      summary: Créer une nouvelle offre
+      description: Crée une nouvelle offre de vente
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - itemId
+                - itemName
+                - price
+                - game
+              properties:
+                itemId:
+                  type: string
+                  description: ID de l'item Steam
+                itemName:
+                  type: string
+                  description: Nom de l'item
+                itemImage:
+                  type: string
+                  format: uri
+                  description: URL de l'image de l'item
+                rarityCode:
+                  type: string
+                  description: Code de rareté de l'item
+                price:
+                  type: number
+                  minimum: 0.01
+                  description: Prix de vente
+                game:
+                  type: string
+                  description: Jeu de l'item
+      responses:
+        '201':
+          description: Offre créée avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Offer'
+        '400':
+          description: Données invalides
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Utilisateur non authentifié
+
+  /cart:
+    get:
+      summary: Récupérer le panier
+      description: Récupère les items dans le panier de l'utilisateur
+      responses:
+        '200':
+          description: Panier récupéré avec succès
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CartItem'
+    
+    post:
+      summary: Ajouter un item au panier
+      description: Ajoute un item au panier de l'utilisateur
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - offerId
+              properties:
+                offerId:
+                  type: string
+                  description: ID de l'offre à ajouter
+      responses:
+        '201':
+          description: Item ajouté au panier avec succès
+        '400':
+          description: Données invalides
+        '401':
+          description: Utilisateur non authentifié
+
+  /transactions:
+    post:
+      summary: Créer une transaction
+      description: Crée une nouvelle transaction d'achat
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - offerId
+              properties:
+                offerId:
+                  type: string
+                  description: ID de l'offre à acheter
+      responses:
+        '201':
+          description: Transaction créée avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'
+        '400':
+          description: Données invalides ou offre non disponible
+        '401':
+          description: Utilisateur non authentifié
+        '402':
+          description: Solde insuffisant
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        steamId:
+          type: string
+        name:
+          type: string
+        avatar:
+          type: string
+          format: uri
+        profileUrl:
+          type: string
+          format: uri
+        tradeUrl:
+          type: string
+          format: uri
+        email:
+          type: string
+          format: email
+        walletBalance:
+          type: number
+        isAdmin:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+
+    UserResponse:
+      type: object
+      properties:
+        loggedIn:
+          type: boolean
+        user:
+          $ref: '#/components/schemas/User'
+
+    Offer:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        sellerId:
+          type: string
+          format: uuid
+        itemId:
+          type: string
+        itemName:
+          type: string
+        itemImage:
+          type: string
+          format: uri
+        rarityCode:
+          type: string
+        game:
+          type: string
+        price:
+          type: number
+        status:
+          type: string
+          enum: [AVAILABLE, PENDING_TRADE_OFFER, COMPLETED, EXPIRED]
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        seller:
+          $ref: '#/components/schemas/User'
+
+    CartItem:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        offerId:
+          type: string
+          format: uuid
+        addedAt:
+          type: string
+          format: date-time
+        offer:
+          $ref: '#/components/schemas/Offer'
+
+    Transaction:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        buyerId:
+          type: string
+          format: uuid
+        sellerId:
+          type: string
+          format: uuid
+        offerId:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [PENDING, IN_ESCROW, RELEASED, REFUNDED, CANCELLED]
+        amount:
+          type: number
+        currency:
+          type: string
+        startedAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: string
+          format: date-time
+        buyer:
+          $ref: '#/components/schemas/User'
+        seller:
+          $ref: '#/components/schemas/User'
+        offer:
+          $ref: '#/components/schemas/Offer'
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        code:
+          type: string
+        status:
+          type: integer
+
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: steamid 

@@ -37,6 +37,7 @@ model Offer {
   itemId      String
   itemName    String?
   itemImage   String?
+  rarityCode  String?
   game        String?
   price       Float
   status      OfferStatus  @default(AVAILABLE)
@@ -105,6 +106,7 @@ model SupportTicket {
   userId      String           @db.Uuid
   subject     String
   status      TicketStatus     @default(OPEN)
+  priority    TicketPriority   @default(MEDIUM)
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @default(now()) @updatedAt
   messages    SupportMessage[]
@@ -152,6 +154,12 @@ enum TicketStatus {
   OPEN
   RESOLVED
   CLOSED
+}
+
+enum TicketPriority {
+  LOW
+  MEDIUM
+  HIGH
 }
 
 enum SupportRole {

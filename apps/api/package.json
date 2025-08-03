@@ -1,0 +1,33 @@
+{
+  "name": "@opnskin/api",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@opnskin/types": "workspace:*",
+    "@opnskin/utils": "workspace:*",
+    "@prisma/client": "^6.11.1",
+    "@supabase/supabase-js": "^2.50.4",
+    "express": "^5.1.0",
+    "express-session": "^1.18.1",
+    "next": "^15.3.1",
+    "next-connect": "^1.0.0",
+    "passport": "^0.7.0",
+    "passport-steam": "^1.0.18"
+  },
+  "devDependencies": {
+    "@types/express-session": "^1.18.1",
+    "@types/node": "^22.14.1",
+    "@types/passport-steam": "^1.0.6",
+    "eslint": "9.30.1",
+    "eslint-config-next": "15.3.5",
+    "prisma": "^6.11.1",
+    "typescript": "5.8.3"
+  }
+} 
