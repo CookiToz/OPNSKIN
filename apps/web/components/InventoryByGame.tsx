@@ -92,7 +92,15 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
   const [hasRequestedLoad, setHasRequestedLoad] = useState(false);
   
   // Utiliser le nouveau hook optimisé
-  const { items, loading: isLoading, error: errorMsg, refresh: refetch } = useInventory({
+  const { 
+    items, 
+    loading: isLoading, 
+    error: errorMsg, 
+    refresh: refetch,
+    lastUpdated,
+    stale,
+    cacheMessage
+  } = useInventory({
     appid: hasRequestedLoad ? String(game?.appid) : undefined,
     autoRefresh: false
   });
@@ -421,6 +429,34 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
           </Button>
         </div>
       </div>
+
+      {/* Affichage des informations de cache */}
+      {hasRequestedLoad && !isLoading && !errorMsg && (
+        <div className="w-full max-w-6xl mb-6">
+          <div className="flex items-center justify-between text-sm text-opnskin-text-secondary">
+            <div className="flex items-center gap-4">
+              {stale && (
+                <Badge variant="secondary" className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30">
+                  ⚠️ Cache ancien
+                </Badge>
+              )}
+              {lastUpdated > 0 && (
+                <span>
+                  Mis à jour il y a {lastUpdated} secondes
+                </span>
+              )}
+              {cacheMessage && (
+                <span className="text-yellow-400">
+                  {cacheMessage}
+                </span>
+              )}
+            </div>
+            <div className="flex items-center gap-2">
+              <span>Total: {filteredItems.length} items</span>
+            </div>
+          </div>
+        </div>
+      )}
 
       {!hasRequestedLoad ? (
         <div className="flex flex-col items-center justify-center py-16 space-y-6">

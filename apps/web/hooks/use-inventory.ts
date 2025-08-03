@@ -18,6 +18,14 @@ interface UseInventoryOptions {
   refreshInterval?: number;
 }
 
+interface InventoryResponse {
+  items: InventoryItem[];
+  lastUpdated: number;
+  stale?: boolean;
+  message?: string;
+  success: boolean;
+}
+
 export function useInventory(options: UseInventoryOptions = {}) {
   const { appid = '730', currency = 'EUR', autoRefresh = false, refreshInterval = 300000 } = options;
   const { user } = useUser();
@@ -25,9 +33,12 @@ export function useInventory(options: UseInventoryOptions = {}) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [lastFetch, setLastFetch] = useState<number>(0);
+  const [lastUpdated, setLastUpdated] = useState<number>(0);
+  const [stale, setStale] = useState<boolean>(false);
+  const [cacheMessage, setCacheMessage] = useState<string | null>(null);
 
   // Cache côté client
-  const [cache, setCache] = useState<Map<string, { data: InventoryItem[]; timestamp: number }>>(new Map());
+  const [cache, setCache] = useState<Map<string, { data: InventoryResponse; timestamp: number }>>(new Map());
   const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
   const fetchInventory = useCallback(async (force = false) => {
@@ -42,7 +53,10 @@ export function useInventory(options: UseInventoryOptions = {}) {
 
     // Utiliser le cache si il est encore valide et qu'on ne force pas
     if (!force && cached && now - cached.timestamp < CACHE_DURATION) {
-      setItems(cached.data);
+      setItems(cached.data.items);
+      setLastUpdated(cached.data.lastUpdated);
+      setStale(cached.data.stale || false);
+      setCacheMessage(cached.data.message || null);
       setError(null);
       return;
     }
@@ -55,9 +69,11 @@ export function useInventory(options: UseInventoryOptions = {}) {
 
     setLoading(true);
     setError(null);
+    setStale(false);
+    setCacheMessage(null);
 
     try {
-      const response = await fetch(`/api/inventory?appid=${appid}&currency=${currency}`);
+      const response = await fetch(`/api/inventory-cache?appid=${appid}&currency=${currency}`);
       
       if (response.status === 429) {
         const errorData = await response.json();
@@ -71,12 +87,20 @@ export function useInventory(options: UseInventoryOptions = {}) {
         return;
       }
 
-      const data = await response.json();
-      setItems(data.items || []);
+      const data: InventoryResponse = await response.json();
       
-      // Mettre en cache
-      setCache(prev => new Map(prev).set(cacheKey, { data: data.items || [], timestamp: now }));
-      setLastFetch(now);
+      if (data.success) {
+        setItems(data.items || []);
+        setLastUpdated(data.lastUpdated || 0);
+        setStale(data.stale || false);
+        setCacheMessage(data.message || null);
+        
+        // Mettre en cache
+        setCache(prev => new Map(prev).set(cacheKey, { data, timestamp: now }));
+        setLastFetch(now);
+      } else {
+        setError(data.message || 'Erreur lors du chargement de l\'inventaire');
+      }
     } catch (err) {
       setError('Erreur réseau lors du chargement de l\'inventaire');
     } finally {
@@ -111,6 +135,9 @@ export function useInventory(options: UseInventoryOptions = {}) {
     loading,
     error,
     refresh,
-    lastFetch
+    lastFetch,
+    lastUpdated,
+    stale,
+    cacheMessage
   };
 } 

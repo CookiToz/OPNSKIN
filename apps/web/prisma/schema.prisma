@@ -124,6 +124,19 @@ model SupportMessage {
   sender      User             @relation(fields: [senderId], references: [id])
 }
 
+model InventoryCache {
+  id        String   @id @default(cuid())
+  steamId   String   @unique
+  data      Json     // Stockage des données d'inventaire
+  updatedAt DateTime @default(now())
+  gameId    String   // Pour différencier les jeux (730, 570, etc.)
+  currency  String   // Pour différencier les devises (EUR, USD, etc.)
+
+  @@unique([steamId, gameId, currency])
+  @@index([steamId])
+  @@index([updatedAt])
+}
+
 enum OfferStatus {
   AVAILABLE
   PENDING_TRADE_OFFER
