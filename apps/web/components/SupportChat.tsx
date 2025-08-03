@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Send, Plus, CheckCircle, MessageCircle } from 'lucide-react';
+import { useUser } from '@/components/UserProvider';
 
 // Types minimalistes pour le chat support
 interface SupportTicket {
@@ -24,6 +25,7 @@ interface SupportMessage {
 }
 
 export default function SupportChat() {
+  const { user } = useUser();
   const [tickets, setTickets] = useState<SupportTicket[]>([]);
   const [loading, setLoading] = useState(true);
   const [showNew, setShowNew] = useState(false);
@@ -95,16 +97,36 @@ export default function SupportChat() {
   };
 
   const handleResolve = async () => {
-    if (!selected) return;
+    if (!selected || !user?.isAdmin) return;
     setResolving(true);
-    await fetch(`/api/support/tickets/${selected.id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status: "RESOLVED" }),
-    });
-    fetchTickets();
-    setSelected(null);
-    setResolving(false);
+    
+    try {
+      console.log('🔍 Debug handleResolve - Admin resolving ticket:', selected.id);
+      
+      const res = await fetch(`/api/support/tickets/${selected.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "RESOLVED" }),
+      });
+      
+      console.log('🔍 Debug handleResolve - Response status:', res.status);
+      
+      if (!res.ok) {
+        const errorData = await res.json();
+        console.error('❌ Error resolving ticket:', errorData);
+        alert(`Erreur lors de la résolution du ticket: ${errorData.error}`);
+        return;
+      }
+      
+      console.log('✅ Ticket resolved successfully by admin');
+      await fetchTickets();
+      setSelected(null);
+    } catch (error) {
+      console.error('❌ Error in handleResolve:', error);
+      alert('Erreur lors de la résolution du ticket');
+    } finally {
+      setResolving(false);
+    }
   };
 
   // Auto-scroll chat
@@ -215,9 +237,9 @@ export default function SupportChat() {
                 </Button>
               </form>
             )}
-            {selected.status === 'OPEN' && (
+            {selected.status === 'OPEN' && user?.isAdmin && (
               <Button onClick={handleResolve} disabled={resolving} variant="outline" className="mt-3 w-full flex items-center gap-2">
-                <CheckCircle className="w-4 h-4" /> Marquer comme résolu
+                <CheckCircle className="w-4 h-4" /> Marquer comme résolu (Admin)
               </Button>
             )}
           </CardContent>

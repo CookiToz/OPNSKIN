@@ -45,9 +45,28 @@ export async function PATCH(req: NextRequest, { params }: { params: { ticketId: 
       return NextResponse.json({ error: 'Ticket not found' }, { status: 404 });
     }
     
-    // Seuls les admins ou le propriétaire du ticket peuvent le modifier
-    if (!user.isAdmin && ticket.userId !== user.id) {
-      return NextResponse.json({ error: 'Not authorized' }, { status: 403 });
+    // Vérifier les autorisations selon le type de modification
+    if (status === 'RESOLVED' || status === 'CLOSED') {
+      // Seuls les admins peuvent résoudre ou fermer un ticket
+      if (!user.isAdmin) {
+        return NextResponse.json({ 
+          error: 'Seuls les administrateurs peuvent marquer un ticket comme résolu ou fermé' 
+        }, { status: 403 });
+      }
+    } else if (status === 'OPEN') {
+      // Le propriétaire du ticket ou un admin peut rouvrir un ticket
+      if (!user.isAdmin && ticket.userId !== user.id) {
+        return NextResponse.json({ 
+          error: 'Vous n\'êtes pas autorisé à modifier ce ticket' 
+        }, { status: 403 });
+      }
+    } else {
+      // Pour les autres modifications, vérifier les autorisations standard
+      if (!user.isAdmin && ticket.userId !== user.id) {
+        return NextResponse.json({ 
+          error: 'Vous n\'êtes pas autorisé à modifier ce ticket' 
+        }, { status: 403 });
+      }
     }
     
     // Préparer les données de mise à jour

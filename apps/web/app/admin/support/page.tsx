@@ -163,14 +163,34 @@ export default function AdminSupportPage() {
   const handleResolve = async () => {
     if (!selected) return;
     setResolving(true);
-    await fetch(`/api/support/tickets/${selected.id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status: "RESOLVED" }),
-    });
-    fetchTickets();
-    setSelected(null);
-    setResolving(false);
+    
+    try {
+      console.log('🔍 Debug handleResolve - Resolving ticket:', selected.id);
+      
+      const res = await fetch(`/api/support/tickets/${selected.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "RESOLVED" }),
+      });
+      
+      console.log('🔍 Debug handleResolve - Response status:', res.status);
+      
+      if (!res.ok) {
+        const errorData = await res.json();
+        console.error('❌ Error resolving ticket:', errorData);
+        alert(`Erreur lors de la résolution du ticket: ${errorData.error}`);
+        return;
+      }
+      
+      console.log('✅ Ticket resolved successfully');
+      await fetchTickets();
+      setSelected(null);
+    } catch (error) {
+      console.error('❌ Error in handleResolve:', error);
+      alert('Erreur lors de la résolution du ticket');
+    } finally {
+      setResolving(false);
+    }
   };
 
   const getPriorityColor = (priority: string) => {
