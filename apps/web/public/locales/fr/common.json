@@ -86,6 +86,11 @@
     "weapon_m4a4": "M4A4",
     "weapon_awp": "AWP",
     "badge_rare": "Rare",
+    "badge_ancient": "Ancien",
+    "badge_legendary": "Légendaire",
+    "badge_mythic": "Mythique",
+    "badge_uncommon": "Peu commun",
+    "badge_common": "Commun",
     "go_to_marketplace": "Voir sur la marketplace"
   },
   "marketplace": {
