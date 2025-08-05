@@ -235,13 +235,7 @@ export default function Home() {
 
       <section className="py-10 md:py-16">
         <div className="container px-2 md:px-4">
-          {/* Titre Skins populaires */}
-          <div className="flex flex-col md:flex-row justify-between items-center mb-6 md:mb-8">
-            <h2 className="text-2xl md:text-3xl font-bold font-satoshi-bold mb-4 md:mb-0">
-              {t('home.popular_title_1')} <span className="neon-text">{t('home.popular_title_2')}</span>
-            </h2>
-          </div>
-            <PopularSkins />
+          <PopularSkins />
         </div>
       </section>
 
