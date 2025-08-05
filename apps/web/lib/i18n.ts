@@ -21,9 +21,14 @@ if (!i18n.isInitialized) {
       },
       backend: {
         loadPath: "/locales/{{lng}}/{{ns}}.json",
+        requestOptions: {
+          cache: 'default'
+        }
       },
-      debug: process.env.NODE_ENV === 'development',
-      initImmediate: false,
+      debug: false, // Désactivé pour la production
+      initImmediate: true, // Changé à true pour un chargement immédiat
+      preload: ['fr'], // Précharger le français
+      load: 'languageOnly', // Charger seulement la langue, pas la région
     });
 }
 

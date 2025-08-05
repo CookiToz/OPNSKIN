@@ -12,6 +12,7 @@ import Marketplace3DGallery from '@/components/Marketplace3DGallery';
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from '@/components/ui/carousel';
 import FeeProgressionChart from '@/components/FeeProgressionChart';
 import PopularSkins from '@/components/PopularSkins';
+import { PageLoading, SectionLoading } from '@/components/ui/loading';
 import { formatPrice } from '@/lib/utils';
 import { useCurrencyStore, useCryptoRatesStore } from '@/hooks/use-currency-store';
 import { cryptoIcons } from '@/lib/utils';
@@ -69,10 +70,9 @@ export default function Home() {
     };
   }, [bgIndex, skinImages.length]);
 
-  if (!ready) return null; // ou un loader si tu préfères
-  if (isLoading) return <div>Chargement…</div>;
-  if (isError) return <div>Erreur de connexion</div>;
-
+  // Afficher le contenu immédiatement, sans loader
+  if (!ready) return null;
+  
   return (
     <div className="relative min-h-screen">
       {/* HERO SECTION avec fond animé */}

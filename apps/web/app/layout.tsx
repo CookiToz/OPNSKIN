@@ -58,6 +58,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="fr" suppressHydrationWarning>
+      <head>
+        {/* Précharger les ressources critiques */}
+        <link rel="preload" href="/locales/fr/common.json" as="fetch" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="//api.opnskin.com" />
+      </head>
       <body className={`${satoshiBold.variable} ${satoshiRegular.variable} ${shareTechMono.variable} ${inter.className} font-sans bg-background`}>
         <I18nProvider>
           <UserProvider>

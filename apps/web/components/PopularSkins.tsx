@@ -11,6 +11,7 @@ import { cryptoIcons } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 import Link from 'next/link';
 import { Loader2 } from 'lucide-react';
+import { Loading, GridLoading } from '@/components/ui/loading';
 
 interface PopularSkin {
   id: string;
@@ -32,9 +33,10 @@ export default function PopularSkins({ limit = 8 }: PopularSkinsProps) {
   const { currency } = useCurrencyStore();
   const cryptoRates = useCryptoRatesStore();
   const [skins, setSkins] = useState<PopularSkin[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false); // Changé à false par défaut
   const [error, setError] = useState<string | null>(null);
   const [activeGame, setActiveGame] = useState('730'); // CS2 par défaut
+  const [hasLoaded, setHasLoaded] = useState(false);
 
   const gameConfigs = {
     '730': { name: 'CS2', key: 'cs2' },
@@ -61,6 +63,7 @@ export default function PopularSkins({ limit = 8 }: PopularSkinsProps) {
       console.log(`[POPULAR SKINS] Received ${data.length} skins for ${game}`);
       
       setSkins(data);
+      setHasLoaded(true);
     } catch (err: any) {
       console.error('[POPULAR SKINS] Error:', err);
       setError(err.message || 'Erreur lors du chargement des skins populaires');
@@ -71,10 +74,10 @@ export default function PopularSkins({ limit = 8 }: PopularSkinsProps) {
   };
 
   useEffect(() => {
-    if (ready) {
+    if (ready && !hasLoaded) {
       fetchPopularSkins(activeGame);
     }
-  }, [ready, activeGame, limit]);
+  }, [ready, activeGame, limit, hasLoaded]);
 
   const handleGameChange = (gameKey: string) => {
     const gameId = Object.entries(gameConfigs).find(([_, config]) => config.key === gameKey)?.[0] || '730';
@@ -140,21 +143,29 @@ export default function PopularSkins({ limit = 8 }: PopularSkinsProps) {
           {Object.entries(gameConfigs).map(([gameId, config]) => (
             <TabsContent key={config.key} value={config.key} className="mt-4 md:mt-6">
               {loading ? (
-                <div className="flex justify-center items-center py-12">
-                  <Loader2 className="w-8 h-8 animate-spin text-opnskin-primary" />
+                <div className="py-12">
+                  <GridLoading count={8} />
                 </div>
               ) : error ? (
                 <div className="text-center py-12">
-                  <p className="text-red-400 mb-4">{error}</p>
-                  <Button onClick={() => fetchPopularSkins(activeGame)} variant="outline">
-                    Réessayer
-                  </Button>
+                  <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-6 max-w-md mx-auto">
+                    <h3 className="text-red-400 font-semibold mb-2">Erreur de chargement</h3>
+                    <p className="text-opnskin-text-secondary mb-4">{error}</p>
+                    <Button onClick={() => fetchPopularSkins(activeGame)} variant="outline" size="sm">
+                      Réessayer
+                    </Button>
+                  </div>
                 </div>
               ) : skins.length === 0 ? (
                 <div className="text-center py-12">
-                  <p className="text-opnskin-text-secondary">
-                    Aucun skin populaire disponible pour {config.name} pour le moment.
-                  </p>
+                  <div className="bg-opnskin-bg-secondary/50 border border-opnskin-bg-secondary rounded-lg p-6 max-w-md mx-auto">
+                    <h3 className="text-opnskin-text-secondary font-semibold mb-2">
+                      Aucun skin disponible
+                    </h3>
+                    <p className="text-opnskin-text-secondary text-sm">
+                      Aucun skin populaire disponible pour {config.name} pour le moment.
+                    </p>
+                  </div>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 w-full max-w-6xl mx-auto px-0 md:px-4">
