@@ -5,7 +5,6 @@ import I18nProvider from '@/components/I18nProvider'
 import { UserProvider } from '@/components/UserProvider'
 import { FloatProvider } from '@/components/FloatProvider'
 import { InventoryProvider } from '@/components/InventoryProvider'
-import { AxeptioProvider } from '@/components/AxeptioProvider'
 import { Toaster } from '@/components/ui/toaster'
 import UserPresencePinger from '@/components/UserPresencePinger'
 import ScrollToTop from '@/components/ScrollToTop'
@@ -18,7 +17,32 @@ const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: 'OPNSKIN - Marketplace de Skins Gaming',
-  description: 'La marketplace de confiance pour tous vos besoins numériques',
+  description: 'La marketplace de confiance pour tous vos besoins numériques. Achetez et vendez des skins CS2, Dota 2, Rust, TF2 en toute sécurité.',
+  keywords: 'skins, gaming, CS2, Dota 2, Rust, TF2, marketplace, trading, OPNSKIN, Counter-Strike, Steam',
+  authors: [{ name: 'OPNSKIN Team' }],
+  robots: 'index, follow',
+  openGraph: {
+    title: 'OPNSKIN - Marketplace de Skins Gaming',
+    description: 'La marketplace de confiance pour tous vos besoins numériques. Achetez et vendez des skins CS2, Dota 2, Rust, TF2 en toute sécurité.',
+    type: 'website',
+    locale: 'fr_FR',
+    url: 'https://www.opnskin.com',
+    siteName: 'OPNSKIN',
+    images: [
+      {
+        url: '/logo-OPNSKIN.png',
+        width: 1200,
+        height: 630,
+        alt: 'OPNSKIN - Marketplace de Skins Gaming',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'OPNSKIN - Marketplace de Skins Gaming',
+    description: 'La marketplace de confiance pour tous vos besoins numériques',
+    images: ['/logo-OPNSKIN.png'],
+  },
   icons: {
     icon: [
       { url: '/favicon.svg', type: 'image/svg+xml' },
@@ -27,6 +51,9 @@ export const metadata: Metadata = {
     shortcut: '/favicon.svg',
   },
   manifest: '/site.webmanifest',
+  verification: {
+    google: 'your-google-verification-code', // Remplacez par votre code de vérification Google
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -40,33 +67,78 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="icon" type="image/png" href="/favicon.png?v=3" />
         <link rel="manifest" href="/site.webmanifest?v=3" />
         <meta name="theme-color" content="#3b82f6" />
+        
+        {/* Axeptio Script - Chargement direct pour assurer l'affichage */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.axeptioSettings = {
+                clientId: "689390aba5e74449ee8b9c58",
+                cookiesVersion: "opnskin-fr-EU",
+                googleConsentMode: {
+                  default: {
+                    analytics_storage: "denied",
+                    ad_storage: "denied",
+                    ad_user_data: "denied",
+                    ad_personalization: "denied",
+                    wait_for_update: 500
+                  }
+                }
+              };
+              
+              void 0 === window._axcb && (window._axcb = []);
+              window._axcb.push(function(axeptio) {
+                axeptio.on("cookies:complete", function(choices) {
+                  console.log('🍪 Axeptio - Choix utilisateur:', choices);
+                });
+              });
+              
+              (function(d, s) {
+                var t = d.getElementsByTagName(s)[0], e = d.createElement(s);
+                e.async = true; e.src = "//static.axept.io/sdk.js";
+                t.parentNode.insertBefore(e, t);
+              })(document, "script");
+            `,
+          }}
+        />
+        
+        {/* Google Analytics - Chargement conditionnel après consentement */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-XXXXXXXXXX'); // Remplacez par votre ID Google Analytics
+            `,
+          }}
+        />
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
       </head>
       <body className={`${inter.className} bg-opnskin-bg-primary text-opnskin-text-primary antialiased`}>
         <I18nProvider>
           <UserProvider>
-            <AxeptioProvider>
-              <UserPresencePinger />
-              <ScrollToTop />
-              <InventoryProvider>
-                <FloatProvider>
-                  {/* Mobile layout */}
-                  <div className="md:hidden w-full h-full min-h-screen">
-                    <MobileLayout>{children}</MobileLayout>
+            <UserPresencePinger />
+            <ScrollToTop />
+            <InventoryProvider>
+              <FloatProvider>
+                {/* Mobile layout */}
+                <div className="md:hidden w-full h-full min-h-screen">
+                  <MobileLayout>{children}</MobileLayout>
+                </div>
+                {/* Desktop layout */}
+                <div className="hidden md:flex h-screen bg-opnskin-bg-primary">
+                  <Sidebar />
+                  <div className="flex-1 flex flex-col overflow-hidden">
+                    <Header />
+                    <main className="flex-1 overflow-y-auto bg-opnskin-bg-primary">
+                      {children}
+                    </main>
                   </div>
-                  {/* Desktop layout */}
-                  <div className="hidden md:flex h-screen bg-opnskin-bg-primary">
-                    <Sidebar />
-                    <div className="flex-1 flex flex-col overflow-hidden">
-                      <Header />
-                      <main className="flex-1 overflow-y-auto bg-opnskin-bg-primary">
-                        {children}
-                      </main>
-                    </div>
-                  </div>
-                  <Toaster />
-                </FloatProvider>
-              </InventoryProvider>
-            </AxeptioProvider>
+                </div>
+                <Toaster />
+              </FloatProvider>
+            </InventoryProvider>
           </UserProvider>
         </I18nProvider>
       </body>
