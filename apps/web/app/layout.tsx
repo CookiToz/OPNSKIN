@@ -50,14 +50,8 @@ export const metadata: Metadata = {
     locale: "fr_FR",
   },
   icons: {
-    icon: [
-      { url: '/favicon.ico', sizes: 'any' },
-      { url: '/favicon.svg', type: 'image/svg+xml' },
-    ],
-    apple: [
-      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
-    ],
-    shortcut: '/favicon.ico',
+    icon: '/favicon.svg',
+    shortcut: '/favicon.svg',
   },
   manifest: '/site.webmanifest',
 }
@@ -74,13 +68,10 @@ export default function RootLayout({
         <link rel="preload" href="/locales/fr/common.json" as="fetch" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="//api.opnskin.com" />
         
-        {/* Favicons */}
+        {/* Favicon */}
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-        <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
         <link rel="manifest" href="/site.webmanifest" />
         <meta name="theme-color" content="#3b82f6" />
-        <meta name="msapplication-TileColor" content="#3b82f6" />
       </head>
       <body className={`${satoshiBold.variable} ${satoshiRegular.variable} ${shareTechMono.variable} ${inter.className} font-sans bg-background`}>
         <I18nProvider>
