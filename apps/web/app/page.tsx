@@ -351,13 +351,13 @@ export default function Home() {
               <h3 className="text-lg font-bold mb-4 font-rajdhani">{t('home.footer_legal')}</h3>
               <ul className="space-y-2">
                 <li>
-                  <a href="#" className="text-white/70 hover:text-opnskin-accent">
-                    {t('home.footer_terms')}
-                  </a>
+                  <Link href="/privacy" className="text-white/70 hover:text-opnskin-accent">
+                    {t('home.footer_privacy')}
+                  </Link>
                 </li>
                 <li>
                   <a href="#" className="text-white/70 hover:text-opnskin-accent">
-                    {t('home.footer_privacy')}
+                    {t('home.footer_terms')}
                   </a>
                 </li>
                 <li>
