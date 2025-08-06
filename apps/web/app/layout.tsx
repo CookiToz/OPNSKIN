@@ -86,6 +86,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 }
               };
               
+              // Fonction pour ouvrir les préférences de cookies
+              window.openAxeptioCookies = function() {
+                if (window.axeptio) {
+                  window.axeptio.show();
+                }
+              };
+              
               void 0 === window._axcb && (window._axcb = []);
               window._axcb.push(function(axeptio) {
                 axeptio.on("cookies:complete", function(choices) {
