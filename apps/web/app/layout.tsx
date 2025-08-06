@@ -50,8 +50,11 @@ export const metadata: Metadata = {
     locale: "fr_FR",
   },
   icons: {
-    icon: '/favicon.svg',
-    shortcut: '/favicon.svg',
+    icon: [
+      { url: '/favicon.png', type: 'image/png' },
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+    ],
+    shortcut: '/favicon.png',
   },
   manifest: '/site.webmanifest',
 }
@@ -69,8 +72,9 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="//api.opnskin.com" />
         
         {/* Favicon */}
-        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-        <link rel="manifest" href="/site.webmanifest" />
+        <link rel="icon" type="image/png" href="/favicon.png?v=2" />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=2" />
+        <link rel="manifest" href="/site.webmanifest?v=2" />
         <meta name="theme-color" content="#3b82f6" />
       </head>
       <body className={`${satoshiBold.variable} ${satoshiRegular.variable} ${shareTechMono.variable} ${inter.className} font-sans bg-background`}>
