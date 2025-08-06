@@ -98,144 +98,187 @@ export default function Home() {
             }}
           >
             {/* Image actuelle */}
-            <Image
+            <img
               src={skinImages[bgIndex]}
-              alt={`Skin gaming ${bgIndex + 1} - OPNSKIN Marketplace`}
-              width={420}
-              height={240}
-              className="skin-bg-image"
+              alt="Skin background current"
+              className="animated-bg-skin"
               style={{
                 width: '100%',
                 height: '100%',
+                aspectRatio: 1.75,
                 objectFit: 'contain',
-                filter: 'blur(2px) brightness(0.3)',
-                transition: 'opacity 1s ease-in-out',
+                background: 'transparent',
+                position: 'absolute',
+                left: 0,
+                top: 0,
               }}
-              priority
+              draggable="false"
             />
           </div>
         </div>
-
-        {/* Contenu principal */}
-        <div className="relative z-10 text-center px-4 md:px-8 max-w-4xl mx-auto">
-          {/* Badge */}
-          <Badge className="mb-4 bg-opnskin-accent/20 text-opnskin-accent border-opnskin-accent/30">
+        {/* Contenu Hero */}
+        <div className="relative z-10 flex flex-col items-center lg:items-start justify-center h-full w-full px-4 md:px-4">
+            <Badge className="mb-4 px-4 py-1 w-fit bg-opnskin-primary/10 text-opnskin-primary border-opnskin-primary/30 text-xs md:text-base mt-6 md:mt-0">
             {t('home.hero_badge')}
-          </Badge>
-
-          {/* Titre principal H1 pour SEO */}
-          <h1 className="text-4xl md:text-6xl font-bold mb-6 text-opnskin-text-primary">
-            {t('home.hero_title_1')} <span className="neon-text">{t('home.hero_title_2')}</span>
+            </Badge>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-6xl font-bold mb-4 md:mb-6 font-satoshi-bold text-center lg:text-left w-full lg:w-auto leading-tight md:leading-tight">
+            {t('home.hero_title_1')} <span className="neon-text">{t('home.hero_title_skins')}</span> {t('home.hero_title_2')} <span className="neon-text">{t('home.hero_title_opportunities')}</span>
           </h1>
-
-          {/* Description */}
-          <p className="text-lg md:text-xl text-opnskin-text-secondary mb-8 max-w-2xl mx-auto">
-            {t('home.hero_description')}
+          <p className="text-base sm:text-lg text-opnskin-text-secondary mb-6 md:mb-8 max-w-xl md:max-w-2xl text-center lg:text-left w-full lg:w-auto">
+            {t('home.hero_subtitle')}
           </p>
-
-          {/* Bouton CTA */}
-          <Link href="/marketplace">
-            <Button size="lg" className="bg-opnskin-accent hover:bg-opnskin-accent/90 text-white px-8 py-3 text-lg">
-              {t('home.hero_cta')} <ArrowRight className="ml-2 w-5 h-5" />
-            </Button>
-          </Link>
-        </div>
-      </section>
-
-      {/* SECTION POURQUOI CHOISIR OPNSKIN */}
-      <section className="py-16 md:py-24 bg-opnskin-bg-secondary">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-opnskin-text-primary mb-4">
-              {t('home.why_title')}
-            </h2>
+          <div className="flex flex-col sm:flex-row gap-3 md:gap-4 w-full lg:w-auto justify-center lg:justify-start">
+            <Link href="/marketplace">
+              <Button size="lg" className="btn-opnskin flex items-center w-full sm:w-auto text-base md:text-lg py-3 md:py-4">
+                {t('home.hero_cta')}
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            </Link>
+            <div className="flex justify-center lg:justify-start">
+              <SteamAuthStatus />
+            </div>
           </div>
+          {/* Animation mobile : SOUS le texte, visible uniquement sur mobile */}
+          <div className="block md:hidden w-full flex justify-center mt-6">
+            <div className="skin-bg-container-mobile max-w-xs w-full flex items-center justify-center">
+              <img
+                src={skinImages[bgIndex]}
+                alt="Skin background current"
+                className="animated-bg-skin"
+                style={{
+                  width: '100%',
+                  height: 'auto',
+                  aspectRatio: 1.75,
+                  objectFit: 'contain',
+                  background: 'transparent',
+                }}
+                draggable="false"
+              />
+            </div>
+          </div>
+        </div>
+        {/* Animations CSS globales */}
+        <style jsx global>{`
+          @keyframes levitate {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-28px); }
+            100% { transform: translateY(0px); }
+          }
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {/* Sécurité */}
-            <Card className="bg-opnskin-bg-card border-opnskin-bg-secondary text-center p-6">
-              <div className="flex justify-center mb-4">
-                <Shield className="w-12 h-12 text-opnskin-accent" />
-              </div>
-              <h3 className="text-xl font-semibold text-opnskin-text-primary mb-2">
-                {t('home.why_security_title')}
-              </h3>
-              <p className="text-opnskin-text-secondary">
-                {t('home.why_security_desc')}
-              </p>
+          .animated-bg-skin {
+            object-fit: contain;
+            object-position: center;
+            will-change: transform, opacity;
+            animation: levitate 7s ease-in-out infinite;
+            transition: opacity 0.8s ease-in-out;
+          }
+        `}</style>
+      </section>
+
+      <section className="py-10 md:py-16">
+        <div className="container px-2 md:px-4">
+          <h2 className="text-2xl md:text-3xl font-bold mb-8 md:mb-12 text-center font-satoshi-bold">
+            {t('home.why_title_1')} <span className="neon-text">OPNSKIN</span> {t('home.why_title_2')}
+          </h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+            <Card className="bg-opnskin-bg-card border-opnskin-bg-secondary card-hover">
+              <CardContent className="p-6">
+                <div className="h-12 w-12 rounded-lg bg-opnskin-primary/20 flex items-center justify-center mb-4">
+                  <Shield className="h-6 w-6 text-opnskin-primary" />
+                </div>
+                <h3 className="text-xl font-bold mb-2 font-satoshi-bold">{t('home.why_security_title')}</h3>
+                <p className="text-opnskin-text-secondary">
+                  {t('home.why_security_desc')}
+                </p>
+              </CardContent>
             </Card>
 
-            {/* Rapidité */}
-            <Card className="bg-opnskin-bg-card border-opnskin-bg-secondary text-center p-6">
-              <div className="flex justify-center mb-4">
-                <Zap className="w-12 h-12 text-opnskin-accent" />
-              </div>
-              <h3 className="text-xl font-semibold text-opnskin-text-primary mb-2">
-                {t('home.why_speed_title')}
-              </h3>
-              <p className="text-opnskin-text-secondary">
-                {t('home.why_speed_desc')}
-              </p>
+            <Card className="bg-opnskin-bg-card border-opnskin-bg-secondary card-hover">
+              <CardContent className="p-6">
+                <div className="h-12 w-12 rounded-lg bg-opnskin-primary/20 flex items-center justify-center mb-4">
+                  <TrendingUp className="h-6 w-6 text-opnskin-primary" />
+                </div>
+                <h3 className="text-xl font-bold mb-2 font-satoshi-bold">{t('home.why_valuation_title')}</h3>
+                <p className="text-opnskin-text-secondary">
+                  {t('home.why_valuation_desc')}
+                </p>
+              </CardContent>
             </Card>
 
-            {/* Portefeuille */}
-            <Card className="bg-opnskin-bg-card border-opnskin-bg-secondary text-center p-6">
-              <div className="flex justify-center mb-4">
-                <Wallet className="w-12 h-12 text-opnskin-accent" />
-              </div>
-              <h3 className="text-xl font-semibold text-opnskin-text-primary mb-2">
-                {t('home.why_wallet_title')}
-              </h3>
-              <p className="text-opnskin-text-secondary">
-                {t('home.why_wallet_desc')}
-              </p>
+            <Card className="bg-opnskin-bg-card border-opnskin-bg-secondary card-hover">
+              <CardContent className="p-6">
+                <div className="h-12 w-12 rounded-lg bg-opnskin-primary/20 flex items-center justify-center mb-4">
+                  <Zap className="h-6 w-6 text-opnskin-primary" />
+                </div>
+                <h3 className="text-xl font-bold mb-2 font-satoshi-bold">{t('home.why_fast_title')}</h3>
+                <p className="text-opnskin-text-secondary">
+                  {t('home.why_fast_desc')}
+                </p>
+              </CardContent>
             </Card>
 
-            {/* Support */}
-            <Card className="bg-opnskin-bg-card border-opnskin-bg-secondary text-center p-6">
-              <div className="flex justify-center mb-4">
-                <Package className="w-12 h-12 text-opnskin-accent" />
-              </div>
-              <h3 className="text-xl font-semibold text-opnskin-text-primary mb-2">
-                {t('home.why_support_title')}
-              </h3>
-              <p className="text-opnskin-text-secondary">
-                {t('home.why_support_desc')}
-              </p>
+            <Card className="bg-opnskin-bg-card border-opnskin-bg-secondary card-hover">
+              <CardContent className="p-6">
+                <div className="h-12 w-12 rounded-lg bg-opnskin-primary/20 flex items-center justify-center mb-4">
+                  <Wallet className="h-6 w-6 text-opnskin-primary" />
+                </div>
+                <h3 className="text-xl font-bold mb-2 font-satoshi-bold">{t('home.why_multi_title')}</h3>
+                <p className="text-opnskin-text-secondary">
+                  {t('home.why_multi_desc')}
+                </p>
+              </CardContent>
             </Card>
           </div>
         </div>
       </section>
 
-      {/* SECTION SKINS POPULAIRES */}
-      <PopularSkins />
+      <section className="py-10 md:py-16">
+        <div className="container px-2 md:px-4">
+          <PopularSkins />
+        </div>
+      </section>
 
-      {/* SECTION FRAIS DE TRANSACTION */}
-      <section className="py-16 md:py-24 bg-opnskin-bg-secondary">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-opnskin-text-primary mb-4">
-              {t('home.fees_title')}
+      <FeeProgressionChart />
+
+      <section className="py-10 md:py-16 bg-gradient-to-b from-black/50 to-black">
+        <div className="container px-2 md:px-4">
+          <div className="max-w-3xl mx-auto text-center">
+            <Badge variant="neon" className="mb-4 px-4 py-1 text-xs md:text-base">
+              {t('home.community_badge')}
+            </Badge>
+            <h2 className="text-2xl md:text-4xl font-bold mb-4 md:mb-6 font-rajdhani">
+              {t('home.community_professional_title')}
             </h2>
-            <p className="text-lg text-opnskin-text-secondary max-w-2xl mx-auto">
-              {t('home.fees_description')}
+            <p className="text-base md:text-lg text-white/70 mb-6 md:mb-8">
+              {t('home.community_subtitle')}
             </p>
-          </div>
-          
-          <div className="max-w-4xl mx-auto">
-            <FeeProgressionChart />
+            {user?.loggedIn ? (
+              <div className="inline-flex items-center gap-2 justify-center">
+                <span className="font-bold text-opnskin-accent">{t('home.connected')}</span>
+                <span className="inline-block w-3 h-3 rounded-full" style={{ background: '#0CE49B', boxShadow: '0 0 8px #0CE49B88' }}></span>
+              </div>
+            ) : (
+              <Button variant="secondary" size="lg" onClick={() => window.location.href = '/api/auth/steam'} className="flex items-center gap-2">
+                <img
+                  src="/icons8-steam-128.png"
+                  alt="Steam"
+                  className="w-7 h-7 object-contain"
+                />
+                {t('home.connect_steam_now')}
+              </Button>
+            )}
           </div>
         </div>
       </section>
 
-      {/* FOOTER */}
-      <footer className="bg-opnskin-bg-primary border-t border-white/10 py-12">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+      <footer className="py-8 bg-black border-t border-white/5">
+        <div className="container px-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
-              <h3 className="text-lg font-bold mb-4 font-rajdhani">{t('home.footer_about')}</h3>
+              <h3 className="text-xl font-bold mb-4 font-rajdhani">{t('home.footer_opnskin')}</h3>
               <p className="text-white/70 mb-4">
-                {t('home.footer_about_desc')}
+                {t('home.footer_desc')}
               </p>
               <div className="flex space-x-4">
                 <a href="#" className="text-white/70 hover:text-opnskin-accent">
@@ -323,16 +366,9 @@ export default function Home() {
                   </a>
                 </li>
                 <li>
-                  <button 
-                    onClick={() => {
-                      if (typeof window !== 'undefined' && window.openAxeptioCookies) {
-                        window.openAxeptioCookies();
-                      }
-                    }}
-                    className="text-white/70 hover:text-opnskin-accent text-left"
-                  >
+                  <a href="javascript:openAxeptioCookies()" className="text-white/70 hover:text-opnskin-accent">
                     {t('home.footer_cookies')}
-                  </button>
+                  </a>
                 </li>
               </ul>
             </div>
