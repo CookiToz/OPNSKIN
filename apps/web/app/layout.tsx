@@ -16,11 +16,21 @@ import { Header } from '@/components/header';
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'OPNSKIN - Marketplace de Skins Gaming',
-  description: 'La marketplace de confiance pour tous vos besoins numériques. Achetez et vendez des skins CS2, Dota 2, Rust, TF2 en toute sécurité.',
-  keywords: 'skins, gaming, CS2, Dota 2, Rust, TF2, marketplace, trading, OPNSKIN, Counter-Strike, Steam',
+  title: 'OPNSKIN - Marketplace de Skins Gaming | Achetez et Vendez des Skins CS2, Dota 2, Rust, TF2',
+  description: 'OPNSKIN est la marketplace de confiance pour acheter et vendre des skins gaming. Skins CS2, Dota 2, Rust, TF2 en toute sécurité. Trading rapide et fiable.',
+  keywords: 'skins, gaming, CS2, Dota 2, Rust, TF2, marketplace, trading, OPNSKIN, Counter-Strike, Steam, skins gaming, acheter skins, vendre skins',
   authors: [{ name: 'OPNSKIN Team' }],
-  robots: 'index, follow',
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
   openGraph: {
     title: 'OPNSKIN - Marketplace de Skins Gaming',
     description: 'La marketplace de confiance pour tous vos besoins numériques. Achetez et vendez des skins CS2, Dota 2, Rust, TF2 en toute sécurité.',
@@ -54,6 +64,9 @@ export const metadata: Metadata = {
   verification: {
     google: 'your-google-verification-code', // Remplacez par votre code de vérification Google
   },
+  alternates: {
+    canonical: 'https://www.opnskin.com',
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -67,6 +80,29 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="icon" type="image/png" href="/favicon.png?v=3" />
         <link rel="manifest" href="/site.webmanifest?v=3" />
         <meta name="theme-color" content="#3b82f6" />
+        
+        {/* Données structurées JSON-LD */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              "name": "OPNSKIN",
+              "description": "Marketplace de skins gaming - Achetez et vendez des skins CS2, Dota 2, Rust, TF2",
+              "url": "https://www.opnskin.com",
+              "potentialAction": {
+                "@type": "SearchAction",
+                "target": "https://www.opnskin.com/marketplace?search={search_term_string}",
+                "query-input": "required name=search_term_string"
+              },
+              "sameAs": [
+                "https://twitter.com/opnskin",
+                "https://discord.gg/opnskin"
+              ]
+            })
+          }}
+        />
         
         {/* Axeptio Script - Chargement direct pour assurer l'affichage */}
         <script
