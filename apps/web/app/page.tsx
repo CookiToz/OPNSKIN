@@ -366,7 +366,7 @@ export default function Home() {
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="text-white/70 hover:text-opnskin-accent">
+                  <a href="javascript:openAxeptioCookies()" className="text-white/70 hover:text-opnskin-accent">
                     {t('home.footer_cookies')}
                   </a>
                 </li>
