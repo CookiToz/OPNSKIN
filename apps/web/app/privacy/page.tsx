@@ -12,7 +12,7 @@ export default function PrivacyPage() {
   return (
     <div className="min-h-screen bg-opnskin-bg-primary">
       <div className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-none mx-auto">
           {/* Header */}
           <div className="text-center mb-12">
             <h1 className="text-4xl font-bold text-opnskin-text-primary mb-4">
@@ -51,15 +51,9 @@ export default function PrivacyPage() {
               </div>
               <div className="text-opnskin-text-secondary space-y-4">
                 <p>
-                  <strong>OPNSKIN</strong> ("nous", "notre", "nos") s'engage à protéger votre vie privée. 
-                  Cette politique de confidentialité explique comment nous collectons, utilisons 
-                  et protégeons vos informations personnelles conformément au Règlement Général 
-                  sur la Protection des Données (RGPD) et à la loi française.
-                </p>
-                <p>
-                  <strong>Pourquoi "nous", "notre", "nos" ?</strong> Ces termes définissent légalement 
-                  qui est responsable du traitement de vos données. C'est une exigence RGPD pour 
-                  clarifier l'identité du responsable du traitement.
+                  OPNSKIN s'engage à protéger votre vie privée. Cette politique de confidentialité 
+                  explique comment nous collectons, utilisons et protégeons vos informations personnelles 
+                  conformément au Règlement Général sur la Protection des Données (RGPD) et à la loi française.
                 </p>
                 <p>
                   En utilisant notre service, vous acceptez les pratiques décrites dans cette politique.
