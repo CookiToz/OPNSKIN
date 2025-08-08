@@ -228,7 +228,7 @@ function WalletPageContent() {
                         <span className="text-2xl md:text-3xl font-bold font-rajdhani text-white tracking-tight">
                           {cryptoRates[currency] ? formatPrice(user?.walletBalance ?? 0, currency, cryptoRates) : <span>...</span>}
                         </span>
-                        <img src="/stripe-logo.png" alt="Stripe" className="h-5 opacity-80" />
+                        <span className="ml-2 inline text-[#635BFF] font-semibold">Stripe</span>
                       </div>
                     </div>
                   </div>
@@ -254,7 +254,7 @@ function WalletPageContent() {
                       <Button className="bg-opnskin-green hover:bg-opnskin-green/80 text-base md:text-lg py-4 md:py-5 transition-all" size="lg" onClick={createDeposit} disabled={loading || !isLoggedIn}>
                         <PlusCircle className="mr-2 h-5 w-5" /> {t('wallet.add_funds')}
                       </Button>
-                      <img src="/stripe-logo.png" alt="Stripe" className="h-5 opacity-80 ml-2 hidden sm:block" />
+                      <span className="ml-2 hidden sm:inline text-[#635BFF] font-semibold">Stripe</span>
                     </div>
                     <Button className="flex-1 bg-opnskin-blue/90 hover:bg-opnskin-blue text-base md:text-lg py-4 md:py-5 transition-all" size="lg" disabled>
                       <Wallet className="mr-2 h-5 w-5" /> {t('wallet.connect_crypto_wallet')}
