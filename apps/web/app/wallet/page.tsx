@@ -116,6 +116,12 @@ function WalletPageContent() {
         await loadStripeAccount();
         return true;
       } else {
+        // Si l'utilisateur a déjà un compte, basculer l'UI en mode validation
+        if ((data?.error || '').toLowerCase().includes('already has a stripe account')) {
+          setStripeAccount((prev: any) => ({ ...(prev || {}), hasAccount: true }));
+          toast({ title: 'Compte Stripe détecté', description: 'Complétez la configuration si nécessaire.' });
+          return true;
+        }
         toast({ title: 'Erreur', description: data.error || 'Erreur lors de la création du compte', variant: 'destructive' });
         return false;
       }
@@ -222,7 +228,7 @@ function WalletPageContent() {
                         <span className="text-2xl md:text-3xl font-bold font-rajdhani text-white tracking-tight">
                           {cryptoRates[currency] ? formatPrice(user?.walletBalance ?? 0, currency, cryptoRates) : <span>...</span>}
                         </span>
-                        <img src="https://cdn.jsdelivr.net/gh/stripe/brand-assets/logo/stripe-logo-blue.png" alt="Stripe" className="h-5 opacity-80" />
+                        <img src="/stripe-logo.png" alt="Stripe" className="h-5 opacity-80" />
                       </div>
                     </div>
                   </div>
@@ -239,6 +245,7 @@ function WalletPageContent() {
                       <input
                         type="number"
                         min={5}
+                        step={1}
                         placeholder="Montant (min 5€)"
                         value={depositAmount}
                         onChange={(e) => setDepositAmount(e.target.value)}
