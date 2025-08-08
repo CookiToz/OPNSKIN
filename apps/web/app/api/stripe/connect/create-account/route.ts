@@ -1,1 +1,1 @@
-export { POST } from '../../create-account';
+export { POST } from '../create-account';
