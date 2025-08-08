@@ -64,6 +64,8 @@ function WalletPageContent() {
   // Charger le statut du compte Stripe
   useEffect(() => {
     loadStripeAccount();
+    const amt = searchParams.get('amount');
+    if (amt) setDepositAmount(amt);
   }, []);
 
   // Rafraîchir le solde après retour Stripe (success=deposit)
@@ -112,36 +114,32 @@ function WalletPageContent() {
       if (response.ok) {
         toast({ title: 'Compte Stripe créé', description: 'Votre compte Stripe a été créé avec succès.' });
         await loadStripeAccount();
+        return true;
       } else {
         toast({ title: 'Erreur', description: data.error || 'Erreur lors de la création du compte', variant: 'destructive' });
+        return false;
       }
     } catch (error) {
       toast({ title: 'Erreur', description: 'Erreur lors de la création du compte Stripe', variant: 'destructive' });
+      return false;
     } finally { setLoading(false); }
   };
 
-  const createAccountLink = async () => {
-    if (!requireAuth()) return;
-    setLoading(true);
-    try {
-      const response = await fetch('/api/stripe/connect/create-account-link', { method: 'POST' });
-      const data = await response.json();
-      if (response.ok) {
-        window.open(data.url, '_blank');
-      } else {
-        toast({ title: 'Erreur', description: data.error || 'Erreur lors de la création du lien', variant: 'destructive' });
-      }
-    } catch (error) {
-      toast({ title: 'Erreur', description: 'Erreur lors de la création du lien', variant: 'destructive' });
-    } finally { setLoading(false); }
+  const ensureStripeAccount = async () => {
+    if (stripeAccount?.hasAccount) return true;
+    const ok = await createStripeAccount();
+    return ok;
   };
 
   const createDeposit = async () => {
     if (!requireAuth()) return;
-    if (!depositAmount || parseFloat(depositAmount) < 1) {
-      toast({ title: 'Montant invalide', description: 'Le montant minimum est de 1€', variant: 'destructive' });
+    if (!depositAmount || parseFloat(depositAmount) < 5) {
+      toast({ title: 'Montant invalide', description: 'Le montant minimum est de 5€', variant: 'destructive' });
       return;
     }
+
+    // Créer automatiquement le compte Stripe si nécessaire (pour future compat)
+    await ensureStripeAccount();
 
     setLoading(true);
     try {
@@ -224,6 +222,7 @@ function WalletPageContent() {
                         <span className="text-2xl md:text-3xl font-bold font-rajdhani text-white tracking-tight">
                           {cryptoRates[currency] ? formatPrice(user?.walletBalance ?? 0, currency, cryptoRates) : <span>...</span>}
                         </span>
+                        <img src="https://cdn.jsdelivr.net/gh/stripe/brand-assets/logo/stripe-logo-blue.png" alt="Stripe" className="h-5 opacity-80" />
                       </div>
                     </div>
                   </div>
@@ -239,7 +238,8 @@ function WalletPageContent() {
                     <div className="flex items-center gap-2 flex-1">
                       <input
                         type="number"
-                        placeholder="Montant (min 1€)"
+                        min={5}
+                        placeholder="Montant (min 5€)"
                         value={depositAmount}
                         onChange={(e) => setDepositAmount(e.target.value)}
                         className="flex-1 bg-black/20 border border-white/10 rounded px-3 py-2 text-sm text-white placeholder:text-white/50"

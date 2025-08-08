@@ -193,7 +193,7 @@ export function Header() {
                   variant="default"
                   size="sm"
                   className="btn-opnskin"
-                  onClick={() => (window.location.href = '/wallet')}
+                  onClick={() => (window.location.href = '/wallet?amount=5')}
                 >
                   {t('header.recharge')}
                 </Button>

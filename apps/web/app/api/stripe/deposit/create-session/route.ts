@@ -11,8 +11,8 @@ export async function POST(req: NextRequest) {
     }
 
     const { amount } = await req.json();
-    if (!amount || amount < 100) {
-      return NextResponse.json({ error: 'Invalid amount. Minimum 1€ required.' }, { status: 400 });
+    if (!amount || amount < 500) {
+      return NextResponse.json({ error: 'Invalid amount. Minimum 5€ required.' }, { status: 400 });
     }
 
     const supabaseAdmin = createClient(
