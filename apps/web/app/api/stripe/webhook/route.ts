@@ -1,13 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import Stripe from 'stripe';
+import { getStripe } from '@/lib/stripe';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-12-18.acacia',
-});
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -17,12 +13,11 @@ const supabaseAdmin = createClient(
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
 export async function POST(req: NextRequest) {
-  // Stripe envoie du raw body; on le lit en texte pour la vérification de signature
+  const stripe = getStripe();
   const body = await req.text();
   const sig = req.headers.get('stripe-signature');
 
-  let event: Stripe.Event;
-
+  let event;
   try {
     event = stripe.webhooks.constructEvent(body, sig!, endpointSecret);
   } catch (err: any) {
@@ -33,19 +28,19 @@ export async function POST(req: NextRequest) {
   try {
     switch (event.type) {
       case 'checkout.session.completed':
-        await handleCheckoutSessionCompleted(event.data.object as Stripe.Checkout.Session);
+        await handleCheckoutSessionCompleted(event.data.object as any);
         break;
       case 'payment_intent.succeeded':
-        await handlePaymentIntentSucceeded(event.data.object as Stripe.PaymentIntent);
+        await handlePaymentIntentSucceeded(event.data.object as any);
         break;
       case 'transfer.created':
-        await handleTransferCreated(event.data.object as Stripe.Transfer);
+        await handleTransferCreated(event.data.object as any);
         break;
       case 'transfer.paid':
-        await handleTransferPaid(event.data.object as Stripe.Transfer);
+        await handleTransferPaid(event.data.object as any);
         break;
       case 'account.updated':
-        await handleAccountUpdated(event.data.object as Stripe.Account);
+        await handleAccountUpdated(event.data.object as any);
         break;
       default:
         console.log(`Unhandled event type: ${event.type}`);
@@ -58,7 +53,7 @@ export async function POST(req: NextRequest) {
   }
 }
 
-async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) {
+async function handleCheckoutSessionCompleted(session: any) {
   if (session.metadata?.type === 'deposit') {
     await supabaseAdmin
       .from('StripeDeposit')
@@ -95,12 +90,11 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
   }
 }
 
-async function handlePaymentIntentSucceeded(paymentIntent: Stripe.PaymentIntent) {
-  // Utilisé si vous traitez des paiements directs
+async function handlePaymentIntentSucceeded(paymentIntent: any) {
   console.log('Payment intent succeeded:', paymentIntent.id);
 }
 
-async function handleTransferCreated(transfer: Stripe.Transfer) {
+async function handleTransferCreated(transfer: any) {
   if (transfer.metadata?.type === 'withdrawal') {
     await supabaseAdmin
       .from('StripeWithdrawal')
@@ -109,7 +103,7 @@ async function handleTransferCreated(transfer: Stripe.Transfer) {
   }
 }
 
-async function handleTransferPaid(transfer: Stripe.Transfer) {
+async function handleTransferPaid(transfer: any) {
   if (transfer.metadata?.type === 'withdrawal') {
     await supabaseAdmin
       .from('StripeWithdrawal')
@@ -129,7 +123,7 @@ async function handleTransferPaid(transfer: Stripe.Transfer) {
   }
 }
 
-async function handleAccountUpdated(account: Stripe.Account) {
+async function handleAccountUpdated(account: any) {
   await supabaseAdmin
     .from('StripeAccount')
     .update({

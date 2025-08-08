@@ -1,24 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import Stripe from 'stripe';
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-12-18.acacia',
-});
-
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+import { getStripe } from '@/lib/stripe';
 
 export async function POST(req: NextRequest) {
   try {
+    const stripe = getStripe();
     const steamId = req.cookies.get('steamid')?.value;
     if (!steamId) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
-    // Récupérer l'utilisateur
+    const supabaseAdmin = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+
     const { data: user, error: userError } = await supabaseAdmin
       .from('User')
       .select('*')
@@ -33,7 +29,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'No Stripe account found. Please create one first.' }, { status: 400 });
     }
 
-    // Créer le lien d'onboarding
     const accountLink = await stripe.accountLinks.create({
       account: user.stripeAccountId,
       refresh_url: `${process.env.NEXT_PUBLIC_BASE_URL}/wallet?refresh=stripe`,
@@ -41,16 +36,9 @@ export async function POST(req: NextRequest) {
       type: 'account_onboarding',
     });
 
-    return NextResponse.json({ 
-      success: true, 
-      url: accountLink.url,
-      message: 'Account link created successfully'
-    });
-
+    return NextResponse.json({ success: true, url: accountLink.url });
   } catch (error: any) {
     console.error('Error creating account link:', error);
-    return NextResponse.json({ 
-      error: error.message || 'Failed to create account link' 
-    }, { status: 500 });
+    return NextResponse.json({ error: error.message || 'Failed to create account link' }, { status: 500 });
   }
 }
