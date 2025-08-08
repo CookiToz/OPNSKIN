@@ -12,7 +12,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Trash2 } from "lucide-react";
+import { Trash2, Pencil } from "lucide-react";
 
 type User = {
   id: string;
@@ -47,6 +47,9 @@ export const OfferCard: React.FC<OfferCardProps> = ({ offer, currentUserId, onOf
   const { toast } = useToast();
   const [isCancelling, setIsCancelling] = useState(false);
   const [showCancelDialog, setShowCancelDialog] = useState(false);
+  const [editingPrice, setEditingPrice] = useState(false);
+  const [newPrice, setNewPrice] = useState<number>(offer.price);
+  const [savingPrice, setSavingPrice] = useState(false);
 
   const canLaunchTrade =
     currentUserId === offer.sellerId &&
@@ -58,6 +61,31 @@ export const OfferCard: React.FC<OfferCardProps> = ({ offer, currentUserId, onOf
   const canCancelOffer = 
     currentUserId === offer.sellerId && 
     offer.status === "AVAILABLE";
+
+  const canEditPrice = canCancelOffer;
+
+  const handleSavePrice = async () => {
+    if (newPrice <= 0) {
+      toast({ title: 'Prix invalide', description: 'Le prix doit être positif.', variant: 'destructive' });
+      return;
+    }
+    setSavingPrice(true);
+    try {
+      const res = await fetch(`/api/offers/${offer.id}/price`, {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ price: Number(newPrice) })
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || 'Échec de la mise à jour du prix');
+      toast({ title: 'Prix mis à jour', description: `Nouveau prix: ${Number(newPrice).toFixed(2)} €` });
+      setEditingPrice(false);
+      (offer as any).price = Number(newPrice);
+    } catch (e: any) {
+      toast({ title: 'Erreur', description: e.message, variant: 'destructive' });
+    } finally {
+      setSavingPrice(false);
+    }
+  };
 
   const handleCancelOffer = async () => {
     setIsCancelling(true);
@@ -111,8 +139,26 @@ export const OfferCard: React.FC<OfferCardProps> = ({ offer, currentUserId, onOf
         <div>
           <span className="font-bold">Item :</span> {offer.itemId}
         </div>
-        <div>
-          <span className="font-bold">Prix :</span> {offer.price} €
+        <div className="flex items-center gap-2">
+          <span className="font-bold">Prix :</span>
+          {editingPrice ? (
+            <div className="flex items-center gap-2">
+              <input type="number" className="bg-black/20 border border-white/10 rounded px-2 py-1 w-28"
+                value={newPrice} min={0.01} step={0.01}
+                onChange={(e) => setNewPrice(parseFloat(e.target.value))} />
+              <Button size="sm" onClick={handleSavePrice} disabled={savingPrice} className="bg-opnskin-green hover:bg-opnskin-green/80">{savingPrice ? '...' : 'Enregistrer'}</Button>
+              <Button size="sm" variant="outline" onClick={() => { setEditingPrice(false); setNewPrice(offer.price); }}>Annuler</Button>
+            </div>
+          ) : (
+            <>
+              <span>{offer.price} €</span>
+              {canEditPrice && (
+                <Button size="icon" variant="ghost" onClick={() => setEditingPrice(true)} title="Modifier le prix">
+                  <Pencil className="w-4 h-4" />
+                </Button>
+              )}
+            </>
+          )}
         </div>
         <div>
           <span className="font-bold">Statut :</span> {offer.status}
