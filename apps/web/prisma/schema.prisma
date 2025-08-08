@@ -29,6 +29,12 @@ model User {
   bannedAt             DateTime?
   supportTickets       SupportTicket[]
   supportMessages      SupportMessage[]
+  isAdmin              Boolean        @default(false) // Colonne existante pour les admins
+  stripeCustomerId     String?        @unique // ID du customer Stripe pour les dépôts/retraits
+  stripeAccountId      String?        @unique // ID du compte Stripe Connect pour les retraits
+  stripeAccount        StripeAccount?
+  stripeDeposits       StripeDeposit[]
+  stripeWithdrawals    StripeWithdrawal[]
 }
 
 model Offer {
@@ -60,6 +66,7 @@ model Transaction {
   refunded       Boolean           @default(false)
   refundReason   String?
   bannedSeller   Boolean           @default(false)
+  transactionFee Float             @default(0) // Frais de transaction (en EUR)
   createdAt      DateTime          @default(now())
   updatedAt      DateTime          @default(now()) @updatedAt
 
@@ -106,7 +113,7 @@ model SupportTicket {
   userId      String           @db.Uuid
   subject     String
   status      TicketStatus     @default(OPEN)
-  priority    TicketPriority   @default(MEDIUM)
+  priority    String           @default("MEDIUM") // Type text pour correspondre à Supabase
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @default(now()) @updatedAt
   messages    SupportMessage[]
@@ -135,6 +142,50 @@ model InventoryCache {
   @@unique([steamId, gameId, currency])
   @@index([steamId])
   @@index([updatedAt])
+}
+
+model StripeAccount {
+  id                    String   @id @default(uuid()) @db.Uuid
+  userId                String   @unique @db.Uuid
+  stripeAccountId       String   @unique
+  businessProfile       Json?    // Données du business profile
+  requirements          Json?    // Requirements Stripe
+  chargesEnabled        Boolean  @default(false)
+  payoutsEnabled        Boolean  @default(false)
+  detailsSubmitted      Boolean  @default(false)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @default(now()) @updatedAt
+  
+  user                  User     @relation(fields: [userId], references: [id])
+}
+
+model StripeDeposit {
+  id                    String   @id @default(uuid()) @db.Uuid
+  userId                String   @db.Uuid
+  stripePaymentIntentId String   @unique
+  stripeSessionId       String?  @unique
+  amount                Int      // Montant en centimes
+  currency              String   @default("eur")
+  status                String   @default("pending") // pending, succeeded, failed
+  walletCredited        Boolean  @default(false) // Si le wallet a été crédité
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @default(now()) @updatedAt
+  
+  user                  User     @relation(fields: [userId], references: [id])
+}
+
+model StripeWithdrawal {
+  id                    String   @id @default(uuid()) @db.Uuid
+  userId                String   @db.Uuid
+  stripeTransferId      String?  @unique
+  amount                Int      // Montant en centimes
+  currency              String   @default("eur")
+  status                String   @default("pending") // pending, succeeded, failed
+  walletDebited         Boolean  @default(false) // Si le wallet a été débité
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @default(now()) @updatedAt
+  
+  user                  User     @relation(fields: [userId], references: [id])
 }
 
 enum OfferStatus {

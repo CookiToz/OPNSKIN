@@ -15,6 +15,9 @@ import {
   Bitcoin,
   Landmark,
   ArrowDownCircle,
+  ExternalLink,
+  CheckCircle,
+  AlertCircle,
 } from "lucide-react"
 import { useCurrencyStore } from '@/hooks/use-currency-store';
 import { useCryptoRatesStore } from '@/hooks/use-currency-store';
@@ -22,12 +25,179 @@ import { formatPrice } from '@/lib/utils';
 import { cryptoIcons } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/hooks/use-toast';
+import { useState, useEffect } from 'react';
 
 export default function WalletPage() {
   const { t } = useTranslation('common');
   const currency = useCurrencyStore((state) => state.currency);
   const cryptoRates = useCryptoRatesStore();
   const { toast } = useToast();
+  
+  const [stripeAccount, setStripeAccount] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+  const [depositAmount, setDepositAmount] = useState('');
+  const [withdrawalAmount, setWithdrawalAmount] = useState('');
+
+  // Charger le statut du compte Stripe
+  useEffect(() => {
+    loadStripeAccount();
+  }, []);
+
+  const loadStripeAccount = async () => {
+    try {
+      const response = await fetch('/api/stripe/account/status');
+      const data = await response.json();
+      if (response.ok) {
+        setStripeAccount(data);
+      }
+    } catch (error) {
+      console.error('Error loading Stripe account:', error);
+    }
+  };
+
+  const createStripeAccount = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch('/api/stripe/connect/create-account', {
+        method: 'POST',
+      });
+      const data = await response.json();
+      
+      if (response.ok) {
+        toast({
+          title: 'Compte Stripe créé',
+          description: 'Votre compte Stripe a été créé avec succès.',
+        });
+        await loadStripeAccount();
+      } else {
+        toast({
+          title: 'Erreur',
+          description: data.error || 'Erreur lors de la création du compte',
+          variant: 'destructive',
+        });
+      }
+    } catch (error) {
+      toast({
+        title: 'Erreur',
+        description: 'Erreur lors de la création du compte Stripe',
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const createAccountLink = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch('/api/stripe/connect/create-account-link', {
+        method: 'POST',
+      });
+      const data = await response.json();
+      
+      if (response.ok) {
+        window.open(data.url, '_blank');
+      } else {
+        toast({
+          title: 'Erreur',
+          description: data.error || 'Erreur lors de la création du lien',
+          variant: 'destructive',
+        });
+      }
+    } catch (error) {
+      toast({
+        title: 'Erreur',
+        description: 'Erreur lors de la création du lien',
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const createDeposit = async () => {
+    if (!depositAmount || parseFloat(depositAmount) < 1) {
+      toast({
+        title: 'Montant invalide',
+        description: 'Le montant minimum est de 1€',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await fetch('/api/stripe/deposit/create-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount: Math.round(parseFloat(depositAmount) * 100) }),
+      });
+      const data = await response.json();
+      
+      if (response.ok) {
+        window.open(data.url, '_blank');
+        setDepositAmount('');
+      } else {
+        toast({
+          title: 'Erreur',
+          description: data.error || 'Erreur lors de la création du dépôt',
+          variant: 'destructive',
+        });
+      }
+    } catch (error) {
+      toast({
+        title: 'Erreur',
+        description: 'Erreur lors de la création du dépôt',
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const createWithdrawal = async () => {
+    if (!withdrawalAmount || parseFloat(withdrawalAmount) < 5) {
+      toast({
+        title: 'Montant invalide',
+        description: 'Le montant minimum est de 5€',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await fetch('/api/stripe/withdrawal/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount: Math.round(parseFloat(withdrawalAmount) * 100) }),
+      });
+      const data = await response.json();
+      
+      if (response.ok) {
+        toast({
+          title: 'Retrait créé',
+          description: 'Votre retrait a été initié avec succès.',
+        });
+        setWithdrawalAmount('');
+        await loadStripeAccount();
+      } else {
+        toast({
+          title: 'Erreur',
+          description: data.error || 'Erreur lors de la création du retrait',
+          variant: 'destructive',
+        });
+      }
+    } catch (error) {
+      toast({
+        title: 'Erreur',
+        description: 'Erreur lors de la création du retrait',
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Méthodes de paiement (fiat/crypto)
   const fiatMethods = [
@@ -75,18 +245,88 @@ export default function WalletPage() {
                     </div>
                   </div>
                   <div className="flex flex-col sm:flex-row gap-2 mt-1">
-                    <Button className="flex-1 bg-opnskin-green hover:bg-opnskin-green/80 text-base md:text-lg py-4 md:py-5 transition-all" size="lg">
+                    <Button 
+                      className="flex-1 bg-opnskin-green hover:bg-opnskin-green/80 text-base md:text-lg py-4 md:py-5 transition-all" 
+                      size="lg"
+                      onClick={createDeposit}
+                      disabled={loading}
+                    >
                       <PlusCircle className="mr-2 h-5 w-5" />
                       {t('wallet.add_funds')}
                     </Button>
                     <Button
                       className="flex-1 bg-opnskin-blue/90 hover:bg-opnskin-blue text-base md:text-lg py-4 md:py-5 transition-all"
                       size="lg"
+                      disabled
                     >
                       <Wallet className="mr-2 h-5 w-5" />
                       {t('wallet.connect_crypto_wallet')}
                     </Button>
                   </div>
+                  
+                  {/* Section Stripe Connect */}
+                  {!stripeAccount?.hasAccount ? (
+                    <div className="mt-2 p-3 bg-opnskin-blue/10 border border-opnskin-blue/20 rounded-lg">
+                      <div className="flex items-center gap-2 mb-2">
+                        <AlertCircle className="h-5 w-5 text-opnskin-blue" />
+                        <span className="text-sm font-semibold text-opnskin-blue">Configuration requise</span>
+                      </div>
+                      <p className="text-xs text-white/70 mb-3">
+                        Pour retirer vos fonds, vous devez configurer votre compte Stripe.
+                      </p>
+                      <Button
+                        className="w-full bg-opnskin-blue hover:bg-opnskin-blue/80 text-sm py-2"
+                        onClick={createStripeAccount}
+                        disabled={loading}
+                      >
+                        {loading ? 'Création...' : 'Créer mon compte Stripe'}
+                      </Button>
+                    </div>
+                  ) : !stripeAccount?.account?.payoutsEnabled ? (
+                    <div className="mt-2 p-3 bg-opnskin-violet/10 border border-opnskin-violet/20 rounded-lg">
+                      <div className="flex items-center gap-2 mb-2">
+                        <AlertCircle className="h-5 w-5 text-opnskin-violet" />
+                        <span className="text-sm font-semibold text-opnskin-violet">Compte en cours de validation</span>
+                      </div>
+                      <p className="text-xs text-white/70 mb-3">
+                        Votre compte Stripe doit être validé pour activer les retraits.
+                      </p>
+                      <Button
+                        className="w-full bg-opnskin-violet hover:bg-opnskin-violet/80 text-sm py-2"
+                        onClick={createAccountLink}
+                        disabled={loading}
+                      >
+                        {loading ? 'Chargement...' : 'Compléter la configuration'}
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="mt-2 p-3 bg-opnskin-green/10 border border-opnskin-green/20 rounded-lg">
+                      <div className="flex items-center gap-2 mb-2">
+                        <CheckCircle className="h-5 w-5 text-opnskin-green" />
+                        <span className="text-sm font-semibold text-opnskin-green">Compte activé</span>
+                      </div>
+                      <p className="text-xs text-white/70 mb-3">
+                        Votre compte Stripe est prêt pour les retraits.
+                      </p>
+                      <div className="flex gap-2">
+                        <input
+                          type="number"
+                          placeholder="Montant (min 5€)"
+                          value={withdrawalAmount}
+                          onChange={(e) => setWithdrawalAmount(e.target.value)}
+                          className="flex-1 bg-black/20 border border-white/10 rounded px-3 py-2 text-sm text-white placeholder:text-white/50"
+                        />
+                        <Button
+                          className="bg-opnskin-green hover:bg-opnskin-green/80 text-sm px-4"
+                          onClick={createWithdrawal}
+                          disabled={loading || !withdrawalAmount}
+                        >
+                          {loading ? '...' : 'Retirer'}
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                  
                   <Button
                     className="w-full mt-2 bg-muted/10 text-base md:text-lg py-4 md:py-5 transition-all flex items-center justify-center gap-2 border border-opnskin-violet/40 text-opnskin-violet hover:bg-opnskin-violet/10"
                     size="lg"

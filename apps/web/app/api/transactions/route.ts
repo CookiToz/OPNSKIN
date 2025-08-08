@@ -42,15 +42,22 @@ export async function POST(req: NextRequest) {
       console.log('ERREUR: Cannot buy your own offer', offer.sellerId, buyer.id);
       return NextResponse.json({ error: 'Cannot buy your own offer' }, { status: 400 });
     }
-    if (buyer.walletBalance < offer.price) {
-      console.log('ERREUR: Insufficient wallet balance', buyer.walletBalance, offer.price);
+    // Calculer les frais de transaction (5% du prix)
+    const transactionFee = offer.price * 0.05;
+    const totalAmount = offer.price + transactionFee;
+    
+    if (buyer.walletBalance < totalAmount) {
+      console.log('ERREUR: Insufficient wallet balance', buyer.walletBalance, totalAmount);
       return NextResponse.json({ error: 'Insufficient wallet balance' }, { status: 400 });
     }
+    
     // Créer la transaction
     const { data: transaction, error: transactionError } = await supabaseAdmin.from('Transaction').insert([{
       offerId,
       buyerId: buyer.id,
+      sellerId: offer.sellerId,
       escrowAmount: offer.price,
+      transactionFee: transactionFee,
       status: 'WAITING_TRADE',
       startedAt: new Date().toISOString()
     }]).select('*,Offer(*),User:buyerId(id,name,tradeUrl,avatar)').single();

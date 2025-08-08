@@ -28,11 +28,16 @@ export async function POST(req: NextRequest) {
     if (offersError) {
       return NextResponse.json({ error: offersError.message }, { status: 500 });
     }
-    // Calculer le total
-    const total = offers.reduce((sum, offer) => sum + (offer.price || 0), 0);
-    if (buyer.walletBalance < total) {
+    // Calculer le total avec les frais de transaction (5% par offre)
+    const totalWithFees = offers.reduce((sum, offer) => {
+      const fee = (offer.price || 0) * 0.05;
+      return sum + (offer.price || 0) + fee;
+    }, 0);
+    
+    if (buyer.walletBalance < totalWithFees) {
       return NextResponse.json({ error: 'Solde insuffisant pour acheter tous les items.' }, { status: 400 });
     }
+    
     // Pour chaque offre, créer la transaction si possible
     const results = [];
     for (const offer of offers) {
@@ -40,11 +45,17 @@ export async function POST(req: NextRequest) {
         results.push({ offerId: offer?.id, success: false, error: 'Offre non disponible ou invalide.' });
         continue;
       }
+      
+      // Calculer les frais pour cette offre
+      const transactionFee = (offer.price || 0) * 0.05;
+      
       // Créer la transaction
       const { data: transaction, error: transactionError } = await supabaseAdmin.from('Transaction').insert([{
         offerId: offer.id,
         buyerId: buyer.id,
+        sellerId: offer.sellerId,
         escrowAmount: offer.price,
+        transactionFee: transactionFee,
         status: 'WAITING_TRADE',
         startedAt: new Date().toISOString()
       }]).select('*').single();
@@ -63,8 +74,8 @@ export async function POST(req: NextRequest) {
       }]);
       results.push({ offerId: offer.id, success: true });
     }
-    // Débiter le solde total de l'utilisateur
-    await supabaseAdmin.from('User').update({ walletBalance: buyer.walletBalance - total }).eq('id', buyer.id);
+    // Débiter le solde total de l'utilisateur (avec frais)
+    await supabaseAdmin.from('User').update({ walletBalance: buyer.walletBalance - totalWithFees }).eq('id', buyer.id);
     // Supprimer les items du panier correspondant aux offres achetées
     await supabaseAdmin.from('CartItem').delete().match({ userId: buyer.id }).in('offerId', offerIds);
     // Notification acheteur (une seule fois)
