@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -25,7 +25,7 @@ import { formatPrice } from '@/lib/utils';
 import { cryptoIcons } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/hooks/use-toast';
-import { useState, useEffect, useMemo } from 'react';
+import { Suspense, useState, useEffect, useMemo } from 'react';
 import { useUser } from '@/components/UserProvider';
 import { useSearchParams, useRouter } from 'next/navigation';
 
@@ -35,6 +35,14 @@ function formatDateTime(iso?: string) {
 }
 
 export default function WalletPage() {
+  return (
+    <Suspense fallback={<div />}> 
+      <WalletPageContent />
+    </Suspense>
+  );
+}
+
+function WalletPageContent() {
   const { t } = useTranslation('common');
   const currency = useCurrencyStore((state) => state.currency);
   const cryptoRates = useCryptoRatesStore();
