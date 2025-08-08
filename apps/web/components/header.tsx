@@ -63,7 +63,7 @@ export function Header() {
     });
   };
 
-  const solde = 0;
+  const solde = user?.walletBalance ?? 0;
   const isSteamLinked = user && user.loggedIn;
 
   return (
@@ -193,6 +193,7 @@ export function Header() {
                   variant="default"
                   size="sm"
                   className="btn-opnskin"
+                  onClick={() => (window.location.href = '/wallet')}
                 >
                   {t('header.recharge')}
                 </Button>
