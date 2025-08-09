@@ -65,7 +65,7 @@ async function getInventoryWithCache(steamId: string, appid: string, gameConfig:
   }
   
   // Sinon, faire la requête Steam
-  const url = `https://steamcommunity.com/inventory/${steamId}/${appid}/${gameConfig.contextid}?l=english&count=1000`;
+  const url = `https://steamcommunity.com/inventory/${steamId}/${appid}/${gameConfig.contextid}?l=english&count=100`;
   
   console.log(`[INVENTORY] Fetching ${gameConfig.name} inventory for SteamID: ${steamId}`);
   

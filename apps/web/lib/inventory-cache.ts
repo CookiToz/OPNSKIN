@@ -81,43 +81,79 @@ async function getSteamMarketPrice(name: string, currency: string): Promise<numb
   }
 }
 
-// Fonction pour récupérer l'inventaire depuis Steam
-async function fetchInventoryFromSteam(steamId: string, appid: string, gameConfig: any): Promise<any> {
-  const url = `https://steamcommunity.com/inventory/${steamId}/${appid}/${gameConfig.contextid}?l=english&count=1000`;
-  
-  console.log(`[INVENTORY CACHE] Fetching ${gameConfig.name} inventory for SteamID: ${steamId}`);
-  
-  const response = await fetchWithProxy(url, {
-    headers: {
-      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-      'Accept': 'application/json, text/plain, */*',
-      'Accept-Language': 'en-US,en;q=0.9',
-      // Évite les réponses gzip binaire mal décodées par certains proxies
-      'Accept-Encoding': 'identity',
-      'DNT': '1',
-      'Connection': 'keep-alive',
-      'Sec-Fetch-Dest': 'empty',
-      'Sec-Fetch-Mode': 'cors',
-      'Sec-Fetch-Site': 'cross-site',
-      'Cache-Control': 'no-cache',
-      'Pragma': 'no-cache'
-    },
-    context: 'steam-inventory',
-    maxRetries: 4,
-    backoffBaseMs: 700,
-    // Timeout dur pour éviter un pending infini
+// Helper: fetch JSON via proxy avec fallback direct si besoin
+async function fetchSteamJson(url: string): Promise<any> {
+  const headers = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+    'Accept': 'application/json, text/plain, */*',
+    'Accept-Language': 'en-US,en;q=0.9',
+    'Accept-Encoding': 'identity',
+    'DNT': '1',
+    'Connection': 'keep-alive',
+    'Sec-Fetch-Dest': 'empty',
+    'Sec-Fetch-Mode': 'cors',
+    'Sec-Fetch-Site': 'cross-site',
+    'Cache-Control': 'no-cache',
+    'Pragma': 'no-cache'
+  } as Record<string, string>;
+
+  const useProxy = (process.env.PROXY_STEAM_ENABLED || 'true').toLowerCase() !== 'false';
+
+  // 1) Essai via proxy (si activé)
+  if (useProxy) {
+    try {
+      const res = await fetchWithProxy(url, {
+        headers,
+        context: 'steam-inventory',
+        maxRetries: 4,
+        backoffBaseMs: 700,
+        signal: (AbortSignal as any).timeout?.(Number(process.env.PROXY_FETCH_TIMEOUT_MS || 15000))
+      });
+      const ct = res.headers.get('content-type') || '';
+      if (!ct.includes('application/json')) {
+        const s = await res.text().catch(()=>'');
+        throw new Error(`non-json via proxy (${ct}) sample=${s.slice(0,120)}`);
+      }
+      return await res.json();
+    } catch (e) {
+      console.warn('[INVENTORY CACHE] proxy fetch failed, will try direct:', String(e));
+    }
+  }
+
+  // 2) Fallback direct (single try)
+  const direct = await fetch(url, {
+    headers,
     signal: (AbortSignal as any).timeout?.(Number(process.env.PROXY_FETCH_TIMEOUT_MS || 15000))
   });
-  
-  if (!response.ok) {
-    throw new Error(`Steam API error: ${response.status} ${response.statusText}`);
+  const ctd = direct.headers.get('content-type') || '';
+  if (!ctd.includes('application/json')) {
+    const s = await direct.text().catch(()=> '');
+    throw new Error(`non-json direct (${ctd}) sample=${s.slice(0,120)}`);
   }
-  const contentType = response.headers.get('content-type') || '';
-  if (!contentType.includes('application/json')) {
-    const sample = await response.text();
-    throw new Error(`Unexpected content-type: ${contentType}. Sample: ${sample.slice(0,200)}`);
+  return await direct.json();
+}
+
+// Fonction pour récupérer l'inventaire depuis Steam (pagination & fallback)
+async function fetchInventoryFromSteam(steamId: string, appid: string, gameConfig: any): Promise<any> {
+  console.log(`[INVENTORY CACHE] Fetching ${gameConfig.name} inventory for SteamID: ${steamId}`);
+
+  const base = `https://steamcommunity.com/inventory/${steamId}/${appid}/${gameConfig.contextid}?l=english&count=100`;
+  let more = true;
+  let start_assetid: string | undefined;
+  const merged = { assets: [] as any[], descriptions: [] as any[] };
+  let safety = 0;
+
+  while (more && safety < 15) {
+    safety++;
+    const url = start_assetid ? `${base}&start_assetid=${start_assetid}` : base;
+    const page = await fetchSteamJson(url);
+    if (page?.assets?.length) merged.assets.push(...page.assets);
+    if (page?.descriptions?.length) merged.descriptions.push(...page.descriptions);
+    more = !!page?.more;
+    start_assetid = page?.last_assetid;
   }
-  return await response.json();
+
+  return merged;
 }
 
 // Fonction principale pour récupérer ou mettre en cache l'inventaire
