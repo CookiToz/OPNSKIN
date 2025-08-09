@@ -21,9 +21,9 @@ export async function GET(req: NextRequest) {
 
     // Retourner la réponse avec les métadonnées
     return NextResponse.json({
-      items: result.items,
-      lastUpdated: result.lastUpdated,
-      stale: result.stale || false,
+      items: result.items || [],
+      lastUpdated: result.lastUpdated || 0,
+      stale: !!result.stale,
       message: result.message,
       success: true
     });
