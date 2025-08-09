@@ -112,6 +112,7 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
   const [sellPrice, setSellPrice] = useState('');
   const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
   const [isSelling, setIsSelling] = useState(false);
+  const [selectedMarketPrice, setSelectedMarketPrice] = useState<number | undefined>(undefined);
   
   // États pour les filtres
   const [rarityFilter, setRarityFilter] = useState<string>('all');
@@ -238,7 +239,9 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
 
   const handleSell = (item: InventoryItem) => {
     setSelectedItem(item);
-    setSellPrice(item.marketPrice ? item.marketPrice.toString() : '');
+    const mp = priceMap[item.name] ?? item.marketPrice;
+    setSelectedMarketPrice(typeof mp === 'number' ? mp : undefined);
+    setSellPrice(typeof mp === 'number' ? mp.toFixed(2) : '');
     setSellDialogOpen(true);
   };
 
@@ -263,7 +266,7 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
     }
 
     // Validation intelligente du prix
-    const validation = validatePrice(price, selectedItem.marketPrice);
+    const validation = validatePrice(price, selectedMarketPrice);
     
     if (!validation.isValid) {
       toast({
@@ -325,6 +328,7 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
         setSellDialogOpen(false);
         setSelectedItem(null);
         setSellPrice('');
+        setSelectedMarketPrice(undefined);
         
         refetch(); // Recharge l'inventaire pour masquer l'item vendu
       } else {
@@ -350,6 +354,26 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
     setSelectedItem(item);
     setDetailsDialogOpen(true);
   };
+
+  // Si on ouvre la modale de vente sans prix marché connu, tenter un fetch ciblé
+  useEffect(() => {
+    if (!sellDialogOpen || !selectedItem) return;
+    if (selectedMarketPrice !== undefined) return;
+    fetch('/api/inventory/prices', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ names: [selectedItem.name] })
+    })
+      .then(r => r.json())
+      .then(d => {
+        const mp = d?.prices?.[selectedItem.name];
+        if (typeof mp === 'number') {
+          setSelectedMarketPrice(mp);
+          if (!sellPrice) setSellPrice(mp.toFixed(2));
+        }
+      })
+      .catch(() => {});
+  }, [sellDialogOpen, selectedItem, selectedMarketPrice, sellPrice]);
 
   // Logique de filtrage
   const filteredItems = items.filter(item => {
@@ -753,9 +777,9 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
                   <Badge variant="outline" className="text-xs border-opnskin-primary/30 text-opnskin-primary">
                     {isRareSkin(selectedItem) ? "Rare" : "Standard"}
                   </Badge>
-                  {selectedItem?.marketPrice && (
+                  {selectedMarketPrice !== undefined && (
                     <span className="text-sm text-opnskin-text-secondary">
-                      Prix marché: {formatPrice(selectedItem.marketPrice, currency, {
+                      Prix marché: {formatPrice(selectedMarketPrice, currency, {
                         ETH: cryptoRates.ETH,
                         BTC: cryptoRates.BTC,
                         SOL: cryptoRates.SOL,
@@ -787,7 +811,7 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
                     // Validation en temps réel
                     const price = parseFloat(e.target.value);
                     if (!isNaN(price) && selectedItem) {
-                      const validation = validatePrice(price, selectedItem.marketPrice);
+                      const validation = validatePrice(price, selectedMarketPrice);
                       // On peut ajouter un indicateur visuel ici si nécessaire
                     }
                   }}
@@ -800,18 +824,18 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
               </div>
               
               {/* Indicateurs de prix recommandés */}
-              {selectedItem?.marketPrice && (
+              {selectedMarketPrice !== undefined && (
                 <div className="text-xs text-opnskin-text-secondary space-y-1">
                   <div className="flex justify-between">
                     <span>Prix minimum recommandé:</span>
                     <span className="text-opnskin-accent font-mono">
-                      {(selectedItem.marketPrice * 0.1).toFixed(2)}€
+                      {(selectedMarketPrice * 0.1).toFixed(2)}€
                     </span>
                   </div>
                   <div className="flex justify-between">
                     <span>Prix maximum autorisé:</span>
                     <span className="text-opnskin-accent font-mono">
-                      {(selectedItem.marketPrice * 5).toFixed(2)}€
+                      {(selectedMarketPrice * 5).toFixed(2)}€
                     </span>
                   </div>
                 </div>

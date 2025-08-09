@@ -26,6 +26,9 @@ interface InventoryResponse {
   success: boolean;
 }
 
+// Cache mémoire au niveau du module pour persister entre pages (SPA)
+const clientInventoryCache: Map<string, { data: InventoryResponse; timestamp: number }> = new Map();
+
 export function useInventory(options: UseInventoryOptions = {}) {
   const { appid = '730', currency = 'EUR', autoRefresh = false, refreshInterval = 300000 } = options;
   const { user } = useUser();
@@ -37,9 +40,8 @@ export function useInventory(options: UseInventoryOptions = {}) {
   const [stale, setStale] = useState<boolean>(false);
   const [cacheMessage, setCacheMessage] = useState<string | null>(null);
 
-  // Cache côté client
-  const [cache, setCache] = useState<Map<string, { data: InventoryResponse; timestamp: number }>>(new Map());
-  const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+  // Ne pas expirer automatiquement: on conserve l'inventaire jusqu'au refresh manuel ou reload
+  const CACHE_DURATION = Number.POSITIVE_INFINITY;
 
   const fetchInventory = useCallback(async (force = false) => {
     if (!user?.steamId) {
@@ -49,10 +51,10 @@ export function useInventory(options: UseInventoryOptions = {}) {
 
     const cacheKey = `${user.steamId}-${appid}-${currency}`;
     const now = Date.now();
-    const cached = cache.get(cacheKey);
+    const cached = clientInventoryCache.get(cacheKey);
 
-    // Utiliser le cache si il est encore valide et qu'on ne force pas
-    if (!force && cached && now - cached.timestamp < CACHE_DURATION) {
+    // Utiliser systématiquement le cache si présent et qu'on ne force pas
+    if (!force && cached) {
       setItems(cached.data.items);
       setLastUpdated(cached.data.lastUpdated);
       setStale(cached.data.stale || false);
@@ -92,7 +94,7 @@ export function useInventory(options: UseInventoryOptions = {}) {
         return;
       }
 
-      const data: InventoryResponse = await response.json();
+       const data: InventoryResponse = await response.json();
       
       if (data.success) {
         setItems(data.items || []);
@@ -100,8 +102,8 @@ export function useInventory(options: UseInventoryOptions = {}) {
         setStale(data.stale || false);
         setCacheMessage(data.message || null);
         
-        // Mettre en cache
-        setCache(prev => new Map(prev).set(cacheKey, { data, timestamp: now }));
+        // Mettre en cache (mémoire module pour persister entre pages)
+        clientInventoryCache.set(cacheKey, { data, timestamp: now });
         setLastFetch(now);
       } else {
         setError(data.message || 'Erreur lors du chargement de l\'inventaire');
@@ -111,7 +113,7 @@ export function useInventory(options: UseInventoryOptions = {}) {
     } finally {
       setLoading(false);
     }
-  }, [user?.steamId, appid, currency, cache, lastFetch]);
+  }, [user?.steamId, appid, currency, lastFetch]);
 
   // Auto-refresh
   useEffect(() => {
