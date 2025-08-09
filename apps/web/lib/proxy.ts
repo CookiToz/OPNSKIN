@@ -1,5 +1,5 @@
 import type { Dispatcher, RequestInit } from 'undici';
-import { ProxyAgent, request as undiciRequest } from 'undici';
+import { ProxyAgent } from 'undici';
 
 type FetchInit = RequestInit & { headers?: Record<string, string> };
 
@@ -98,30 +98,27 @@ export async function fetchWithProxy(url: string, init: FetchWithProxyOptions = 
     if (wait > 0) await sleep(wait);
 
     try {
-      const { statusCode, body, headers } = await undiciRequest(url, {
-        method: init.method || 'GET',
-        headers: init.headers,
-        body: init.body as any,
+      const res = await fetch(url, {
+        ...init,
         dispatcher,
-      });
+      } as RequestInit & { dispatcher?: Dispatcher });
 
       lastRequestPerHost.set(host, now());
 
-      const text = await body.text();
-      const status = statusCode;
-
-      // Detect blocks or captcha
-      const isBlocked = status === 429 || status === 403 || /captcha|access denied|forbidden/i.test(text);
+      // Clone to inspect text for captcha while keeping stream for caller
+      const textSample = await res.clone().text().catch(() => '');
+      const status = res.status;
+      const isBlocked = status === 429 || status === 403 || /captcha|access denied|forbidden/i.test(textSample);
       if (isBlocked) {
         markProxyAsFailed(proxy);
         throw new Error(`Proxy/Steam blocked (${status})`);
       }
 
-      if (status < 200 || status >= 300) {
+      if (!res.ok) {
         throw new Error(`Bad status ${status}`);
       }
 
-      return new Response(text, { status, headers: headers as any });
+      return res;
     } catch (e: any) {
       lastError = e;
       attempt += 1;

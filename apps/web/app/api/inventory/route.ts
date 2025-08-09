@@ -92,6 +92,11 @@ async function getInventoryWithCache(steamId: string, appid: string, gameConfig:
     throw new Error(`Steam API error: ${response.status} ${response.statusText}`);
   }
   
+  const contentType = response.headers.get('content-type') || '';
+  if (!contentType.includes('application/json')) {
+    const sample = await response.text();
+    throw new Error(`Unexpected content-type: ${contentType}. Sample: ${sample.slice(0,200)}`);
+  }
   const data = await response.json();
   
   // Mettre en cache

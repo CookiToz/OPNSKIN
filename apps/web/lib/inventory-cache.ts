@@ -109,7 +109,11 @@ async function fetchInventoryFromSteam(steamId: string, appid: string, gameConfi
   if (!response.ok) {
     throw new Error(`Steam API error: ${response.status} ${response.statusText}`);
   }
-  
+  const contentType = response.headers.get('content-type') || '';
+  if (!contentType.includes('application/json')) {
+    const sample = await response.text();
+    throw new Error(`Unexpected content-type: ${contentType}. Sample: ${sample.slice(0,200)}`);
+  }
   return await response.json();
 }
 
