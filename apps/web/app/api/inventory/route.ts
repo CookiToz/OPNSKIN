@@ -293,11 +293,17 @@ export async function GET(req: NextRequest) {
     ] : [];
 
     // On ne garde que les items tradables, marketables, et non exclus
-    const filteredAssets = data.assets.filter((asset: any) => {
-      const desc = data.descriptions.find(
-        (d: any) => d.classid === asset.classid && d.instanceid === asset.instanceid
-      );
-      if (!desc) return false;
+  const findDesc = (asset: any) => {
+    let d = data.descriptions.find(
+      (x: any) => x.classid === asset.classid && x.instanceid === asset.instanceid
+    );
+    if (!d) d = data.descriptions.find((x: any) => x.classid === asset.classid);
+    return d;
+  };
+
+  const filteredAssets = data.assets.filter((asset: any) => {
+    const desc = findDesc(asset);
+    if (!desc) return false;
       if (desc.tradable !== 1) return false;
       if (desc.marketable !== 1) return false;
       if (EXCLUDED_TYPES.some(type => desc.type && desc.type.includes(type))) return false;
@@ -308,9 +314,7 @@ export async function GET(req: NextRequest) {
     const priceMap: Record<string, number> = {};
     const namesToFetch: string[] = [];
     for (const asset of filteredAssets) {
-      const desc = data.descriptions.find(
-        (d: any) => d.classid === asset.classid && d.instanceid === asset.instanceid
-      );
+      const desc = findDesc(asset);
       const name = desc?.market_hash_name || 'Unknown Item';
       if (!uniqueNames.has(name)) {
         uniqueNames.add(name);

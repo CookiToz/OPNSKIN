@@ -223,11 +223,20 @@ export async function getOrFetchInventory(
       'Gift', 'Coupon', 'Tool',
     ] : [];
     
+    // Helper pour trouver la description (fallback si instanceid ne matche pas)
+    const findDesc = (asset: any) => {
+      let d = steamData.descriptions.find(
+        (x: any) => x.classid === asset.classid && x.instanceid === asset.instanceid
+      );
+      if (!d) {
+        d = steamData.descriptions.find((x: any) => x.classid === asset.classid);
+      }
+      return d;
+    };
+
     // Filtrer les assets
     const filteredAssets = steamData.assets.filter((asset: any) => {
-      const desc = steamData.descriptions.find(
-        (d: any) => d.classid === asset.classid && d.instanceid === asset.instanceid
-      );
+      const desc = findDesc(asset);
       if (!desc) return false;
       if (desc.tradable !== 1) return false;
       if (desc.marketable !== 1) return false;
@@ -243,9 +252,7 @@ export async function getOrFetchInventory(
       const uniqueNames = new Set<string>();
       const namesToFetch: string[] = [];
       for (const asset of filteredAssets) {
-        const desc = steamData.descriptions.find(
-          (d: any) => d.classid === asset.classid && d.instanceid === asset.instanceid
-        );
+        const desc = findDesc(asset);
         const name = desc?.market_hash_name || 'Unknown Item';
         if (!uniqueNames.has(name)) {
           uniqueNames.add(name);
@@ -271,11 +278,9 @@ export async function getOrFetchInventory(
     
     // Générer les items
     const items = filteredAssets.map((asset: any) => {
-      const desc = steamData.descriptions.find(
-        (d: any) => d.classid === asset.classid && d.instanceid === asset.instanceid
-      );
+      const desc = findDesc(asset);
       const name = desc?.market_hash_name || 'Unknown Item';
-      const marketPrice = priceMap[name] || 0;
+      const marketPrice = computePricesInline ? (priceMap[name] || 0) : undefined;
       
       let rarityCode = undefined;
       if (desc?.tags && Array.isArray(desc.tags)) {
