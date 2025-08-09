@@ -89,7 +89,8 @@ const getWeaponCategory = (name: string): string => {
 export default function InventoryByGame({ game, onBack }: InventoryByGameProps) {
   const { t } = useTranslation('common');
   const { toast } = useToast();
-  const [hasRequestedLoad, setHasRequestedLoad] = useState(false);
+  // Démarre le chargement automatiquement quand un jeu est sélectionné
+  const [hasRequestedLoad, setHasRequestedLoad] = useState(true);
   
   // Utiliser le nouveau hook optimisé
   const { 

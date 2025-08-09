@@ -73,7 +73,7 @@ export function useInventory(options: UseInventoryOptions = {}) {
     setCacheMessage(null);
 
     try {
-      const response = await fetch(`/api/inventory-cache?appid=${appid}&currency=${currency}`);
+      const response = await fetch(`/api/inventory-cache?appid=${appid}&currency=${currency}`, { cache: 'no-store' });
       
       if (response.status === 429) {
         const errorData = await response.json();
@@ -82,8 +82,13 @@ export function useInventory(options: UseInventoryOptions = {}) {
       }
 
       if (!response.ok) {
-        const errorData = await response.json();
-        setError(errorData.error || 'Erreur lors du chargement de l\'inventaire');
+        let msg = 'Erreur lors du chargement de l\'inventaire';
+        try {
+          const errorData = await response.json();
+          msg = errorData.error || msg;
+        } catch {}
+        setError(msg);
+        setLoading(false);
         return;
       }
 
