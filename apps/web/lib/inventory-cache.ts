@@ -92,7 +92,8 @@ async function fetchInventoryFromSteam(steamId: string, appid: string, gameConfi
       'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
       'Accept': 'application/json, text/plain, */*',
       'Accept-Language': 'en-US,en;q=0.9',
-      'Accept-Encoding': 'gzip, deflate, br',
+      // Évite les réponses gzip binaire mal décodées par certains proxies
+      'Accept-Encoding': 'identity',
       'DNT': '1',
       'Connection': 'keep-alive',
       'Sec-Fetch-Dest': 'empty',
@@ -103,7 +104,9 @@ async function fetchInventoryFromSteam(steamId: string, appid: string, gameConfi
     },
     context: 'steam-inventory',
     maxRetries: 4,
-    backoffBaseMs: 700
+    backoffBaseMs: 700,
+    // Timeout dur pour éviter un pending infini
+    signal: (AbortSignal as any).timeout?.(Number(process.env.PROXY_FETCH_TIMEOUT_MS || 15000))
   });
   
   if (!response.ok) {

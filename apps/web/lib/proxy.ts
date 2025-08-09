@@ -98,10 +98,15 @@ export async function fetchWithProxy(url: string, init: FetchWithProxyOptions = 
     if (wait > 0) await sleep(wait);
 
     try {
+      const controller = new AbortController();
+      const timeoutMs = Number(getEnv('PROXY_FETCH_TIMEOUT_MS', '15000'));
+      const timeout = setTimeout(() => controller.abort(), timeoutMs);
       const res = await fetch(url, {
         ...init,
         dispatcher,
+        signal: init.signal || controller.signal,
       } as RequestInit & { dispatcher?: Dispatcher });
+      clearTimeout(timeout);
 
       lastRequestPerHost.set(host, now());
 

@@ -74,7 +74,7 @@ async function getInventoryWithCache(steamId: string, appid: string, gameConfig:
       'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
       'Accept': 'application/json, text/plain, */*',
       'Accept-Language': 'en-US,en;q=0.9',
-      'Accept-Encoding': 'gzip, deflate, br',
+      'Accept-Encoding': 'identity',
       'DNT': '1',
       'Connection': 'keep-alive',
       'Sec-Fetch-Dest': 'empty',
@@ -85,7 +85,8 @@ async function getInventoryWithCache(steamId: string, appid: string, gameConfig:
     },
     context: 'steam-inventory',
     maxRetries: 4,
-    backoffBaseMs: 700
+    backoffBaseMs: 700,
+    signal: (AbortSignal as any).timeout?.(Number(process.env.PROXY_FETCH_TIMEOUT_MS || 15000))
   });
   
   if (!response.ok) {
@@ -94,8 +95,8 @@ async function getInventoryWithCache(steamId: string, appid: string, gameConfig:
   
   const contentType = response.headers.get('content-type') || '';
   if (!contentType.includes('application/json')) {
-    const sample = await response.text();
-    throw new Error(`Unexpected content-type: ${contentType}. Sample: ${sample.slice(0,200)}`);
+    const sample = await response.text().catch(() => '');
+    return NextResponse.json({ error: `Steam response not JSON (${contentType})`, sample: sample.slice(0,200) }, { status: 502 });
   }
   const data = await response.json();
   
