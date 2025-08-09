@@ -105,6 +105,7 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
     appid: hasRequestedLoad ? String(game?.appid) : undefined,
     autoRefresh: false
   });
+  const [priceMap, setPriceMap] = useState<Record<string, number>>({});
   
   const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
   const [sellDialogOpen, setSellDialogOpen] = useState(false);
@@ -166,6 +167,20 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
       refetch();
     }, 1000); // 1 seconde de délai
   };
+
+  // Charger les prix en arrière-plan une fois les items chargés
+  useEffect(() => {
+    if (!items || items.length === 0) return;
+    const unique = Array.from(new Set(items.map(i => i.name)));
+    fetch('/api/inventory/prices', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ names: unique })
+    })
+      .then(r => r.json())
+      .then(d => setPriceMap(d.prices || {}))
+      .catch(() => {});
+  }, [items]);
 
   // Fonction de validation intelligente des prix
   const validatePrice = (price: number, marketPrice?: number): { isValid: boolean; message?: string; warning?: string } => {
@@ -693,7 +708,7 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
                   name={item.name}
                   image={item.icon}
                   rarity={item.rarityCode || undefined}
-                  price={item.marketPrice}
+                  price={priceMap[item.name] ?? item.marketPrice}
                   currency={currency}
                   wear={weaponWear}
                   actionButton={

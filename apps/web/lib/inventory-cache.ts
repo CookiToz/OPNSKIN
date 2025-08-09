@@ -235,38 +235,39 @@ export async function getOrFetchInventory(
       return true;
     });
     
-    // Récupérer les prix en parallèle avec limitation
-    const uniqueNames = new Set<string>();
+    // FAST INVENTORY: on ne calcule pas les prix dans le chemin critique.
+    // Les prix seront résolus côté client via /api/inventory/prices
+    const computePricesInline = (process.env.FAST_INVENTORY || 'true').toLowerCase() === 'false';
     const priceMap: Record<string, number> = {};
-    const namesToFetch: string[] = [];
-    
-    for (const asset of filteredAssets) {
-      const desc = steamData.descriptions.find(
-        (d: any) => d.classid === asset.classid && d.instanceid === asset.instanceid
-      );
-      const name = desc?.market_hash_name || 'Unknown Item';
-      if (!uniqueNames.has(name)) {
-        uniqueNames.add(name);
-        namesToFetch.push(name);
+    if (computePricesInline) {
+      const uniqueNames = new Set<string>();
+      const namesToFetch: string[] = [];
+      for (const asset of filteredAssets) {
+        const desc = steamData.descriptions.find(
+          (d: any) => d.classid === asset.classid && d.instanceid === asset.instanceid
+        );
+        const name = desc?.market_hash_name || 'Unknown Item';
+        if (!uniqueNames.has(name)) {
+          uniqueNames.add(name);
+          namesToFetch.push(name);
+        }
       }
-    }
-    
-    // Parallélisation contrôlée des fetchs de prix
-    const limit = pLimit(MAX_PARALLEL_REQUESTS);
-    await Promise.all(
-      namesToFetch.map((name, index) =>
-        limit(() => 
-          new Promise(resolve => {
-            setTimeout(() => {
-              getSteamMarketPrice(name, currency).then(price => { 
-                priceMap[name] = price; 
-                resolve(undefined);
-              });
-            }, index * STEAM_THROTTLE_DELAY);
-          })
+      const limit = pLimit(MAX_PARALLEL_REQUESTS);
+      await Promise.all(
+        namesToFetch.map((name, index) =>
+          limit(() => 
+            new Promise(resolve => {
+              setTimeout(() => {
+                getSteamMarketPrice(name, currency).then(price => { 
+                  priceMap[name] = price; 
+                  resolve(undefined);
+                });
+              }, index * STEAM_THROTTLE_DELAY);
+            })
+          )
         )
-      )
-    );
+      );
+    }
     
     // Générer les items
     const items = filteredAssets.map((asset: any) => {
