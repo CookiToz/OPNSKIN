@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { convertCurrency } from '@/lib/utils';
 import { Currency } from '@/hooks/use-currency-store';
 import pLimit from 'p-limit';
+import { fetchWithProxy } from '@/lib/proxy';
 
 // Cache local pour les prix CSFloat
 const priceCache = new Map<string, { price: number; float?: number; link?: string; timestamp: number }>();
@@ -68,7 +69,7 @@ async function getInventoryWithCache(steamId: string, appid: string, gameConfig:
   
   console.log(`[INVENTORY] Fetching ${gameConfig.name} inventory for SteamID: ${steamId}`);
   
-  const response = await fetch(url, {
+  const response = await fetchWithProxy(url, {
     headers: {
       'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
       'Accept': 'application/json, text/plain, */*',
@@ -81,7 +82,10 @@ async function getInventoryWithCache(steamId: string, appid: string, gameConfig:
       'Sec-Fetch-Site': 'cross-site',
       'Cache-Control': 'no-cache',
       'Pragma': 'no-cache'
-    }
+    },
+    context: 'steam-inventory',
+    maxRetries: 4,
+    backoffBaseMs: 700
   });
   
   if (!response.ok) {
