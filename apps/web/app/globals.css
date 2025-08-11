@@ -148,6 +148,18 @@
   .neon-glow {
     color: #287CFA;
   }
+
+  /* Remove number input spin buttons globally */
+  /* Chrome, Safari, Edge, Opera */
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  /* Firefox */
+  input[type=number] {
+    -moz-appearance: textfield;
+  }
 }
 
 /* Scrollbar OPNSKIN */
