@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { signSession } from '@/lib/session';
+import { verifySteamOpenID, validateOpenIDNonce } from '@/lib/openid';
 
 export async function GET(req: NextRequest) {
   try {
@@ -20,7 +21,7 @@ export async function GET(req: NextRequest) {
     const url = new URL(req.url);
     const searchParams = url.searchParams;
 
-    // Basic OpenID anti-replay: validate "return_to" against our host
+    // Basic OpenID anti-replay: validate "return_to" against our host + check_authentication
     const returnTo = searchParams.get('openid.return_to');
     if (returnTo) {
       try {
@@ -32,6 +33,18 @@ export async function GET(req: NextRequest) {
       } catch {
         return NextResponse.redirect(new URL('/login?error=invalid_return_to', req.url));
       }
+    }
+
+    // nonce anti-replay
+    const responseNonce = searchParams.get('openid.response_nonce');
+    if (!validateOpenIDNonce(responseNonce)) {
+      return NextResponse.redirect(new URL('/login?error=invalid_nonce', req.url));
+    }
+
+    // check_authentication with Steam (server-to-server verification)
+    const verify = await verifySteamOpenID(searchParams);
+    if (!verify.valid) {
+      return NextResponse.redirect(new URL('/login?error=openid_not_valid', req.url));
     }
 
     // Log des paramètres pour debug

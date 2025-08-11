@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSteamIdFromRequest } from '@/lib/session';
+import { rateLimit } from '@/lib/rate-limit';
 import pLimit from 'p-limit';
 
 const STEAM_CACHE_MS = 1000 * 60 * 60 * 6; // 6h
@@ -49,6 +50,17 @@ export async function POST(req: NextRequest) {
     // Require authenticated user to fetch prices (prevents abuse)
     const steamId = getSteamIdFromRequest(req);
     if (!steamId) return NextResponse.json({ error: 'Non connecté' }, { status: 401 });
+
+    // Rate limit per user and IP
+    const ip = req.headers.get('x-forwarded-for') || 'unknown';
+    const keyUser = `prices:${steamId}`;
+    const keyIp = `pricesip:${ip}`;
+    const u = rateLimit(keyUser, 10, 60_000);
+    const i = rateLimit(keyIp, 40, 60_000);
+    if (!u.allowed || !i.allowed) {
+      const retry = Math.max(u.retryAfter || 0, i.retryAfter || 0);
+      return NextResponse.json({ error: 'Rate limit', retryAfter: retry }, { status: 429 });
+    }
 
     const { names, currency = 'EUR' } = await req.json();
     if (!Array.isArray(names) || names.length === 0) {

@@ -9,12 +9,13 @@ export async function GET(req: NextRequest) {
 
     console.log('[STEAM AUTH] Using base URL:', baseUrl);
 
-    // Construction de l'URL Steam OpenID selon la documentation officielle
+    // Construction de l'URL Steam OpenID avec nonce anti-replay
     const steamLoginUrl = new URL("https://steamcommunity.com/openid/login");
+    const nonce = Math.random().toString(36).slice(2) + Date.now().toString(36);
     steamLoginUrl.search = new URLSearchParams({
       "openid.ns": "http://specs.openid.net/auth/2.0",
       "openid.mode": "checkid_setup",
-      "openid.return_to": `${baseUrl}/api/auth/steam/return`,
+      "openid.return_to": `${baseUrl}/api/auth/steam/return?nonce=${encodeURIComponent(nonce)}`,
       "openid.realm": baseUrl,
       "openid.identity": "http://specs.openid.net/auth/2.0/identifier_select",
       "openid.claimed_id": "http://specs.openid.net/auth/2.0/identifier_select"

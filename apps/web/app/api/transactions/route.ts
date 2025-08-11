@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { z } from 'zod';
+import { getSteamIdFromRequest } from '@/lib/session';
+import { rateLimit } from '@/lib/rate-limit';
+
+const BuySchema = z.object({ offerId: z.string().uuid() });
 
 export async function POST(req: NextRequest) {
   try {
@@ -7,12 +12,26 @@ export async function POST(req: NextRequest) {
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
-    const steamId = req.cookies.get('steamid')?.value;
+    const steamId = getSteamIdFromRequest(req);
     if (!steamId) {
       console.log('ERREUR: Pas de steamId dans les cookies');
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
-    const { offerId } = await req.json();
+    // Rate limit
+    const ip = req.headers.get('x-forwarded-for') || 'unknown';
+    const u = rateLimit(`buy:${steamId}`, 5, 60_000);
+    const i = rateLimit(`buyip:${ip}`, 20, 60_000);
+    if (!u.allowed || !i.allowed) {
+      const retry = Math.max(u.retryAfter || 0, i.retryAfter || 0);
+      return NextResponse.json({ error: 'Rate limit', retryAfter: retry }, { status: 429 });
+    }
+
+    const body = await req.json();
+    const parsed = BuySchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Invalid payload' }, { status: 400 });
+    }
+    const { offerId } = parsed.data;
     console.log('--- ACHAT DEBUG ---');
     console.log('offerId reçu:', offerId);
     // Récupérer l'acheteur
@@ -81,7 +100,7 @@ export async function GET(req: NextRequest) {
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
-    const steamId = req.cookies.get('steamid')?.value;
+    const steamId = getSteamIdFromRequest(req);
     if (!steamId) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }

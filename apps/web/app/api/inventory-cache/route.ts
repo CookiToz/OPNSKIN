@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSteamIdFromRequest } from '@/lib/session';
 export const runtime = 'nodejs';
 import { getOrFetchInventory } from '@/lib/inventory-cache';
+import { rateLimit } from '@/lib/rate-limit';
 
 export async function GET(req: NextRequest) {
   try {
@@ -19,6 +20,17 @@ export async function GET(req: NextRequest) {
     }
 
     console.log(`[INVENTORY CACHE API] Request for SteamID: ${steamId}, Game: ${appid}, Currency: ${currency}`);
+
+    // Rate limit per user and IP
+    const ip = req.headers.get('x-forwarded-for') || 'unknown';
+    const keyUser = `inv:${steamId}`;
+    const keyIp = `invip:${ip}`;
+    const u = rateLimit(keyUser, 3, 60_000);
+    const i = rateLimit(keyIp, 10, 60_000);
+    if (!u.allowed || !i.allowed) {
+      const retry = Math.max(u.retryAfter || 0, i.retryAfter || 0);
+      return NextResponse.json({ error: 'Rate limit', retryAfter: retry }, { status: 429 });
+    }
 
     // Utiliser la fonction de cache
     const result = await getOrFetchInventory(steamId, appid, currency);
