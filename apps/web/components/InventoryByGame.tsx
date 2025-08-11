@@ -102,7 +102,7 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
     stale,
     cacheMessage
   } = useInventory({
-    appid: hasRequestedLoad ? String(game?.appid) : undefined,
+    appid: String(game?.appid),
     autoRefresh: false,
     autoLoad: false,
   });
@@ -186,6 +186,14 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
       .then(d => setPriceMap(d.prices || {}))
       .catch(() => {});
   }, [items]);
+
+  // Si un cache existe (items hydratés) et que l'utilisateur revient sur la page,
+  // afficher directement l'inventaire sans exiger un clic
+  useEffect(() => {
+    if (!hasRequestedLoad && items && items.length > 0) {
+      setHasRequestedLoad(true);
+    }
+  }, [items, hasRequestedLoad]);
 
   // Fonction de validation intelligente des prix
   const validatePrice = (price: number, marketPrice?: number): { isValid: boolean; message?: string; warning?: string } => {
