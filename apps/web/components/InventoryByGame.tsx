@@ -139,7 +139,6 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
   const searchQuery = useSearchStore((state) => state.searchQuery);
   const { user } = useUser();
   const [listedItemIds, setListedItemIds] = useState<string[]>([]);
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     // Récupérer les itemId des offres actives de l'utilisateur
@@ -247,42 +246,7 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
     setSellDialogOpen(true);
   };
 
-  const toggleSelect = (id: string) => {
-    setSelectedIds(prev => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id); else next.add(id);
-      return next;
-    });
-  };
-
-  const handleBulkSell = async () => {
-    if (selectedIds.size === 0) return;
-    const toSell = items.filter(i => selectedIds.has(i.id));
-    const confirmed = confirm(`Mettre en vente ${toSell.length} items ?`);
-    if (!confirmed) return;
-    for (const it of toSell) {
-      try {
-        const price = priceMap[it.name] ?? it.marketPrice ?? 0.5;
-        // Applique borne min
-        const min = price > 0 ? Math.max(price * 0.1, 0.01) : 0.01;
-        const res = await fetch('/api/offers', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            itemId: it.id,
-            itemName: it.name,
-            itemImage: it.icon,
-            rarityCode: it.rarityCode,
-            game: game.key,
-            price: Number(min.toFixed(2))
-          })
-        });
-        await res.json();
-      } catch {}
-    }
-    // Ne pas recharger l’inventaire, laisser tel quel
-    setSelectedIds(new Set());
-  };
+  // Vente multiple supprimée
 
   const handleSellConfirm = async () => {
     if (!selectedItem || !sellPrice) {
@@ -363,13 +327,13 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
           })}.`,
         });
         
-        // Fermer la modal et réinitialiser
+        // Fermer la modal et réinitialiser (sans rechargement de l'inventaire)
         setSellDialogOpen(false);
         setSelectedItem(null);
         setSellPrice('');
         setSelectedMarketPrice(undefined);
-        
-        refetch(); // Recharge l'inventaire pour masquer l'item vendu
+        // Marquer localement cet item comme listé pour désactiver la revente
+        setListedItemIds(prev => prev.includes(selectedItem.id) ? prev : [...prev, selectedItem.id]);
       } else {
         toast({
           title: "Erreur",
@@ -416,8 +380,6 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
 
   // Logique de filtrage
   const filteredItems = items.filter(item => {
-    // Exclure les items déjà listés en vente par l'utilisateur
-    if (listedItemIds.includes(item.id)) return false;
     // Filtre de base : exclure les skins de faible valeur (< 0.02€)
     if (item.marketPrice !== undefined && item.marketPrice < 0.02) {
       return false;
@@ -777,56 +739,27 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
                   currency={currency}
                   wear={weaponWear}
                   actionButton={
-                    <div className="flex gap-2 w-full">
+                    listedItemIds.includes(item.id) ? (
+                      <Button size="sm" disabled className="w-full opacity-70 cursor-not-allowed">
+                        Déjà listé
+                      </Button>
+                    ) : (
                       <Button 
                         size="sm" 
-                        className="btn-opnskin-secondary flex-1 text-xs" 
+                        className="btn-opnskin-secondary w-full text-xs" 
                         onClick={() => handleSell(item)}
                       >
                         <Tag className="w-3 h-3 mr-1" />
                         {t('inventory.sell', 'Vendre')}
                       </Button>
-                      <Button
-                        size="sm"
-                        variant={selectedIds.has(item.id) ? 'default' : 'outline'}
-                        className={`text-xs ${selectedIds.has(item.id) ? 'bg-opnskin-accent text-black' : 'border-opnskin-primary/30 text-opnskin-primary hover:bg-opnskin-primary/10'}`}
-                        onClick={() => toggleSelect(item.id)}
-                        aria-pressed={selectedIds.has(item.id)}
-                        title={selectedIds.has(item.id) ? 'Désélectionner' : 'Sélectionner pour mise en vente multiple'}
-                      >
-                        {selectedIds.has(item.id) ? 'Sélectionné' : 'Sélectionner'}
-                      </Button>
-                    </div>
+                    )
                   }
                   onDetails={() => handleDetails(item)}
                 />
               );
             })}
           </div>
-          {filteredItems.length > 0 && (
-            <div className="w-full max-w-6xl mx-auto px-4 mt-4 flex items-center justify-between">
-              <div className="text-sm text-opnskin-text-secondary">
-                {selectedIds.size} sélectionné(s)
-              </div>
-              <div className="flex gap-2">
-                <Button 
-                  variant="outline"
-                  className="border-opnskin-primary/30 text-opnskin-primary hover:bg-opnskin-primary/10"
-                  disabled={selectedIds.size === 0}
-                  onClick={() => setSelectedIds(new Set())}
-                >
-                  Désélectionner tout
-                </Button>
-                <Button 
-                  className="btn-opnskin"
-                  disabled={selectedIds.size === 0}
-                  onClick={handleBulkSell}
-                >
-                  Mettre en vente ({selectedIds.size})
-                </Button>
-              </div>
-            </div>
-          )}
+          {/* Vente multiple supprimée */}
         </div>
       )}
 
