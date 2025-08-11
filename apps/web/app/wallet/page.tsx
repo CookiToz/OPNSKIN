@@ -253,7 +253,7 @@ function WalletPageContent() {
                       />
                       <Button className="bg-opnskin-green hover:bg-opnskin-green/80 text-base md:text-lg py-4 md:py-5 transition-all" size="lg" onClick={createDeposit} disabled={loading || !isLoggedIn}>
                         <PlusCircle className="mr-2 h-5 w-5" /> {t('wallet.add_funds')}
-                      </Button>
+                    </Button>
                       <span className="ml-2 hidden sm:inline text-[#635BFF] font-semibold">Stripe</span>
                     </div>
                     <Button className="flex-1 bg-opnskin-blue/90 hover:bg-opnskin-blue text-base md:text-lg py-4 md:py-5 transition-all" size="lg" disabled>
@@ -271,7 +271,7 @@ function WalletPageContent() {
                       <p className="text-xs text-white/70 mb-3">Pour retirer vos fonds, vous devez configurer votre compte Stripe.</p>
                       <Button className="w-full bg-opnskin-blue hover:bg-opnskin-blue/80 text-sm py-2" onClick={createStripeAccount} disabled={loading || !isLoggedIn}>
                         {loading ? 'Création...' : 'Créer mon compte Stripe'}
-                      </Button>
+                  </Button>
                     </div>
                   ) : !stripeAccount?.account?.payoutsEnabled ? (
                     <div className="mt-2 p-3 bg-opnskin-violet/10 border border-opnskin-violet/20 rounded-lg">
@@ -296,11 +296,11 @@ function WalletPageContent() {
                         <Button className="bg-opnskin-green hover:bg-opnskin-green/80 text-sm px-4" onClick={createWithdrawal} disabled={loading || !withdrawalAmount || !isLoggedIn}>
                           {loading ? '...' : 'Retirer'}
                         </Button>
-                      </div>
+                    </div>
                     </div>
                   )}
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
 
               {/* Historique Dépôts / Retraits */}
               <Card className="rounded-xl bg-black/40 border-white/5">
@@ -320,7 +320,7 @@ function WalletPageContent() {
                             <span className={`text-xs px-2 py-1 rounded ${d.status==='succeeded'?'bg-green-500/20 text-green-400':'bg-yellow-500/20 text-yellow-300'}`}>{d.status}</span>
                           </div>
                         ))}
-                      </div>
+                    </div>
                     </div>
                     <div>
                       <h3 className="font-rajdhani font-bold mb-2">Retraits</h3>

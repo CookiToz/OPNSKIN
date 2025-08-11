@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
 import { useTranslation } from 'react-i18next';
 import { useInventory } from "@/hooks/use-inventory";
 import { useFloat } from "@/components/FloatProvider";
@@ -712,6 +713,19 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
                         placeholder="1000.00"
                         className="bg-opnskin-bg-secondary border-opnskin-bg-secondary text-opnskin-text-primary"
                       />
+                    </div>
+
+                    {/* Masquer items déjà listés */}
+                    <div className="space-y-2">
+                      <Label className="text-opnskin-text-primary text-sm">
+                        {t('inventory.hide_listed', 'Masquer les items déjà listés')}
+                      </Label>
+                      <div className="flex items-center justify-between bg-opnskin-bg-secondary border border-opnskin-bg-secondary rounded-md px-3 py-2">
+                        <span className="text-opnskin-text-secondary text-sm">
+                          {hideListed ? t('common.yes', 'Oui') : t('common.no', 'Non')}
+                        </span>
+                        <Switch checked={hideListed} onCheckedChange={setHideListed} />
+                      </div>
                     </div>
                   </div>
                   
