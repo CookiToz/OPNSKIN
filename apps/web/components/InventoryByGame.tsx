@@ -91,6 +91,7 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
   const { toast } = useToast();
   // Démarrer automatiquement: on charge depuis la DB/cache au montage
   const [hasRequestedLoad, setHasRequestedLoad] = useState(true);
+  const [loadedOnce, setLoadedOnce] = useState(false);
   
   // Utiliser le nouveau hook optimisé
   const { 
@@ -104,7 +105,7 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
   } = useInventory({
     appid: String(game?.appid),
     autoRefresh: false,
-    autoLoad: false,
+    autoLoad: true,
   });
   const [priceMap, setPriceMap] = useState<Record<string, number>>({});
   
@@ -121,6 +122,9 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
   const [priceMaxFilter, setPriceMaxFilter] = useState<string>('');
   const [weaponFilter, setWeaponFilter] = useState<string>('all');
   const [showFilters, setShowFilters] = useState(false);
+  // Sélection multiple
+  const [multiSelected, setMultiSelected] = useState<Record<string, { item: InventoryItem; price: string; marketPrice?: number }>>({});
+  const multiSelectedCount = Object.keys(multiSelected).length;
   
   const currency = useCurrencyStore((s) => s.currency);
   const cryptoRates = useCryptoRatesStore((s) => s);
@@ -195,13 +199,12 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
       .catch(() => {});
   }, [items]);
 
-  // Si un cache existe (items hydratés) et que l'utilisateur revient sur la page,
-  // afficher directement l'inventaire sans exiger un clic
+  // Marquer que le premier chargement a eu lieu pour afficher le bouton de mise à jour ensuite
   useEffect(() => {
-    if (!hasRequestedLoad && items && items.length > 0) {
-      setHasRequestedLoad(true);
+    if (!loadedOnce && !isLoading && !errorMsg && items && items.length > 0) {
+      setLoadedOnce(true);
     }
-  }, [items, hasRequestedLoad]);
+  }, [items, isLoading, errorMsg, loadedOnce]);
 
   // Fonction de validation intelligente des prix
   const validatePrice = (price: number, marketPrice?: number): { isValid: boolean; message?: string; warning?: string } => {
@@ -265,7 +268,55 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
     setSellDialogOpen(true);
   };
 
-  // Vente multiple supprimée
+  const toggleMultiSelect = (item: InventoryItem) => {
+    if (listedItemIds.includes(item.id) || sessionListedIds.has(item.id)) return;
+    setMultiSelected(prev => {
+      const copy = { ...prev };
+      if (copy[item.id]) {
+        delete copy[item.id];
+      } else {
+        const mp = priceMap[item.name] ?? item.marketPrice;
+        const defaultPrice = typeof mp === 'number' && mp > 0 ? mp.toFixed(2) : '0.50';
+        copy[item.id] = { item, price: defaultPrice, marketPrice: typeof mp === 'number' ? mp : undefined };
+      }
+      return copy;
+    });
+  };
+
+  const updateMultiPrice = (id: string, value: string) => {
+    setMultiSelected(prev => ({ ...prev, [id]: { ...prev[id], price: value } }));
+  };
+
+  const handleListAllSelected = async () => {
+    const ids = Object.keys(multiSelected);
+    if (ids.length === 0) return;
+    if (!confirm(`Mettre en vente ${ids.length} item(s) ?`)) return;
+    for (const id of ids) {
+      const entry = multiSelected[id];
+      const price = parseFloat(entry.price);
+      if (!entry || isNaN(price) || price <= 0) continue;
+      try {
+        const v = validatePrice(price, entry.marketPrice);
+        if (!v.isValid) continue;
+        const res = await fetch('/api/offers', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            itemId: entry.item.id,
+            itemName: entry.item.name,
+            itemImage: entry.item.icon,
+            rarityCode: entry.item.rarityCode,
+            game: game.key,
+            price,
+          })
+        });
+        if (res.ok) {
+          setSessionListedIds(prev => new Set(prev).add(entry.item.id));
+          setMultiSelected(prev => { const c = { ...prev }; delete c[id]; return c; });
+        }
+      } catch {}
+    }
+  };
 
   const handleSellConfirm = async () => {
     if (!selectedItem || !sellPrice) {
@@ -471,7 +522,7 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
         <h2 className="text-3xl md:text-4xl font-bold font-rajdhani tracking-tight text-opnskin-primary drop-shadow-lg">
           {t('inventory.title', 'Inventaire')} {t(`marketplace.game_${game.key}`, game.name)}
         </h2>
-        {hasRequestedLoad && !isLoading && (
+        {loadedOnce && !isLoading && (
           <div className="flex items-center gap-2">
             <Button 
               onClick={() => setShowFilters(!showFilters)}
@@ -750,18 +801,28 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
                   wear={weaponWear}
                   actionButton={
                     (listedItemIds.includes(item.id) || sessionListedIds.has(item.id)) ? (
-                      <Button size="sm" disabled className="w-full opacity-70 cursor-not-allowed">
-                        Déjà listé
-                      </Button>
+                      <Button size="sm" disabled className="w-full opacity-70 cursor-not-allowed">Déjà listé</Button>
                     ) : (
-                      <Button 
-                        size="sm" 
-                        className="btn-opnskin-secondary w-full text-xs" 
-                        onClick={() => handleSell(item)}
-                      >
-                        <Tag className="w-3 h-3 mr-1" />
-                        {t('inventory.sell', 'Vendre')}
-                      </Button>
+                      <div className="flex gap-2 w-full">
+                        <Button 
+                          size="sm" 
+                          className="btn-opnskin-secondary flex-1 text-xs" 
+                          onClick={() => handleSell(item)}
+                        >
+                          <Tag className="w-3 h-3 mr-1" />
+                          {t('inventory.sell', 'Vendre')}
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant={multiSelected[item.id] ? 'default' : 'outline'}
+                          className={`text-xs ${multiSelected[item.id] ? 'bg-opnskin-accent text-black' : 'border-opnskin-primary/30 text-opnskin-primary hover:bg-opnskin-primary/10'}`}
+                          onClick={() => toggleMultiSelect(item)}
+                          aria-pressed={!!multiSelected[item.id]}
+                          title={multiSelected[item.id] ? 'Désélectionner' : 'Sélectionner pour vente multiple'}
+                        >
+                          {multiSelected[item.id] ? 'Sélectionné' : 'Sélectionner'}
+                        </Button>
+                      </div>
                     )
                   }
                   onDetails={() => handleDetails(item)}
@@ -769,7 +830,41 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
               );
             })}
           </div>
-          {/* Vente multiple supprimée */}
+          {multiSelectedCount > 0 && (
+            <div className="fixed bottom-0 left-0 right-0 bg-opnskin-bg-card/95 border-t border-opnskin-bg-secondary z-50">
+              <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+                <div className="text-sm text-opnskin-text-secondary">
+                  {multiSelectedCount} sélectionné(s)
+                </div>
+                <div className="flex-1 overflow-x-auto">
+                  <div className="flex items-center gap-3 min-w-[600px]">
+                    {Object.values(multiSelected).map(sel => (
+                      <div key={sel.item.id} className="flex items-center gap-2 bg-opnskin-bg-secondary rounded px-2 py-1 border border-opnskin-bg-secondary">
+                        <img src={sel.item.icon} alt={sel.item.name} className="w-8 h-8 object-contain" />
+                        <div className="text-xs max-w-[220px] truncate" title={sel.item.name}>{sel.item.name}</div>
+                        <Input
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          value={sel.price}
+                          onChange={(e) => updateMultiPrice(sel.item.id, e.target.value)}
+                          className="h-8 w-24 bg-opnskin-bg-primary border-opnskin-bg-secondary text-opnskin-text-primary"
+                        />
+                        {typeof sel.marketPrice === 'number' && (
+                          <span className="text-[10px] text-opnskin-text-secondary">min {(sel.marketPrice*0.1).toFixed(2)}€</span>
+                        )}
+                        <Button size="sm" variant="ghost" className="text-xs" onClick={() => toggleMultiSelect(sel.item)}>✕</Button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button variant="outline" className="border-opnskin-primary/30 text-opnskin-primary hover:bg-opnskin-primary/10" onClick={() => setMultiSelected({})}>Tout effacer</Button>
+                  <Button className="btn-opnskin" onClick={handleListAllSelected}>Lister tout</Button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
