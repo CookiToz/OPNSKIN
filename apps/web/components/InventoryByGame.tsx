@@ -138,7 +138,9 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
   
   const searchQuery = useSearchStore((state) => state.searchQuery);
   const { user } = useUser();
-  const [listedItemIds, setListedItemIds] = useState<string[]>([]);
+  const [listedItemIds, setListedItemIds] = useState<string[]>([]); // depuis le serveur
+  const [sessionListedIds, setSessionListedIds] = useState<Set<string>>(new Set()); // listés localement depuis dernier refresh
+  const [hideListed, setHideListed] = useState<boolean>(false); // cacher les listés après refresh manuel
 
   useEffect(() => {
     // Récupérer les itemId des offres actives de l'utilisateur
@@ -163,6 +165,7 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
 
   const handleRefreshInventory = () => {
     setHasRequestedLoad(true);
+    setHideListed(true); // Après un refresh manuel, on masque les items listés
     
     // Ajouter un délai pour éviter le rate limit
     setTimeout(() => {
@@ -332,8 +335,8 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
         setSelectedItem(null);
         setSellPrice('');
         setSelectedMarketPrice(undefined);
-        // Marquer localement cet item comme listé pour désactiver la revente
-        setListedItemIds(prev => prev.includes(selectedItem.id) ? prev : [...prev, selectedItem.id]);
+        // Marquer localement cet item comme listé pour désactiver la revente jusqu'au prochain refresh
+        setSessionListedIds(prev => new Set(prev).add(selectedItem.id));
       } else {
         toast({
           title: "Erreur",
@@ -380,6 +383,8 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
 
   // Logique de filtrage
   const filteredItems = items.filter(item => {
+    const isListed = listedItemIds.includes(item.id) || sessionListedIds.has(item.id);
+    if (hideListed && isListed) return false;
     // Filtre de base : exclure les skins de faible valeur (< 0.02€)
     if (item.marketPrice !== undefined && item.marketPrice < 0.02) {
       return false;
@@ -739,7 +744,7 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
                   currency={currency}
                   wear={weaponWear}
                   actionButton={
-                    listedItemIds.includes(item.id) ? (
+                    (listedItemIds.includes(item.id) || sessionListedIds.has(item.id)) ? (
                       <Button size="sm" disabled className="w-full opacity-70 cursor-not-allowed">
                         Déjà listé
                       </Button>
