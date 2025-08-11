@@ -139,6 +139,7 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
   const searchQuery = useSearchStore((state) => state.searchQuery);
   const { user } = useUser();
   const [listedItemIds, setListedItemIds] = useState<string[]>([]);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     // Récupérer les itemId des offres actives de l'utilisateur
@@ -244,6 +245,43 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
     setSelectedMarketPrice(typeof mp === 'number' ? mp : undefined);
     setSellPrice(typeof mp === 'number' ? mp.toFixed(2) : '');
     setSellDialogOpen(true);
+  };
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
+
+  const handleBulkSell = async () => {
+    if (selectedIds.size === 0) return;
+    const toSell = items.filter(i => selectedIds.has(i.id));
+    const confirmed = confirm(`Mettre en vente ${toSell.length} items ?`);
+    if (!confirmed) return;
+    for (const it of toSell) {
+      try {
+        const price = priceMap[it.name] ?? it.marketPrice ?? 0.5;
+        // Applique borne min
+        const min = price > 0 ? Math.max(price * 0.1, 0.01) : 0.01;
+        const res = await fetch('/api/offers', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            itemId: it.id,
+            itemName: it.name,
+            itemImage: it.icon,
+            rarityCode: it.rarityCode,
+            game: game.key,
+            price: Number(min.toFixed(2))
+          })
+        });
+        await res.json();
+      } catch {}
+    }
+    // Ne pas recharger l’inventaire, laisser tel quel
+    setSelectedIds(new Set());
   };
 
   const handleSellConfirm = async () => {
@@ -450,25 +488,27 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
         <h2 className="text-3xl md:text-4xl font-bold font-rajdhani tracking-tight text-opnskin-primary drop-shadow-lg">
           {t('inventory.title', 'Inventaire')} {t(`marketplace.game_${game.key}`, game.name)}
         </h2>
-        <div className="flex items-center gap-2">
-          <Button 
-            onClick={() => setShowFilters(!showFilters)}
-            variant={hasActiveFilters ? "default" : "outline"}
-            className={`flex items-center gap-2 ${hasActiveFilters ? 'bg-opnskin-accent text-black' : 'border-opnskin-primary/30 text-opnskin-primary hover:bg-opnskin-primary/10'}`}
-          >
-            <Filter className="w-4 h-4" />
-            {t('inventory.filters', 'Filtres')}
-            {hasActiveFilters && <Badge className="ml-1 bg-black/20 text-black text-xs">Actif</Badge>}
-          </Button>
-          <Button 
-            onClick={handleRefreshInventory}
-            disabled={isLoading}
-            className="btn-opnskin flex items-center gap-2"
-          >
-            <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
-            {t('inventory.refresh', 'Actualiser')}
-          </Button>
-        </div>
+        {hasRequestedLoad && (
+          <div className="flex items-center gap-2">
+            <Button 
+              onClick={() => setShowFilters(!showFilters)}
+              variant={hasActiveFilters ? "default" : "outline"}
+              className={`flex items-center gap-2 ${hasActiveFilters ? 'bg-opnskin-accent text-black' : 'border-opnskin-primary/30 text-opnskin-primary hover:bg-opnskin-primary/10'}`}
+            >
+              <Filter className="w-4 h-4" />
+              {t('inventory.filters', 'Filtres')}
+              {hasActiveFilters && <Badge className="ml-1 bg-black/20 text-black text-xs">Actif</Badge>}
+            </Button>
+            <Button 
+              onClick={handleRefreshInventory}
+              disabled={isLoading}
+              className="btn-opnskin flex items-center gap-2"
+            >
+              <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+              {t('inventory.refresh', 'Actualiser')}
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Affichage des informations de cache */}
@@ -737,20 +777,56 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
                   currency={currency}
                   wear={weaponWear}
                   actionButton={
-                    <Button 
-                      size="sm" 
-                      className="btn-opnskin-secondary flex-1 text-xs" 
-                      onClick={() => handleSell(item)}
-                    >
-                      <Tag className="w-3 h-3 mr-1" />
-                      {t('inventory.sell', 'Vendre')}
-                    </Button>
+                    <div className="flex gap-2 w-full">
+                      <Button 
+                        size="sm" 
+                        className="btn-opnskin-secondary flex-1 text-xs" 
+                        onClick={() => handleSell(item)}
+                      >
+                        <Tag className="w-3 h-3 mr-1" />
+                        {t('inventory.sell', 'Vendre')}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant={selectedIds.has(item.id) ? 'default' : 'outline'}
+                        className={`text-xs ${selectedIds.has(item.id) ? 'bg-opnskin-accent text-black' : 'border-opnskin-primary/30 text-opnskin-primary hover:bg-opnskin-primary/10'}`}
+                        onClick={() => toggleSelect(item.id)}
+                        aria-pressed={selectedIds.has(item.id)}
+                        title={selectedIds.has(item.id) ? 'Désélectionner' : 'Sélectionner pour mise en vente multiple'}
+                      >
+                        {selectedIds.has(item.id) ? 'Sélectionné' : 'Sélectionner'}
+                      </Button>
+                    </div>
                   }
                   onDetails={() => handleDetails(item)}
                 />
               );
             })}
           </div>
+          {filteredItems.length > 0 && (
+            <div className="w-full max-w-6xl mx-auto px-4 mt-4 flex items-center justify-between">
+              <div className="text-sm text-opnskin-text-secondary">
+                {selectedIds.size} sélectionné(s)
+              </div>
+              <div className="flex gap-2">
+                <Button 
+                  variant="outline"
+                  className="border-opnskin-primary/30 text-opnskin-primary hover:bg-opnskin-primary/10"
+                  disabled={selectedIds.size === 0}
+                  onClick={() => setSelectedIds(new Set())}
+                >
+                  Désélectionner tout
+                </Button>
+                <Button 
+                  className="btn-opnskin"
+                  disabled={selectedIds.size === 0}
+                  onClick={handleBulkSell}
+                >
+                  Mettre en vente ({selectedIds.size})
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
