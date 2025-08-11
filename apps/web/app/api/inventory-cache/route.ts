@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSteamIdFromRequest } from '@/lib/session';
 export const runtime = 'nodejs';
 import { getOrFetchInventory } from '@/lib/inventory-cache';
-import { rateLimit } from '@/lib/rate-limit';
+import { rateLimit, extractClientIp } from '@/lib/rate-limit';
 
 export async function GET(req: NextRequest) {
   try {
@@ -22,14 +22,19 @@ export async function GET(req: NextRequest) {
     console.log(`[INVENTORY CACHE API] Request for SteamID: ${steamId}, Game: ${appid}, Currency: ${currency}`);
 
     // Rate limit per user and IP
-    const ip = req.headers.get('x-forwarded-for') || 'unknown';
+    const ip = extractClientIp(req.headers);
     const keyUser = `inv:${steamId}`;
     const keyIp = `invip:${ip}`;
-    const u = rateLimit(keyUser, 3, 60_000);
-    const i = rateLimit(keyIp, 10, 60_000);
+    const u = rateLimit(keyUser, 10, 60_000); // 10/min par utilisateur
+    const i = rateLimit(keyIp, 60, 60_000);   // 60/min par IP
     if (!u.allowed || !i.allowed) {
       const retry = Math.max(u.retryAfter || 0, i.retryAfter || 0);
-      return NextResponse.json({ error: 'Rate limit', retryAfter: retry }, { status: 429 });
+      // Si l'utilisateur a atteint sa propre limite → bloquer seulement lui, pas l'IP entière
+      if (!u.allowed) {
+        return NextResponse.json({ error: 'Rate limit user', retryAfter: retry }, { status: 429 });
+      }
+      // Sinon, l'IP a atteint la limite (possiblement du spam): on renvoie un retry sans bloquer d'autres users/account si possible
+      return NextResponse.json({ error: 'Rate limit ip', retryAfter: retry }, { status: 429 });
     }
 
     // Utiliser la fonction de cache: par défaut, préférer le cache existant

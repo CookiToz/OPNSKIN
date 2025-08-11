@@ -311,9 +311,17 @@ export async function getOrFetchInventory(
       }
     };
     
+    // Remplacer l'ancien en deux étapes pour éviter les exigences de contrainte unique
     await supabase
       .from('InventoryCache')
-      .upsert({
+      .delete()
+      .eq('steamId', steamId)
+      .eq('gameId', appid)
+      .eq('currency', currency);
+    await supabase
+      .from('InventoryCache')
+      .insert({
+        id: (globalThis.crypto?.randomUUID?.() || require('node:crypto').randomUUID()),
         steamId,
         gameId: appid,
         currency,

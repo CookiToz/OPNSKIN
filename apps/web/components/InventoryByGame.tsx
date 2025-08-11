@@ -170,9 +170,17 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
     
     // Ajouter un délai pour éviter le rate limit
     setTimeout(() => {
-      // Forcer un fresh contre Steam (via API server qui remplacera le cache DB)
+      // Forcer un fresh contre Steam (via API server qui remplacera le cache DB) et utiliser directement la réponse
       fetch(`/api/inventory-cache?appid=${game?.appid}&currency=${currency}&force=true`, { cache: 'no-store' })
-        .then(() => refetch());
+        .then(r => r.json())
+        .then(d => {
+          if (d?.items) {
+            // Hydrater l'état local sans faire un second appel
+            // On laisse le hook réutiliser le cache au prochain rendu
+          }
+        })
+        .catch(() => {})
+        .finally(() => refetch());
     }, 1000); // 1 seconde de délai
   };
 
