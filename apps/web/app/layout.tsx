@@ -6,6 +6,7 @@ import { UserProvider } from '@/components/UserProvider'
 import { FloatProvider } from '@/components/FloatProvider'
 import { InventoryProvider } from '@/components/InventoryProvider'
 import { Toaster } from '@/components/ui/toaster'
+import NotificationsLive from '@/components/NotificationsLive'
 import UserPresencePinger from '@/components/UserPresencePinger'
 import ScrollToTop from '@/components/ScrollToTop'
 import { usePingPresence } from './hooks/use-ping-presence';
@@ -143,6 +144,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     </main>
                   </div>
                 </div>
+                <NotificationsLive />
                 <Toaster />
               </FloatProvider>
             </InventoryProvider>

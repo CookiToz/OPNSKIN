@@ -8,8 +8,10 @@ import type {
   ToastProps,
 } from "@/components/ui/toast"
 
-const TOAST_LIMIT = 1
-const TOAST_REMOVE_DELAY = 1000000
+// Limite d'affichage simultané pour éviter d'obstruer l'UI
+const TOAST_LIMIT = 3
+// Retirer automatiquement après 8s
+const TOAST_REMOVE_DELAY = 8000
 
 type ToasterToast = ToastProps & {
   id: string
