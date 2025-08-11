@@ -19,6 +19,20 @@ export async function GET(req: NextRequest) {
     const url = new URL(req.url);
     const searchParams = url.searchParams;
 
+    // Basic OpenID anti-replay: validate "return_to" against our host
+    const returnTo = searchParams.get('openid.return_to');
+    if (returnTo) {
+      try {
+        const rt = new URL(returnTo);
+        const host = req.headers.get('host') || '';
+        if (rt.host !== host) {
+          return NextResponse.redirect(new URL('/login?error=invalid_return_to', req.url));
+        }
+      } catch {
+        return NextResponse.redirect(new URL('/login?error=invalid_return_to', req.url));
+      }
+    }
+
     // Log des paramètres pour debug
     console.log('[STEAM OPENID] Received params:', Object.fromEntries(searchParams.entries()));
 
@@ -102,8 +116,8 @@ export async function GET(req: NextRequest) {
     // Configuration du cookie pour le domaine Vercel
     response.cookies.set('steamid', steamId, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production', // true seulement en production
-      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
       path: '/',
       maxAge: 60 * 60 * 24 * 7, // 7 jours
     });

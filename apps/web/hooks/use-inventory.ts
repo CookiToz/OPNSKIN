@@ -12,10 +12,11 @@ interface InventoryItem {
 }
 
 interface UseInventoryOptions {
-  appid?: string;
+  appid?: string; // Ne pas mettre de valeur par défaut: undefined signifie "ne pas charger"
   currency?: string;
   autoRefresh?: boolean;
   refreshInterval?: number;
+  autoLoad?: boolean; // Nouveau: contrôle explicite du chargement initial
 }
 
 interface InventoryResponse {
@@ -30,7 +31,7 @@ interface InventoryResponse {
 const clientInventoryCache: Map<string, { data: InventoryResponse; timestamp: number }> = new Map();
 
 export function useInventory(options: UseInventoryOptions = {}) {
-  const { appid = '730', currency = 'EUR', autoRefresh = false, refreshInterval = 300000 } = options;
+  const { appid, currency = 'EUR', autoRefresh = false, refreshInterval = 300000, autoLoad = false } = options;
   const { user } = useUser();
   const [items, setItems] = useState<InventoryItem[]>([]);
   const [loading, setLoading] = useState(false);
@@ -44,6 +45,8 @@ export function useInventory(options: UseInventoryOptions = {}) {
   const CACHE_DURATION = Number.POSITIVE_INFINITY;
 
   const fetchInventory = useCallback(async (force = false) => {
+    // Ne jamais charger si l'appid n'est pas fourni
+    if (!appid) return;
     if (!user?.steamId) {
       setError('Utilisateur non connecté');
       return;
@@ -115,9 +118,9 @@ export function useInventory(options: UseInventoryOptions = {}) {
     }
   }, [user?.steamId, appid, currency, lastFetch]);
 
-  // Auto-refresh
+  // Auto-refresh (désactivé par défaut)
   useEffect(() => {
-    if (!autoRefresh || !user?.steamId) return;
+    if (!autoRefresh || !user?.steamId || !appid) return;
 
     const interval = setInterval(() => {
       fetchInventory();
@@ -126,12 +129,12 @@ export function useInventory(options: UseInventoryOptions = {}) {
     return () => clearInterval(interval);
   }, [autoRefresh, user?.steamId, refreshInterval, fetchInventory]);
 
-  // Chargement initial
+  // Chargement initial contrôlé
   useEffect(() => {
-    if (user?.steamId) {
+    if (autoLoad && user?.steamId && appid) {
       fetchInventory();
     }
-  }, [user?.steamId, appid, currency]);
+  }, [autoLoad, user?.steamId, appid, currency, fetchInventory]);
 
   const refresh = useCallback(() => {
     fetchInventory(true);

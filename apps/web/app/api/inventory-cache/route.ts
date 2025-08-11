@@ -11,8 +11,11 @@ export async function GET(req: NextRequest) {
 
     // Récupérer les paramètres de l'URL
     const { searchParams } = new URL(req.url);
-    const appid = searchParams.get('appid') || '730';
+    const appid = searchParams.get('appid') || undefined;
     const currency = searchParams.get('currency') || 'EUR';
+    if (!appid) {
+      return NextResponse.json({ error: 'appid requis' }, { status: 400 });
+    }
 
     console.log(`[INVENTORY CACHE API] Request for SteamID: ${steamId}, Game: ${appid}, Currency: ${currency}`);
 

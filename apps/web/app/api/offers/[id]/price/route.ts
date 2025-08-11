@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import { createClient } from '@supabase/supabase-js';
+
+const UpdatePriceSchema = z.object({ price: z.number().min(0.01).max(10000) });
 
 export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
   try {
@@ -17,10 +20,12 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
       .single();
     if (userError || !user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
-    const { price } = await req.json();
-    if (typeof price !== 'number' || price <= 0) {
+    const body = await req.json();
+    const parsed = UpdatePriceSchema.safeParse(body);
+    if (!parsed.success) {
       return NextResponse.json({ error: 'Invalid price' }, { status: 400 });
     }
+    const { price } = parsed.data;
 
     const { data: offer, error: offerError } = await supabaseAdmin
       .from('Offer')

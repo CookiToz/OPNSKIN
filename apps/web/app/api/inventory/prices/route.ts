@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import pLimit from 'p-limit';
 
 const STEAM_CACHE_MS = 1000 * 60 * 60 * 6; // 6h
-const PARALLEL = 8;
-const STEP_DELAY_MS = 120;
+const PARALLEL = 4; // réduire pression sur Steam
+const STEP_DELAY_MS = 200; // délai un peu plus long
 
 const memoryCache = new Map<string, { price: number; ts: number }>();
 

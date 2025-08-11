@@ -1,7 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import { createClient } from '@supabase/supabase-js';
 
 // Créer une nouvelle offre
+const CreateOfferSchema = z.object({
+  itemId: z.string().min(1),
+  itemName: z.string().optional(),
+  itemImage: z.string().optional(),
+  rarityCode: z.string().optional().nullable(),
+  game: z.enum(['cs2','dota2','rust','tf2']).optional(),
+  price: z.number().min(0.01).max(10000),
+});
+
 export async function POST(req: NextRequest) {
   try {
     const supabaseAdmin = createClient(
@@ -12,10 +22,12 @@ export async function POST(req: NextRequest) {
     if (!steamId) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
-    const { itemId, itemName, itemImage, rarityCode, game, price } = await req.json();
-    if (!itemId || price === undefined || price === null) {
-      return NextResponse.json({ error: 'Invalid offer data' }, { status: 400 });
+    const body = await req.json();
+    const parsed = CreateOfferSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Invalid offer data', details: parsed.error.flatten() }, { status: 400 });
     }
+    const { itemId, itemName, itemImage, rarityCode, game, price } = parsed.data;
     // Récupérer l'utilisateur
     const { data: user, error: userError } = await supabaseAdmin.from('User').select('*').eq('steamId', steamId).single();
     if (userError || !user) {
@@ -34,11 +46,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Vous avez déjà une offre active pour ce skin." }, { status: 400 });
     }
     // Validation stricte du champ game
-    const allowedGames = ['cs2', 'dota2', 'rust', 'tf2'];
-    let offerGame = (game || '').toLowerCase();
-    if (!allowedGames.includes(offerGame)) {
-      offerGame = 'cs2';
-    }
+    const offerGame = (game || 'cs2');
     // Créer l'offre
     const { data: offer, error: offerError } = await supabaseAdmin.from('Offer').insert([{
       sellerId: user.id,
@@ -47,7 +55,7 @@ export async function POST(req: NextRequest) {
       itemImage: itemImage || '',
       rarityCode: rarityCode || null,
       game: offerGame,
-      price: parseFloat(price),
+      price: price,
       status: 'AVAILABLE',
       expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
     }]).select('*').single();
