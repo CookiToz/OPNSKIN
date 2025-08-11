@@ -32,8 +32,9 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Rate limit', retryAfter: retry }, { status: 429 });
     }
 
-    // Utiliser la fonction de cache
-    const result = await getOrFetchInventory(steamId, appid, currency);
+    // Utiliser la fonction de cache: par défaut, préférer le cache existant
+    const forceFresh = (searchParams.get('force') === 'true');
+    const result = await getOrFetchInventory(steamId, appid, currency, { forceFresh, preferCache: !forceFresh });
 
     // Retourner la réponse avec les métadonnées
     return NextResponse.json({

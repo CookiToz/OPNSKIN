@@ -3,7 +3,7 @@ import { fetchWithProxy } from '@/lib/proxy';
 import pLimit from 'p-limit';
 
 // Configuration
-const CACHE_DURATION = 60 * 1000; // 60 secondes
+const CACHE_DURATION = 60 * 1000; // 60 secondes (informationnelle)
 const STEAM_THROTTLE_DELAY = 500; // 500ms entre requêtes Steam
 const MAX_PARALLEL_REQUESTS = 4; // 4 requêtes max en parallèle
 
@@ -158,9 +158,10 @@ async function fetchInventoryFromSteam(steamId: string, appid: string, gameConfi
 
 // Fonction principale pour récupérer ou mettre en cache l'inventaire
 export async function getOrFetchInventory(
-  steamId: string, 
-  appid: string = '730', 
-  currency: string = 'EUR'
+  steamId: string,
+  appid: string = '730',
+  currency: string = 'EUR',
+  options: { forceFresh?: boolean; preferCache?: boolean } = { forceFresh: false, preferCache: true }
 ): Promise<{
   items: any[];
   lastUpdated: number;
@@ -193,9 +194,9 @@ export async function getOrFetchInventory(
     .eq('currency', currency)
     .single();
   
-  // 2. Si le cache existe et est récent (< 60 secondes), le retourner
-  if (cachedData && (now - new Date(cachedData.updatedAt).getTime()) < CACHE_DURATION) {
-    console.log(`[INVENTORY CACHE] Using cached data for ${gameConfig.name}`);
+  // 2. Si le cache existe et qu'on préfère le cache (comportement par défaut), le retourner
+  if (cachedData && !options.forceFresh && options.preferCache !== false) {
+    console.log(`[INVENTORY CACHE] Using cached data for ${gameConfig.name} (preferCache)`);
     return {
       items: cachedData.data.items || [],
       lastUpdated: Math.floor((now - new Date(cachedData.updatedAt).getTime()) / 1000)
