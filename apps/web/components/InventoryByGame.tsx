@@ -7,7 +7,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
 import { useTranslation } from 'react-i18next';
 import { useInventory } from "@/hooks/use-inventory";
 import { useFloat } from "@/components/FloatProvider";
@@ -90,8 +89,8 @@ const getWeaponCategory = (name: string): string => {
 export default function InventoryByGame({ game, onBack }: InventoryByGameProps) {
   const { t } = useTranslation('common');
   const { toast } = useToast();
-  // Ne pas démarrer automatiquement: l'utilisateur doit cliquer sur Actualiser
-  const [hasRequestedLoad, setHasRequestedLoad] = useState(false);
+  // Démarrer automatiquement: on charge depuis la DB/cache au montage
+  const [hasRequestedLoad, setHasRequestedLoad] = useState(true);
   
   // Utiliser le nouveau hook optimisé
   const { 
@@ -141,7 +140,6 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
   const { user } = useUser();
   const [listedItemIds, setListedItemIds] = useState<string[]>([]); // depuis le serveur
   const [sessionListedIds, setSessionListedIds] = useState<Set<string>>(new Set()); // listés localement depuis dernier refresh
-  const [hideListed, setHideListed] = useState<boolean>(false); // cacher les listés après refresh manuel
 
   useEffect(() => {
     // Récupérer les itemId des offres actives de l'utilisateur
@@ -166,7 +164,6 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
 
   const handleRefreshInventory = () => {
     setHasRequestedLoad(true);
-    setHideListed(true); // Après un refresh manuel, on masque les items listés
     
     // Ajouter un délai pour éviter le rate limit
     setTimeout(() => {
@@ -403,7 +400,7 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
   // Logique de filtrage
   const filteredItems = items.filter(item => {
     const isListed = listedItemIds.includes(item.id) || sessionListedIds.has(item.id);
-    if (hideListed && isListed) return false;
+    if (isListed) return false; // Ne jamais afficher les items déjà listés
     // Filtre de base : exclure les skins de faible valeur (< 0.02€)
     if (item.marketPrice !== undefined && item.marketPrice < 0.02) {
       return false;
@@ -474,7 +471,7 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
         <h2 className="text-3xl md:text-4xl font-bold font-rajdhani tracking-tight text-opnskin-primary drop-shadow-lg">
           {t('inventory.title', 'Inventaire')} {t(`marketplace.game_${game.key}`, game.name)}
         </h2>
-        {hasRequestedLoad && (
+        {hasRequestedLoad && !isLoading && (
           <div className="flex items-center gap-2">
             <Button 
               onClick={() => setShowFilters(!showFilters)}
@@ -491,7 +488,7 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
               className="btn-opnskin flex items-center gap-2"
             >
               <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
-              {t('inventory.refresh', 'Actualiser')}
+              Mettre à jour l'inventaire
             </Button>
           </div>
         )}
@@ -525,20 +522,7 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
         </div>
       )}
 
-      {!hasRequestedLoad ? (
-        <div className="flex flex-col items-center justify-center py-16 space-y-6">
-          <div className="text-opnskin-text-secondary text-lg font-rajdhani text-center">
-            {t('inventory.click_to_load', 'Cliquez sur "Actualiser" pour charger l\'inventaire {{gameName}}', { gameName: t(`marketplace.game_${game.key}`, game.name) })}
-          </div>
-          <Button 
-            onClick={handleRefreshInventory}
-            className="btn-opnskin flex items-center gap-2"
-          >
-            <RefreshCw className="w-4 h-4" />
-            {t('inventory.load_inventory', 'Charger l\'inventaire')}
-          </Button>
-        </div>
-      ) : isLoading ? (
+      {isLoading ? (
         <div className="flex flex-col items-center justify-center py-16 space-y-6">
           <div className="text-opnskin-primary text-xl font-rajdhani animate-pulse">
             {t('inventory.loading', "Chargement de l'inventaire…")}
@@ -725,18 +709,7 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
                       />
                     </div>
 
-                    {/* Masquer items déjà listés */}
-                    <div className="space-y-2">
-                      <Label className="text-opnskin-text-primary text-sm">
-                        {t('inventory.hide_listed', 'Masquer les items déjà listés')}
-                      </Label>
-                      <div className="flex items-center justify-between bg-opnskin-bg-secondary border border-opnskin-bg-secondary rounded-md px-3 py-2">
-                        <span className="text-opnskin-text-secondary text-sm">
-                          {hideListed ? t('common.yes', 'Oui') : t('common.no', 'Non')}
-                        </span>
-                        <Switch checked={hideListed} onCheckedChange={setHideListed} />
-                      </div>
-                    </div>
+                    {/* Suppression du filtre "Masquer items déjà listés" : les items listés sont toujours exclus */}
                   </div>
                   
                   {/* Statistiques des filtres */}
