@@ -136,6 +136,21 @@ export function useInventory(options: UseInventoryOptions = {}) {
     }
   }, [autoLoad, user?.steamId, appid, currency, fetchInventory]);
 
+  // Hydrater depuis le cache en mémoire lorsque l'on revient sur la page
+  useEffect(() => {
+    if (!user?.steamId || !appid) return;
+    const cacheKey = `${user.steamId}-${appid}-${currency}`;
+    const cached = clientInventoryCache.get(cacheKey);
+    if (cached) {
+      setItems(cached.data.items || []);
+      setLastUpdated(cached.data.lastUpdated || 0);
+      setStale(!!cached.data.stale);
+      setCacheMessage(cached.data.message || null);
+      setError(null);
+      setLoading(false);
+    }
+  }, [user?.steamId, appid, currency]);
+
   const refresh = useCallback(() => {
     fetchInventory(true);
   }, [fetchInventory]);
