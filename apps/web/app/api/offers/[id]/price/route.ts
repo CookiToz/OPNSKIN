@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { createClient } from '@supabase/supabase-js';
+import { getSteamIdFromRequest } from '@/lib/session';
 
 const UpdatePriceSchema = z.object({ price: z.number().min(0.01).max(10000) });
 
@@ -10,7 +11,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
-    const steamId = req.cookies.get('steamid')?.value;
+    const steamId = getSteamIdFromRequest(req);
     if (!steamId) return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
 
     const { data: user, error: userError } = await supabaseAdmin

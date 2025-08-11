@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { createClient } from '@supabase/supabase-js';
+import { getSteamIdFromRequest } from '@/lib/session';
 
 // Créer une nouvelle offre
 const CreateOfferSchema = z.object({
@@ -18,7 +19,7 @@ export async function POST(req: NextRequest) {
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
-    const steamId = req.cookies.get('steamid')?.value;
+    const steamId = getSteamIdFromRequest(req);
     if (!steamId) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }

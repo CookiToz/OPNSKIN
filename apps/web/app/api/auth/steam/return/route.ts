@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { signSession } from '@/lib/session';
 
 export async function GET(req: NextRequest) {
   try {
@@ -114,12 +115,23 @@ export async function GET(req: NextRequest) {
     const response = NextResponse.redirect(new URL('/', baseUrl));
 
     // Configuration du cookie pour le domaine Vercel
+    // Legacy cookie for compatibility (will be phased out)
     response.cookies.set('steamid', steamId, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
       path: '/',
       maxAge: 60 * 60 * 24 * 7, // 7 jours
+    });
+
+    // New signed session cookie
+    const token = signSession(steamId);
+    response.cookies.set('sid', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      path: '/',
+      maxAge: 60 * 60 * 24 * 7,
     });
 
     console.log('[STEAM OPENID] Authentication successful, redirecting to:', baseUrl);

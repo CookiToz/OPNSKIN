@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getSteamIdFromRequest } from '@/lib/session';
 export const runtime = 'nodejs';
 import { getOrFetchInventory } from '@/lib/inventory-cache';
 
 export async function GET(req: NextRequest) {
   try {
-    const steamId = req.cookies.get('steamid')?.value;
+    const steamId = getSteamIdFromRequest(req);
     if (!steamId) {
       return NextResponse.json({ error: 'Non connecté à Steam' }, { status: 401 });
     }

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getSteamIdFromRequest } from '@/lib/session';
 import pLimit from 'p-limit';
 
 const STEAM_CACHE_MS = 1000 * 60 * 60 * 6; // 6h
@@ -45,6 +46,10 @@ async function fetchPrice(name: string, currency: string): Promise<number> {
 
 export async function POST(req: NextRequest) {
   try {
+    // Require authenticated user to fetch prices (prevents abuse)
+    const steamId = getSteamIdFromRequest(req);
+    if (!steamId) return NextResponse.json({ error: 'Non connecté' }, { status: 401 });
+
     const { names, currency = 'EUR' } = await req.json();
     if (!Array.isArray(names) || names.length === 0) {
       return NextResponse.json({ prices: {} });

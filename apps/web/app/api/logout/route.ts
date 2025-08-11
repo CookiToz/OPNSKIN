@@ -7,13 +7,20 @@ export async function GET(req: NextRequest) {
 
     const response = NextResponse.redirect(baseUrl);
     
-    // Suppression du cookie Steam
+    // Suppression des cookies
     response.cookies.set('steamid', '', {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      sameSite: 'strict',
       path: '/',
       maxAge: 0, // Expire immédiatement
+    });
+    response.cookies.set('sid', '', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      path: '/',
+      maxAge: 0,
     });
 
     console.log('[LOGOUT] User logged out successfully');
