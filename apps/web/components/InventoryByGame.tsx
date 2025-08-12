@@ -145,6 +145,25 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
   const [listedItemIds, setListedItemIds] = useState<string[]>([]); // depuis le serveur
   const [sessionListedIds, setSessionListedIds] = useState<Set<string>>(new Set()); // listés localement depuis dernier refresh
 
+  // Formatage compact du temps écoulé (s → min → h → j → sem → mois → ans)
+  const formatElapsed = (seconds: number): string => {
+    if (!Number.isFinite(seconds) || seconds < 0) return '0 s';
+    const s = Math.floor(seconds);
+    if (s < 60) return `${s} s`;
+    const m = Math.floor(s / 60);
+    if (m < 60) return `${m} min`;
+    const h = Math.floor(s / 3600);
+    if (h < 24) return `${h} h`;
+    const d = Math.floor(s / 86400);
+    if (d < 7) return `${d} j`;
+    const w = Math.floor(s / 604800);
+    if (w < 5) return `${w} sem`;
+    const mo = Math.floor(s / 2629800); // ~30.44 jours
+    if (mo < 12) return `${mo} mois`;
+    const y = Math.floor(s / 31557600); // année moyenne (365.25 j)
+    return `${y} an${y > 1 ? 's' : ''}`;
+  };
+
   useEffect(() => {
     // Récupérer les itemId des offres actives de l'utilisateur
     if (user && user.loggedIn) {
@@ -557,7 +576,7 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
               )}
               {lastUpdated > 0 && (
                 <span>
-                  Mis à jour il y a {lastUpdated} secondes
+                  Mis à jour il y a {formatElapsed(lastUpdated)}
                 </span>
               )}
               {cacheMessage && (
