@@ -5,21 +5,21 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-70",
+  "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-70 border border-transparent",
   {
     variants: {
       variant: {
         default:
-          "bg-opnskin-blue text-primary-foreground hover:bg-opnskin-blue/80 shadow-[0_0_10px_rgba(81,167,194,0.2)]",
+          "bg-opnskin-blue text-white hover:bg-opnskin-blue/80 shadow-[0_0_10px_rgba(81,167,194,0.2)]",
         destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-        outline: "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
+        outline: "border border-input bg-background text-foreground hover:bg-accent hover:text-accent-foreground",
         secondary:
-          "bg-opnskin-violet text-secondary-foreground hover:bg-opnskin-violet/80 shadow-[0_0_10px_rgba(155,81,224,0.2)]",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
-        link: "text-primary underline-offset-4 hover:underline",
+          "bg-opnskin-violet text-white hover:bg-opnskin-violet/80 shadow-[0_0_10px_rgba(155,81,224,0.2)]",
+        ghost: "text-foreground hover:bg-accent hover:text-accent-foreground",
+        link: "text-opnskin-blue underline-offset-4 hover:underline",
         success:
-          "bg-opnskin-green text-success-foreground hover:bg-opnskin-green/80 shadow-[0_0_10px_rgba(0,255,163,0.2)]",
-        terminal: "bg-opnskin-bg-card/60 border border-opnskin-bg-secondary hover:bg-opnskin-bg-card/80 hover:border-opnskin-primary/30 backdrop-blur-sm",
+          "bg-opnskin-green text-white hover:bg-opnskin-green/80 shadow-[0_0_10px_rgba(0,255,163,0.2)]",
+        terminal: "bg-opnskin-bg-card/60 border border-opnskin-bg-secondary text-foreground hover:bg-opnskin-bg-card/80 hover:border-opnskin-primary/30 backdrop-blur-sm",
       },
       size: {
         default: "h-10 px-4 py-2",

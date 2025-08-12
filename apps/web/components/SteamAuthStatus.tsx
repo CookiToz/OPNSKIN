@@ -36,9 +36,8 @@ export default function SteamAuthStatus({ iconColor = 'white' }: SteamAuthStatus
         aria-label="Se connecter avec Steam"
         disabled={isRedirecting}
       >
-        {/* Thème sombre: toujours icône blanche; Thème clair: selon prop */}
-        <img src="/icons8-steam-128.png" alt="Steam" className="w-6 h-6 object-contain hidden dark:block" />
-        <img src={iconColor === 'black' ? '/icons8-steam-128-noir.png' : '/icons8-steam-128.png'} alt="Steam" className="w-6 h-6 object-contain block dark:hidden" />
+        {/* Forcer l'icône blanche dans tous les thèmes */}
+        <img src="/icons8-steam-128.png" alt="Steam" className="w-6 h-6 object-contain" />
       </button>
     );
   }

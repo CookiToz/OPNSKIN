@@ -66,6 +66,10 @@ const config: Config = {
         "opnskin-text-primary": "hsl(var(--opnskin-text-primary))",
         "opnskin-text-secondary": "hsl(var(--opnskin-text-secondary))",
         "opnskin-accent": "hsl(var(--opnskin-accent))",
+        // Missing brand colors used across components
+        "opnskin-blue": "hsl(var(--opnskin-blue))",
+        "opnskin-green": "hsl(var(--opnskin-green))",
+        "opnskin-violet": "hsl(var(--opnskin-violet))",
       },
       borderRadius: {
         lg: "var(--radius)",

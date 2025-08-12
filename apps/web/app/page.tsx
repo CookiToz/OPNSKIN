@@ -136,7 +136,7 @@ export default function Home() {
               </Button>
             </Link>
             <div className="flex justify-center lg:justify-start">
-              <SteamAuthStatus iconColor="black" />
+              <SteamAuthStatus />
             </div>
           </div>
           {/* Animation mobile : SOUS le texte, visible uniquement sur mobile */}
@@ -260,8 +260,8 @@ export default function Home() {
                 <span className="inline-block w-3 h-3 rounded-full" style={{ background: '#0CE49B', boxShadow: '0 0 8px #0CE49B88' }}></span>
               </div>
             ) : (
-              <Button variant="secondary" size="lg" onClick={() => window.location.href = '/api/auth/steam'} className="flex items-center gap-2 bg-white text-opnskin-text-primary border border-opnskin-bg-secondary hover:bg-opnskin-bg-secondary/40 dark:bg-opnskin-blue dark:text-white dark:border-transparent dark:hover:bg-opnskin-blue/80">
-                <img src="/icons8-steam-128-noir.png" alt="Steam" className="w-7 h-7 object-contain" />
+              <Button variant="secondary" size="lg" onClick={() => window.location.href = '/api/auth/steam'} className="flex items-center gap-2 bg-opnskin-blue text-white hover:bg-opnskin-blue/80">
+                <img src="/icons8-steam-128.png" alt="Steam" className="w-7 h-7 object-contain icon-steam" />
                 {t('home.connect_steam_now')}
               </Button>
             )}
@@ -304,10 +304,10 @@ export default function Home() {
                   href="https://www.instagram.com/opnskin/" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="text-white/70 hover:text-opnskin-accent transition-colors duration-200"
+                  className="hover:text-opnskin-accent transition-colors duration-200"
                   aria-label="Suivez-nous sur Instagram"
                 >
-                  <Instagram className="w-5 h-5" />
+                  <Instagram className="w-5 h-5 icon-instagram" />
                 </a>
               </div>
             </div>

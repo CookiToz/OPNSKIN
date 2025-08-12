@@ -806,7 +806,7 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
                       <div className="flex gap-2 w-full">
                         <Button 
                           size="sm" 
-                          className="btn-opnskin-secondary flex-1 text-xs" 
+                          className="flex-1 text-xs bg-white text-opnskin-text-primary border border-opnskin-bg-secondary hover:bg-opnskin-bg-secondary/40 dark:bg-opnskin-blue dark:text-white dark:border-transparent dark:hover:bg-opnskin-blue/80" 
                           onClick={() => handleSell(item)}
                         >
                           <Tag className="w-3 h-3 mr-1" />

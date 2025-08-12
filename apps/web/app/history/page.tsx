@@ -93,7 +93,7 @@ export default function HistoryPage() {
           <History className="h-12 w-12 md:h-16 md:w-16 text-opnskin-text-secondary mb-3 md:mb-4" />
           <h2 className="text-xl md:text-2xl font-bold mb-2 font-rajdhani">Aucune transaction</h2>
           <p className="text-opnskin-text-secondary mb-4 md:mb-6 max-w-md text-base md:text-lg">Tu n'as pas de transactions dans cette catégorie.</p>
-          <Button className="bg-opnskin-violet hover:bg-opnskin-violet/80 w-full text-base md:text-lg text-white dark:text-white">
+          <Button className="btn-market w-full text-base md:text-lg">
             <Store className="mr-2 h-4 w-4" />
             Explorer la marketplace
           </Button>

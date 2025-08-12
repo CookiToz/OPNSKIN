@@ -13,7 +13,7 @@
     --popover: 220 25% 7%; /* #0B111D */
     --popover-foreground: 0 0% 100%;
 
-    --primary: 217 100% 60%; /* #287CFA */
+    --primary: 217 92% 54%; /* unify with logo blue */
     --primary-foreground: 0 0% 100%;
 
     --secondary: 220 15% 13%; /* #1C1F26 */
@@ -38,14 +38,18 @@
     --radius: 0.5rem;
 
     /* OPNSKIN specific colors */
-    --opnskin-primary: 217 100% 60%; /* #287CFA */
-    --opnskin-primary-hover: 217 100% 70%; /* #4A9FFF */
+    --opnskin-primary: 217 92% 54%; /* same as logo blue */
+    --opnskin-primary-hover: 217 92% 60%; /* hover variant */
     --opnskin-bg-primary: 220 25% 7%; /* #0B111D */
     --opnskin-bg-secondary: 220 15% 13%; /* #1C1F26 */
     --opnskin-bg-card: 220 20% 12%; /* #13181F */
     --opnskin-text-primary: 0 0% 100%; /* #FFFFFF */
     --opnskin-text-secondary: 220 10% 85%; /* #C6CDD7 */
     --opnskin-accent: 160 100% 46%; /* #0CE49B */
+    /* Brand palette (global tokens for Tailwind extension) */
+    --opnskin-blue: 217 92% 54%; /* base blue */
+    --opnskin-green: 160 84% 42%; /* success green */
+    --opnskin-violet: 264 83% 56%; /* accent violet */
   }
   /* Thème clair - variables */
   .light {
@@ -58,7 +62,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 220 15% 10%;
 
-    --primary: 217 100% 40%;
+    --primary: 217 92% 45%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 220 20% 96%;
@@ -82,14 +86,18 @@
 
     --radius: 0.5rem;
 
-    --opnskin-primary: 217 100% 40%;
-    --opnskin-primary-hover: 217 100% 35%;
+    --opnskin-primary: 217 92% 45%;
+    --opnskin-primary-hover: 217 92% 40%;
     --opnskin-bg-primary: 0 0% 100%;
     --opnskin-bg-secondary: 220 16% 94%;
     --opnskin-bg-card: 0 0% 100%;
     --opnskin-text-primary: 220 15% 10%;
     --opnskin-text-secondary: 220 10% 35%;
     --opnskin-accent: 160 85% 35%;
+    /* Brand palette for light theme */
+    --opnskin-blue: 217 92% 45%;
+    --opnskin-green: 160 70% 38%;
+    --opnskin-violet: 264 73% 52%;
   }
 }
 
@@ -179,13 +187,26 @@
     @apply bg-opnskin-accent/10 text-opnskin-accent border-opnskin-accent/30;
   }
 
+  /* Icon helpers (global) */
+  .icon-steam {
+    filter: brightness(0) invert(1);
+  }
+  .icon-instagram {
+    @apply text-black dark:text-white;
+  }
+
   /* Button styles */
   .btn-opnskin {
-    @apply bg-opnskin-primary text-opnskin-text-primary font-satoshi-bold rounded-md px-4 py-2 transition-all duration-300 hover:bg-opnskin-primary-hover hover:shadow-[0_0_20px_rgba(40,124,250,0.3)] hover:scale-105;
+    @apply bg-opnskin-primary text-white font-satoshi-bold rounded-md px-4 py-2 transition-all duration-300 hover:bg-opnskin-primary-hover hover:shadow-[0_0_20px_rgba(40,124,250,0.3)] hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-opnskin-primary focus-visible:ring-offset-2;
   }
 
   .btn-opnskin-secondary {
-    @apply bg-transparent text-opnskin-primary border border-opnskin-primary rounded-md px-4 py-2 transition-all duration-300 hover:bg-opnskin-primary/10 hover:border-opnskin-primary-hover;
+    @apply bg-background text-opnskin-primary border border-opnskin-primary rounded-md px-4 py-2 transition-all duration-300 hover:bg-opnskin-primary/10 hover:border-opnskin-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-opnskin-primary focus-visible:ring-offset-2;
+  }
+
+  /* Market CTA button (blue across themes) */
+  .btn-market {
+    @apply bg-opnskin-primary text-white rounded-md px-4 py-2 transition-colors duration-200 hover:bg-opnskin-primary-hover active:brightness-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-opnskin-primary focus-visible:ring-offset-2;
   }
 
   /* Focus styles for accessibility */

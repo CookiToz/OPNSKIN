@@ -267,7 +267,7 @@ export default function Profile() {
                     className="bg-opnskin-bg-secondary border border-opnskin-bg-secondary text-opnskin-text-primary rounded px-3 py-2 text-base"
                     placeholder="https://steamcommunity.com/tradeoffer/new/?partner=..."
                   />
-                  <Button type="submit" className="w-fit" disabled={tradeUrlLoading}>
+                  <Button type="submit" className="w-fit bg-white text-opnskin-text-primary border border-opnskin-bg-secondary hover:bg-opnskin-bg-secondary/40 dark:bg-opnskin-blue dark:text-white dark:border-transparent dark:hover:bg-opnskin-blue/80" disabled={tradeUrlLoading}>
                     {tradeUrlLoading ? "Mise à jour..." : "Mettre à jour"}
                   </Button>
                   {tradeUrlMessage && (
@@ -290,7 +290,7 @@ export default function Profile() {
                     className="bg-opnskin-bg-secondary border border-opnskin-bg-secondary text-opnskin-text-primary rounded px-3 py-2 text-base"
                     placeholder="votre@email.com"
                   />
-                  <Button type="submit" className="w-fit" disabled={emailLoading}>
+                  <Button type="submit" className="w-fit bg-white text-opnskin-text-primary border border-opnskin-bg-secondary hover:bg-opnskin-bg-secondary/40 dark:bg-opnskin-blue dark:text-white dark:border-transparent dark:hover:bg-opnskin-blue/80" disabled={emailLoading}>
                     {emailLoading ? "Mise à jour..." : "Mettre à jour"}
                   </Button>
                   {emailMessage && (
