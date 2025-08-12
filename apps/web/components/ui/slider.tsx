@@ -22,11 +22,11 @@ const Slider = React.forwardRef<
     </SliderPrimitive.Track>
     {Array.isArray(props.value) && props.value.length === 2 ? (
       <>
-        <SliderPrimitive.Thumb className="block h-5 w-5 rounded-full bg-[#287CFA] transition-all duration-150 hover:scale-110" />
-        <SliderPrimitive.Thumb className="block h-5 w-5 rounded-full bg-[#287CFA] transition-all duration-150 hover:scale-110" />
+      <SliderPrimitive.Thumb className="block h-5 w-5 rounded-full bg-opnskin-primary transition-all duration-150 hover:scale-110" />
+      <SliderPrimitive.Thumb className="block h-5 w-5 rounded-full bg-opnskin-primary transition-all duration-150 hover:scale-110" />
       </>
     ) : (
-      <SliderPrimitive.Thumb className="block h-5 w-5 rounded-full bg-[#287CFA] transition-all duration-150 hover:scale-110" />
+    <SliderPrimitive.Thumb className="block h-5 w-5 rounded-full bg-opnskin-primary transition-all duration-150 hover:scale-110" />
     )}
   </SliderPrimitive.Root>
 ))

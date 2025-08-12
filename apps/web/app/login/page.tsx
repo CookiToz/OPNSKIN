@@ -113,7 +113,7 @@ function LoginContent() {
             <Button
               onClick={error ? handleRetry : handleSteamLogin}
               disabled={isRedirecting}
-              className="w-full btn-opnskin flex items-center justify-center gap-2"
+              className="w-full flex items-center justify-center gap-2 bg-white text-opnskin-text-primary border border-opnskin-bg-secondary hover:bg-opnskin-bg-secondary/40 dark:bg-opnskin-blue dark:text-white dark:border-transparent dark:hover:bg-opnskin-blue/80"
             >
               {isRedirecting ? (
                 <>
@@ -122,11 +122,8 @@ function LoginContent() {
                 </>
               ) : (
                 <>
-                  <img
-                    src="/icons8-steam-128.png"
-                    alt="Steam"
-                    className="w-6 h-6 object-contain"
-                  />
+                    <img src="/icons8-steam-128-noir.png" alt="Steam" className="w-6 h-6 object-contain block dark:hidden" />
+                    <img src="/icons8-steam-128.png" alt="Steam" className="w-6 h-6 object-contain hidden dark:block" />
                   {error ? 'Réessayer' : 'Se connecter avec Steam'}
                 </>
               )}

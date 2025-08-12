@@ -46,7 +46,7 @@ export default function Marketplace3DGallery() {
   const currency = useCurrencyStore((state) => state.currency);
 
   return (
-    <div className="w-full h-[420px] md:h-[520px] relative rounded-xl overflow-visible bg-black/80 border border-opnskin-primary/20 shadow-2xl">
+    <div className="w-full h-[420px] md:h-[520px] relative rounded-xl overflow-visible bg-opnskin-bg-card/80 border border-opnskin-primary/20 shadow-2xl">
       <Canvas camera={{ position: [0, 0, 12], fov: 40 }} shadows>
         <color attach="background" args={["#0a0a1a"]} />
         <ambientLight intensity={0.7} />
@@ -62,7 +62,7 @@ export default function Marketplace3DGallery() {
                     <div className="font-mono text-opnskin-accent text-sm font-bold drop-shadow-[0_0_4px_#00fff7]">
                       {formatPrice(skin.price, currency)}
                     </div>
-                    <div className="text-xs text-white font-bold drop-shadow-[0_0_4px_#00fff7]">
+                    <div className="text-xs text-opnskin-text-primary font-bold drop-shadow-[0_0_4px_#00fff7]">
                       {skin.name}
                     </div>
                   </div>

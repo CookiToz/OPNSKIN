@@ -208,24 +208,24 @@ function WalletPageContent() {
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 mb-3 md:mb-4">
             <div>
               <h1 className="text-2xl md:text-3xl font-bold font-rajdhani">{t('wallet.title')}</h1>
-              <p className="text-white/70 text-base md:text-lg">{t('wallet.subtitle')}</p>
+              <p className="text-opnskin-text-secondary text-base md:text-lg">{t('wallet.subtitle')}</p>
             </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-3 md:gap-4">
             {/* Carte solde + actions */}
             <div>
-              <Card className="rounded-2xl shadow-md bg-black/60 border-white/5 mb-3 md:mb-4">
+              <Card className="rounded-2xl shadow-md bg-opnskin-bg-card/80 border-opnskin-bg-secondary mb-3 md:mb-4">
                 <CardContent className="p-4 md:p-6 flex flex-col gap-3 md:gap-4">
                   <div className="flex items-center gap-3 md:gap-4">
                     <div className="h-16 w-16 md:h-20 md:w-20 rounded-xl bg-opnskin-green/20 flex items-center justify-center">
                       <Wallet className="h-8 w-8 md:h-10 md:w-10 text-opnskin-green" />
                     </div>
                     <div>
-                      <div className="text-white/80 text-sm md:text-base mb-1">{t('wallet.balance_available')}</div>
+                      <div className="text-opnskin-text-secondary text-sm md:text-base mb-1">{t('wallet.balance_available')}</div>
                       <div className="flex items-center gap-2">
                         {cryptoIcons[currency] && <img src={cryptoIcons[currency]!} alt={currency} className="inline w-6 h-6 md:w-7 md:h-7 mr-1 align-middle" />}
-                        <span className="text-2xl md:text-3xl font-bold font-rajdhani text-white tracking-tight">
+                         <span className="text-2xl md:text-3xl font-bold font-rajdhani text-opnskin-text-primary tracking-tight">
                           {cryptoRates[currency] ? formatPrice(user?.walletBalance ?? 0, currency, cryptoRates) : <span>...</span>}
                         </span>
                         <span className="ml-2 inline text-[#635BFF] font-semibold">Stripe</span>
@@ -233,10 +233,10 @@ function WalletPageContent() {
                     </div>
                   </div>
 
-                  {!isLoggedIn && (
-                    <div className="p-3 bg-opnskin-blue/10 border border-opnskin-blue/20 rounded-lg text-sm text-white/80">
+                   {!isLoggedIn && (
+                    <div className="p-3 bg-opnskin-blue/10 border border-opnskin-blue/20 rounded-lg text-sm text-opnskin-text-secondary">
                       Connecte-toi pour déposer ou retirer des fonds.
-                      <Button className="ml-2 h-8 px-3 bg-opnskin-blue hover:bg-opnskin-blue/80" onClick={() => router.push('/login')}>Se connecter</Button>
+                       <Button className="ml-2 h-8 px-3 bg-white text-opnskin-text-primary border border-opnskin-bg-secondary hover:bg-opnskin-bg-secondary/40 dark:bg-opnskin-blue dark:text-white dark:hover:bg-opnskin-blue/80" onClick={() => router.push('/login')}>Se connecter</Button>
                     </div>
                   )}
 
@@ -249,27 +249,27 @@ function WalletPageContent() {
                         placeholder="Montant (min 5€)"
                         value={depositAmount}
                         onChange={(e) => setDepositAmount(e.target.value)}
-                        className="flex-1 bg-black/20 border border-white/10 rounded px-3 py-2 text-sm text-white placeholder:text-white/50"
+                       className="flex-1 bg-opnskin-bg-card border border-opnskin-bg-secondary rounded px-3 py-2 text-sm text-opnskin-text-primary placeholder:text-opnskin-text-secondary"
                       />
-                      <Button className="bg-opnskin-green hover:bg-opnskin-green/80 text-base md:text-lg py-4 md:py-5 transition-all" size="lg" onClick={createDeposit} disabled={loading || !isLoggedIn}>
+                      <Button className="bg-white text-opnskin-text-primary border border-opnskin-bg-secondary hover:bg-opnskin-bg-secondary/40 text-base md:text-lg py-4 md:py-5 transition-all dark:bg-opnskin-green dark:text-white dark:hover:bg-opnskin-green/80" size="lg" onClick={createDeposit} disabled={loading || !isLoggedIn}>
                         <PlusCircle className="mr-2 h-5 w-5" /> {t('wallet.add_funds')}
                     </Button>
                       <span className="ml-2 hidden sm:inline text-[#635BFF] font-semibold">Stripe</span>
                     </div>
-                    <Button className="flex-1 bg-opnskin-blue/90 hover:bg-opnskin-blue text-base md:text-lg py-4 md:py-5 transition-all" size="lg" disabled>
+                    <Button className="flex-1 bg-white text-opnskin-text-primary border border-opnskin-bg-secondary hover:bg-opnskin-bg-secondary/40 text-base md:text-lg py-4 md:py-5 transition-all dark:bg-opnskin-blue/90 dark:text-white dark:hover:bg-opnskin-blue" size="lg" disabled>
                       <Wallet className="mr-2 h-5 w-5" /> {t('wallet.connect_crypto_wallet')}
                     </Button>
                   </div>
 
                   {/* Section Stripe Connect */}
                   {!stripeAccount?.hasAccount ? (
-                    <div className="mt-2 p-3 bg-opnskin-blue/10 border border-opnskin-blue/20 rounded-lg">
+                     <div className="mt-2 p-3 bg-opnskin-blue/10 border border-opnskin-blue/20 rounded-lg">
                       <div className="flex items-center gap-2 mb-2">
                         <AlertCircle className="h-5 w-5 text-opnskin-blue" />
                         <span className="text-sm font-semibold text-opnskin-blue">Configuration requise</span>
                       </div>
-                      <p className="text-xs text-white/70 mb-3">Pour retirer vos fonds, vous devez configurer votre compte Stripe.</p>
-                      <Button className="w-full bg-opnskin-blue hover:bg-opnskin-blue/80 text-sm py-2" onClick={createStripeAccount} disabled={loading || !isLoggedIn}>
+                       <p className="text-xs text-opnskin-text-secondary mb-3">Pour retirer vos fonds, vous devez configurer votre compte Stripe.</p>
+                       <Button className="w-full bg-white text-opnskin-text-primary border border-opnskin-bg-secondary hover:bg-opnskin-bg-secondary/40 text-sm py-2 dark:bg-opnskin-primary dark:text-white dark:hover:bg-opnskin-primary/90" onClick={createStripeAccount} disabled={loading || !isLoggedIn}>
                         {loading ? 'Création...' : 'Créer mon compte Stripe'}
                   </Button>
                     </div>
@@ -279,8 +279,8 @@ function WalletPageContent() {
                         <AlertCircle className="h-5 w-5 text-opnskin-violet" />
                         <span className="text-sm font-semibold text-opnskin-violet">Compte en cours de validation</span>
                       </div>
-                      <p className="text-xs text-white/70 mb-3">Votre compte Stripe doit être validé pour activer les retraits.</p>
-                      <Button className="w-full bg-opnskin-violet hover:bg-opnskin-violet/80 text-sm py-2" onClick={createAccountLink} disabled={loading || !isLoggedIn}>
+                       <p className="text-xs text-opnskin-text-secondary mb-3">Votre compte Stripe doit être validé pour activer les retraits.</p>
+                       <Button className="w-full bg-white text-opnskin-text-primary border border-opnskin-bg-secondary hover:bg-opnskin-bg-secondary/40 text-sm py-2 dark:bg-opnskin-primary dark:text-white dark:hover:bg-opnskin-primary/90" onClick={createAccountLink} disabled={loading || !isLoggedIn}>
                         {loading ? 'Chargement...' : 'Compléter la configuration'}
                       </Button>
                     </div>
@@ -290,10 +290,10 @@ function WalletPageContent() {
                         <CheckCircle className="h-5 w-5 text-opnskin-green" />
                         <span className="text-sm font-semibold text-opnskin-green">Compte activé</span>
                       </div>
-                      <p className="text-xs text-white/70 mb-3">Votre compte Stripe est prêt pour les retraits.</p>
+                       <p className="text-xs text-opnskin-text-secondary mb-3">Votre compte Stripe est prêt pour les retraits.</p>
                       <div className="flex gap-2">
-                        <input type="number" placeholder="Montant (min 5€)" value={withdrawalAmount} onChange={(e) => setWithdrawalAmount(e.target.value)} className="flex-1 bg-black/20 border border-white/10 rounded px-3 py-2 text-sm text-white placeholder:text-white/50" />
-                        <Button className="bg-opnskin-green hover:bg-opnskin-green/80 text-sm px-4" onClick={createWithdrawal} disabled={loading || !withdrawalAmount || !isLoggedIn}>
+                       <input type="number" placeholder="Montant (min 5€)" value={withdrawalAmount} onChange={(e) => setWithdrawalAmount(e.target.value)} className="flex-1 bg-opnskin-bg-card border border-opnskin-bg-secondary rounded px-3 py-2 text-sm text-opnskin-text-primary placeholder:text-opnskin-text-secondary" />
+                         <Button className="bg-white text-opnskin-text-primary border border-opnskin-bg-secondary hover:bg-opnskin-bg-secondary/40 text-sm px-4 dark:bg-opnskin-green dark:text-white dark:hover:bg-opnskin-green/80" onClick={createWithdrawal} disabled={loading || !withdrawalAmount || !isLoggedIn}>
                           {loading ? '...' : 'Retirer'}
                         </Button>
                     </div>
@@ -303,19 +303,19 @@ function WalletPageContent() {
                 </Card>
 
               {/* Historique Dépôts / Retraits */}
-              <Card className="rounded-xl bg-black/40 border-white/5">
+              <Card className="rounded-xl bg-opnskin-bg-card/60 border-opnskin-bg-secondary">
                 <CardContent className="p-3 md:p-4">
                   <h2 className="text-lg md:text-xl font-bold mb-3 md:mb-4 font-rajdhani">Historique récent</h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div>
                       <h3 className="font-rajdhani font-bold mb-2">Dépôts</h3>
                       <div className="space-y-2">
-                        {deposits.length === 0 && <div className="text-white/60 text-sm">Aucun dépôt récent</div>}
+                         {deposits.length === 0 && <div className="text-opnskin-text-secondary text-sm">Aucun dépôt récent</div>}
                         {deposits.map((d: any) => (
-                          <div key={d.id} className="flex items-center justify-between rounded-lg border border-white/10 px-3 py-2">
-                            <div className="text-sm text-white/80">
+                          <div key={d.id} className="flex items-center justify-between rounded-lg border border-opnskin-bg-secondary px-3 py-2">
+                            <div className="text-sm text-opnskin-text-primary">
                               <div className="font-semibold">{(d.amount/100).toFixed(2)} €</div>
-                              <div className="text-white/60 text-xs">{formatDateTime(d.createdAt)}</div>
+                              <div className="text-opnskin-text-secondary text-xs">{formatDateTime(d.createdAt)}</div>
                             </div>
                             <span className={`text-xs px-2 py-1 rounded ${d.status==='succeeded'?'bg-green-500/20 text-green-400':'bg-yellow-500/20 text-yellow-300'}`}>{d.status}</span>
                           </div>
@@ -325,12 +325,12 @@ function WalletPageContent() {
                     <div>
                       <h3 className="font-rajdhani font-bold mb-2">Retraits</h3>
                       <div className="space-y-2">
-                        {withdrawals.length === 0 && <div className="text-white/60 text-sm">Aucun retrait récent</div>}
+                         {withdrawals.length === 0 && <div className="text-opnskin-text-secondary text-sm">Aucun retrait récent</div>}
                         {withdrawals.map((w: any) => (
-                          <div key={w.id} className="flex items-center justify-between rounded-lg border border-white/10 px-3 py-2">
-                            <div className="text-sm text-white/80">
+                          <div key={w.id} className="flex items-center justify-between rounded-lg border border-opnskin-bg-secondary px-3 py-2">
+                            <div className="text-sm text-opnskin-text-primary">
                               <div className="font-semibold">{(w.amount/100).toFixed(2)} €</div>
-                              <div className="text-white/60 text-xs">{formatDateTime(w.createdAt)}</div>
+                              <div className="text-opnskin-text-secondary text-xs">{formatDateTime(w.createdAt)}</div>
                             </div>
                             <span className={`text-xs px-2 py-1 rounded ${w.status==='succeeded'?'bg-green-500/20 text-green-400': w.status==='pending' ? 'bg-yellow-500/20 text-yellow-300' : 'bg-red-500/20 text-red-300'}`}>{w.status}</span>
                           </div>
@@ -344,22 +344,22 @@ function WalletPageContent() {
 
             {/* Méthodes de paiement (colonne droite) */}
             <div>
-              <Card className="rounded-2xl bg-black/60 border-white/5 shadow-md mb-3 md:mb-4">
+              <Card className="rounded-2xl bg-opnskin-bg-card/80 border-opnskin-bg-secondary shadow-md mb-3 md:mb-4">
                 <CardContent className="p-3 md:p-4">
                   <h2 className="text-lg md:text-xl font-bold mb-3 md:mb-4 font-rajdhani">{t('wallet.payment_methods')}</h2>
-                  <div className="mb-1 text-white/60 font-semibold uppercase text-xs tracking-wider">Fiat</div>
+                  <div className="mb-1 text-opnskin-text-secondary font-semibold uppercase text-xs tracking-wider">Fiat</div>
                   <div className="flex flex-col gap-2 mb-2">
                     {fiatMethods.map((m, i) => (
-                      <Card key={i} className="rounded-xl bg-black/30 border-white/10 flex items-center gap-2 p-2 md:p-3">
-                        <div className="flex items-center gap-2 md:gap-3">{m.icon}<div><div className="font-rajdhani font-bold text-white text-sm md:text-base">{m.label}</div><div className="text-white/60 text-xs">{m.desc}</div></div></div>
+                      <Card key={i} className="rounded-xl bg-opnskin-bg-card/60 border-opnskin-bg-secondary flex items-center gap-2 p-2 md:p-3">
+                        <div className="flex items-center gap-2 md:gap-3">{m.icon}<div><div className="font-rajdhani font-bold text-opnskin-text-primary text-sm md:text-base">{m.label}</div><div className="text-opnskin-text-secondary text-xs">{m.desc}</div></div></div>
                       </Card>
                     ))}
                   </div>
-                  <div className="mb-1 text-white/60 font-semibold uppercase text-xs tracking-wider">Crypto</div>
+                  <div className="mb-1 text-opnskin-text-secondary font-semibold uppercase text-xs tracking-wider">Crypto</div>
                   <div className="flex flex-col gap-2">
                     {cryptoMethods.map((m, i) => (
-                      <Card key={i} className="rounded-xl bg-black/30 border-white/10 flex items-center gap-2 p-2 md:p-3">
-                        <div className="flex items-center gap-2 md:gap-3">{m.icon}<div><div className="font-rajdhani font-bold text-white text-sm md:text-base">{m.label}</div><div className="text-white/60 text-xs">{m.desc}</div></div></div>
+                      <Card key={i} className="rounded-xl bg-opnskin-bg-card/60 border-opnskin-bg-secondary flex items-center gap-2 p-2 md:p-3">
+                        <div className="flex items-center gap-2 md:gap-3">{m.icon}<div><div className="font-rajdhani font-bold text-opnskin-text-primary text-sm md:text-base">{m.label}</div><div className="text-opnskin-text-secondary text-xs">{m.desc}</div></div></div>
                       </Card>
                     ))}
                   </div>

@@ -94,11 +94,11 @@ export default function CartDrawer({ open, onClose }: { open: boolean; onClose: 
           ) : (
             <div className="flex flex-col gap-4">
               {items.map((skin) => (
-                <div key={skin.id} className="flex items-center gap-4 bg-[#20222a] hover:bg-[#23263a] transition-colors rounded-xl p-3 shadow border border-opnskin-primary/10">
+                <div key={skin.id} className="flex items-center gap-4 bg-opnskin-bg-card hover:bg-opnskin-bg-secondary/50 transition-colors rounded-xl p-3 shadow border border-opnskin-bg-secondary">
                   <img
                     src={skin.image || '/placeholder.svg'}
                     alt={skin.name}
-                    className="w-20 h-20 object-contain rounded-lg border border-opnskin-bg-secondary bg-black/30"
+                    className="w-20 h-20 object-contain rounded-lg border border-opnskin-bg-secondary bg-opnskin-bg-card/60"
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
                       target.src = '/placeholder.svg';

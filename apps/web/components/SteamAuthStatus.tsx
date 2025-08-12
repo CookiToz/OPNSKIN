@@ -4,7 +4,11 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useUser } from "@/components/UserProvider";
 
-export default function SteamAuthStatus() {
+type SteamAuthStatusProps = {
+  iconColor?: 'white' | 'black'
+}
+
+export default function SteamAuthStatus({ iconColor = 'white' }: SteamAuthStatusProps) {
   const { user, isLoading, isError, refetch } = useUser();
   const [isRedirecting, setIsRedirecting] = useState(false);
 
@@ -32,11 +36,9 @@ export default function SteamAuthStatus() {
         aria-label="Se connecter avec Steam"
         disabled={isRedirecting}
       >
-        <img
-          src="/icons8-steam-128.png"
-          alt="Steam"
-          className="w-6 h-6 object-contain"
-        />
+        {/* Thème sombre: toujours icône blanche; Thème clair: selon prop */}
+        <img src="/icons8-steam-128.png" alt="Steam" className="w-6 h-6 object-contain hidden dark:block" />
+        <img src={iconColor === 'black' ? '/icons8-steam-128-noir.png' : '/icons8-steam-128.png'} alt="Steam" className="w-6 h-6 object-contain block dark:hidden" />
       </button>
     );
   }

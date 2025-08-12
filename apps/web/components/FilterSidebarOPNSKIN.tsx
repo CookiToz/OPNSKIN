@@ -145,7 +145,7 @@ export function DesktopFilters({
   priceMax?: number;
 }) {
   return (
-    <aside className="hidden lg:block w-80 max-w-full bg-[#181a20] rounded-2xl p-6 shadow-2xl flex flex-col gap-6 sticky top-24 border border-opnskin-primary/20">
+    <aside className="hidden lg:block w-80 max-w-full bg-opnskin-bg-card rounded-2xl p-6 shadow-2xl flex flex-col gap-6 sticky top-24 border border-opnskin-bg-secondary">
       <div className="flex items-center justify-between mb-2">
         <h2 className="text-xl font-rajdhani font-bold text-opnskin-text-primary tracking-wide">
           Filtres avancés
@@ -305,7 +305,7 @@ export function WeaponCategoryBar({
           >
             {category}
             {filters.type.length > 0 && selectedCategory === category && (
-              <Badge className="ml-2 bg-white/20 text-white text-xs">
+            <Badge className="ml-2 bg-opnskin-bg-secondary/40 text-opnskin-text-primary text-xs">
                 {filters.type.length}
               </Badge>
             )}

@@ -143,7 +143,7 @@ export const OfferCard: React.FC<OfferCardProps> = ({ offer, currentUserId, onOf
           <span className="font-bold">Prix :</span>
           {editingPrice ? (
             <div className="flex items-center gap-2">
-              <input type="number" className="bg-black/20 border border-white/10 rounded px-2 py-1 w-28"
+              <input type="number" className="bg-opnskin-bg-card border border-opnskin-bg-secondary rounded px-2 py-1 w-28 text-opnskin-text-primary"
                 value={newPrice} min={0.01} step={0.01}
                 onChange={(e) => setNewPrice(parseFloat(e.target.value))} />
               <Button size="sm" onClick={handleSavePrice} disabled={savingPrice} className="bg-opnskin-green hover:bg-opnskin-green/80">{savingPrice ? '...' : 'Enregistrer'}</Button>
@@ -174,7 +174,7 @@ export const OfferCard: React.FC<OfferCardProps> = ({ offer, currentUserId, onOf
               rel="noopener noreferrer"
               className="flex-1"
             >
-              <Button className="w-full bg-opnskin-blue hover:bg-opnskin-blue/80 text-white">
+              <Button className="w-full bg-opnskin-blue hover:bg-opnskin-blue/80 text-white dark:text-white">
                 Lancer l'échange Steam
               </Button>
             </a>
@@ -213,7 +213,7 @@ export const OfferCard: React.FC<OfferCardProps> = ({ offer, currentUserId, onOf
                   <AlertDialogAction 
                     onClick={handleCancelOffer}
                     disabled={isCancelling}
-                    className="bg-red-600 hover:bg-red-700 text-white"
+                    className="bg-red-600 hover:bg-red-700 text-white dark:text-white"
                   >
                     {isCancelling ? "Retrait..." : "Retirer l'offre"}
                   </AlertDialogAction>

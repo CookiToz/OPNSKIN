@@ -89,11 +89,11 @@ export default function HistoryPage() {
     }
     if (filtered.length === 0) {
       return (
-        <div className="terminal-bg rounded-lg p-4 md:p-8 flex flex-col items-center justify-center text-center">
-          <History className="h-12 w-12 md:h-16 md:w-16 text-white/30 mb-3 md:mb-4" />
+          <div className="terminal-bg rounded-lg p-4 md:p-8 flex flex-col items-center justify-center text-center">
+          <History className="h-12 w-12 md:h-16 md:w-16 text-opnskin-text-secondary mb-3 md:mb-4" />
           <h2 className="text-xl md:text-2xl font-bold mb-2 font-rajdhani">Aucune transaction</h2>
-          <p className="text-white/70 mb-4 md:mb-6 max-w-md text-base md:text-lg">Tu n'as pas de transactions dans cette catégorie.</p>
-          <Button className="bg-opnskin-violet hover:bg-opnskin-violet/80 w-full text-base md:text-lg">
+          <p className="text-opnskin-text-secondary mb-4 md:mb-6 max-w-md text-base md:text-lg">Tu n'as pas de transactions dans cette catégorie.</p>
+          <Button className="bg-opnskin-violet hover:bg-opnskin-violet/80 w-full text-base md:text-lg text-white dark:text-white">
             <Store className="mr-2 h-4 w-4" />
             Explorer la marketplace
           </Button>
@@ -159,15 +159,15 @@ export default function HistoryPage() {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 md:gap-4 mb-4 md:mb-6">
           <div>
             <h1 className="text-2xl md:text-3xl font-bold font-rajdhani">{t('history.title')}</h1>
-            <p className="text-white/70 text-base md:text-lg">{t('history.subtitle')}</p>
+            <p className="text-opnskin-text-secondary text-base md:text-lg">{t('history.subtitle')}</p>
           </div>
           {/* Bouton Rafraîchir */}
-          <Button onClick={fetchTransactions} className="ml-2">
+          <Button onClick={fetchTransactions} className="ml-2 bg-white text-opnskin-text-primary border border-opnskin-bg-secondary hover:bg-opnskin-bg-secondary/40 dark:bg-opnskin-blue dark:text-white dark:border-transparent dark:hover:bg-opnskin-blue/80">
             Rafraîchir
           </Button>
         </div>
         <Tabs defaultValue="all">
-          <TabsList className="bg-black/40 border border-white/10 flex flex-wrap md:flex-nowrap">
+          <TabsList className="bg-opnskin-bg-card/60 border border-opnskin-bg-secondary flex flex-wrap md:flex-nowrap">
             <TabsTrigger value="all" className="data-[state=active]:bg-opnskin-blue/20 data-[state=active]:text-opnskin-blue">{t('history.tab_all')}</TabsTrigger>
             <TabsTrigger value="purchases" className="data-[state=active]:bg-opnskin-blue/20 data-[state=active]:text-opnskin-blue">{t('history.tab_purchases')}</TabsTrigger>
             <TabsTrigger value="sales" className="data-[state=active]:bg-opnskin-blue/20 data-[state=active]:text-opnskin-blue">{t('history.tab_sales')}</TabsTrigger>

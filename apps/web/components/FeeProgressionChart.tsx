@@ -47,9 +47,19 @@ export default function FeeProgressionChart() {
         <h2 className="text-3xl md:text-4xl font-bold font-satoshi-bold text-opnskin-text-primary mb-4">
           Système de <span className="neon-text">niveaux</span> et frais dégressifs
         </h2>
-        <p className="text-lg text-opnskin-text-secondary max-w-2xl mx-auto">
-          Progressez dans notre système de niveaux pour réduire vos frais de vente et optimiser vos profits
-        </p>
+        <div className="text-base md:text-lg text-opnskin-text-secondary max-w-3xl mx-auto space-y-2">
+          <p>
+            Progressez en vendant et en achetant sur OPNSKIN. Chaque palier atteint réduit vos frais de vente.
+          </p>
+          <p>
+            Niveaux Standard, Pro, Premium et Elite débloquent des avantages: frais réduits, mise en avant des annonces,
+            délais d’escrow optimisés et support prioritaire. Le statut <span className="font-bold">Vérifié</span> diminue
+            immédiatement vos frais.
+          </p>
+          <p className="text-sm">
+            Astuce: maintenir une activité régulière et un bon historique de transactions accélère la progression.
+          </p>
+        </div>
       </div>
       
       <div className="rounded-2xl bg-gradient-to-br from-opnskin-bg-card/80 to-opnskin-bg-secondary/40 border border-opnskin-primary/20 p-8 shadow-2xl overflow-hidden">

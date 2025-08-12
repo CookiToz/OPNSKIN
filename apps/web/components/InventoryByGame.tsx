@@ -527,11 +527,11 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
             <Button 
               onClick={() => setShowFilters(!showFilters)}
               variant={hasActiveFilters ? "default" : "outline"}
-              className={`flex items-center gap-2 ${hasActiveFilters ? 'bg-opnskin-accent text-black' : 'border-opnskin-primary/30 text-opnskin-primary hover:bg-opnskin-primary/10'}`}
+             className={`flex items-center gap-2 ${hasActiveFilters ? 'bg-opnskin-accent text-opnskin-text-primary' : 'border-opnskin-primary/30 text-opnskin-primary hover:bg-opnskin-primary/10'}`}
             >
               <Filter className="w-4 h-4" />
               {t('inventory.filters', 'Filtres')}
-              {hasActiveFilters && <Badge className="ml-1 bg-black/20 text-black text-xs">Actif</Badge>}
+             {hasActiveFilters && <Badge className="ml-1 bg-opnskin-bg-card/40 text-opnskin-text-primary text-xs">Actif</Badge>}
             </Button>
             <Button 
               onClick={handleRefreshInventory}
@@ -815,7 +815,7 @@ export default function InventoryByGame({ game, onBack }: InventoryByGameProps) 
                         <Button
                           size="sm"
                           variant={multiSelected[item.id] ? 'default' : 'outline'}
-                          className={`text-xs ${multiSelected[item.id] ? 'bg-opnskin-accent text-black' : 'border-opnskin-primary/30 text-opnskin-primary hover:bg-opnskin-primary/10'}`}
+                         className={`text-xs ${multiSelected[item.id] ? 'bg-opnskin-accent text-opnskin-text-primary' : 'border-opnskin-primary/30 text-opnskin-primary hover:bg-opnskin-primary/10'}`}
                           onClick={() => toggleMultiSelect(item)}
                           aria-pressed={!!multiSelected[item.id]}
                           title={multiSelected[item.id] ? 'Désélectionner' : 'Sélectionner pour vente multiple'}

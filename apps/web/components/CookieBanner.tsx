@@ -57,4 +57,4 @@ export const CookieBanner = () => {
       </div>
     </div>
   );
-}; 
+};

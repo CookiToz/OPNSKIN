@@ -34,13 +34,13 @@ export function TerminalCard({
       {...props}
     >
       {title && (
-        <div className="px-4 py-2 border-b border-white/10 bg-black/50 flex items-center">
+        <div className="px-4 py-2 border-b border-opnskin-bg-secondary/40 bg-opnskin-bg-card/70 flex items-center">
           <div className="flex gap-1.5 mr-3">
             <div className="w-3 h-3 rounded-full bg-red-500/70"></div>
             <div className="w-3 h-3 rounded-full bg-yellow-500/70"></div>
             <div className="w-3 h-3 rounded-full bg-green-500/70"></div>
           </div>
-          <div className="font-mono text-xs text-white/70">{title}</div>
+          <div className="font-mono text-xs text-opnskin-text-secondary">{title}</div>
         </div>
       )}
       <div className="p-6">{children}</div>

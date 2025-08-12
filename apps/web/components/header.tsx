@@ -22,6 +22,7 @@ import { usePathname } from 'next/navigation';
 import { useCartStore } from '@/hooks/use-cart-store';
 import React, { useState, useEffect } from "react";
 import CartDrawer from "@/components/CartDrawer";
+import { ThemeToggle } from '@/components/theme-toggle';
 
 export function Header() {
   const { t } = useTranslation('common');
@@ -103,6 +104,7 @@ export function Header() {
           </div>
 
           <div className="flex items-center space-x-6">
+            <ThemeToggle />
             <Tooltip>
               <TooltipTrigger asChild>
                 <div className="relative">
@@ -241,11 +243,7 @@ export function Header() {
                 onClick={() => (window.location.href = '/api/auth/steam')}
                 className="btn-opnskin flex items-center gap-2"
               >
-                <img
-                  src="/icons8-steam-128.png"
-                  alt="Steam"
-                  className="w-6 h-6 object-contain"
-                />
+                  <img src="/icons8-steam-128.png" alt="Steam" className="w-6 h-6 object-contain" />
                 Connecter Steam
               </Button>
             )}

@@ -47,6 +47,50 @@
     --opnskin-text-secondary: 220 10% 85%; /* #C6CDD7 */
     --opnskin-accent: 160 100% 46%; /* #0CE49B */
   }
+  /* Thème clair - variables */
+  .light {
+    --background: 0 0% 100%;
+    --foreground: 220 15% 10%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 220 15% 10%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 15% 10%;
+
+    --primary: 217 100% 40%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 220 20% 96%;
+    --secondary-foreground: 220 15% 20%;
+
+    --muted: 220 20% 96%;
+    --muted-foreground: 220 10% 30%;
+
+    --accent: 160 85% 35%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 67% 45%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 160 85% 35%;
+    --success-foreground: 0 0% 100%;
+
+    --border: 217 100% 40%;
+    --input: 220 16% 90%;
+    --ring: 217 100% 40%;
+
+    --radius: 0.5rem;
+
+    --opnskin-primary: 217 100% 40%;
+    --opnskin-primary-hover: 217 100% 35%;
+    --opnskin-bg-primary: 0 0% 100%;
+    --opnskin-bg-secondary: 220 16% 94%;
+    --opnskin-bg-card: 0 0% 100%;
+    --opnskin-text-primary: 220 15% 10%;
+    --opnskin-text-secondary: 220 10% 35%;
+    --opnskin-accent: 160 85% 35%;
+  }
 }
 
 @layer base {
@@ -58,6 +102,10 @@
     background-image: radial-gradient(circle at 15% 50%, rgba(40, 124, 250, 0.05) 0%, transparent 25%),
       radial-gradient(circle at 85% 30%, rgba(12, 228, 155, 0.03) 0%, transparent 25%);
     letter-spacing: 0.5px;
+    font-size: 16px;
+  }
+  @media (min-width: 768px) {
+    body { font-size: 17px; }
   }
   h1,
   h2,

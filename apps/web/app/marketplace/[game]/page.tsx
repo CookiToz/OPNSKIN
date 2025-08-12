@@ -689,24 +689,43 @@ export default function MarketplaceGamePage() {
       
       {/* Modal détail skin */}
       <Dialog open={showDetails} onOpenChange={setShowDetails}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-lg">
           <DialogTitle>Détail du skin</DialogTitle>
           {selectedOffer && (
-            <div className="flex flex-col items-center gap-4">
-              <img src={selectedOffer.itemImage || '/placeholder.svg'} alt={selectedOffer.itemName || 'Skin'} className="w-32 h-32 object-contain rounded" />
-              <div className="font-bold text-lg">{selectedOffer.itemName || selectedOffer.itemId || 'Nom inconnu'}</div>
-              <div className="text-sm text-opnskin-text-secondary">ID: {selectedOffer.itemId || 'N/A'}</div>
-              <div className="font-mono text-opnskin-accent font-bold">
-                {typeof selectedOffer.price === 'number' && !isNaN(selectedOffer.price)
-                  ? (SUPPORTED_CRYPTOS.includes(currency)
-                      ? formatPrice(selectedOffer.price, currency, cryptoRates as unknown as Record<string, import('@/hooks/use-currency-store').CryptoRate>)
-                      : `${selectedOffer.price.toFixed(2)} €`)
-                  : 'N/A'}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="flex flex-col items-center">
+                <img src={selectedOffer.itemImage || '/placeholder.svg'} alt={selectedOffer.itemName || 'Skin'} className="w-48 h-48 object-contain rounded" />
+                <div className="mt-2 font-mono text-opnskin-accent font-bold text-lg">
+                  {typeof selectedOffer.price === 'number' && !isNaN(selectedOffer.price)
+                    ? (SUPPORTED_CRYPTOS.includes(currency)
+                        ? formatPrice(selectedOffer.price, currency, cryptoRates as unknown as Record<string, import('@/hooks/use-currency-store').CryptoRate>)
+                        : `${selectedOffer.price.toFixed(2)} €`)
+                    : 'N/A'}
+                </div>
               </div>
-              <div className="text-xs text-opnskin-text-secondary">Statut: {selectedOffer.status || 'N/A'}</div>
-              <DialogClose asChild>
-                <Button className="mt-4">Fermer</Button>
-              </DialogClose>
+              <div className="flex flex-col gap-2">
+                <div className="font-bold text-lg">{selectedOffer.itemName || selectedOffer.itemId || 'Nom inconnu'}</div>
+                <div className="text-sm text-opnskin-text-secondary">ID: {selectedOffer.itemId || 'N/A'}</div>
+                {selectedOffer.createdAt && (
+                  <div className="text-sm text-opnskin-text-secondary">Mise en ligne: {new Date(selectedOffer.createdAt).toLocaleString()}</div>
+                )}
+                <div className="text-sm text-opnskin-text-secondary">Statut: {selectedOffer.status || 'N/A'}</div>
+                <div className="mt-2">
+                  <Button
+                    className="w-full btn-opnskin"
+                    onClick={() => handleAddToCart(selectedOffer.id)}
+                    disabled={addingId === selectedOffer.id}
+                  >
+                    {addingId === selectedOffer.id ? 'Ajout...' : 'Ajouter au panier'}
+                  </Button>
+                </div>
+                <div className="text-xs text-opnskin-text-secondary mt-2">
+                  Historique des prix: bientôt disponible
+                </div>
+                <DialogClose asChild>
+                  <Button variant="outline" className="mt-2 border-opnskin-primary/30 text-opnskin-primary hover:bg-opnskin-primary/10">Fermer</Button>
+                </DialogClose>
+              </div>
             </div>
           )}
         </DialogContent>

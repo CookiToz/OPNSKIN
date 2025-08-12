@@ -151,13 +151,13 @@ export default function Profile() {
       <div className="min-h-screen flex items-center justify-center text-center p-4 md:p-6">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold font-rajdhani mb-3 md:mb-4">{t('profile.login_title')}</h1>
-          <p className="text-white/70 mb-4 md:mb-6 max-w-md mx-auto text-base md:text-lg">{t('profile.login_desc')}</p>
+          <p className="text-opnskin-text-secondary mb-4 md:mb-6 max-w-md mx-auto text-base md:text-lg">{t('profile.login_desc')}</p>
           <Button
             onClick={() => (window.location.href = '/api/auth/steam')}
             className="bg-opnskin-blue hover:bg-opnskin-blue/80 text-white px-4 md:px-6 py-3 rounded flex items-center gap-2 w-full max-w-xs mx-auto text-base md:text-lg"
           >
             <img
-              src="/icons8-steam-128.png"
+              src="/icons8-steam-128-noir.png"
               alt="Steam"
               className="w-6 h-6 object-contain"
             />
@@ -174,17 +174,17 @@ export default function Profile() {
       <div className="container mx-auto p-3 md:p-6">
         <div className="mb-4 md:mb-6">
           <h1 className="text-2xl md:text-3xl font-bold font-rajdhani">Mon Profil</h1>
-          <p className="text-white/70 text-base md:text-lg">{t('profile.subtitle')}</p>
+          <p className="text-opnskin-text-secondary text-base md:text-lg">{t('profile.subtitle')}</p>
         </div>
 
         <Tabs defaultValue="stats">
-          <TabsList className="bg-black/40 border border-white/10 mb-3 md:mb-4 flex flex-wrap md:flex-nowrap">
+          <TabsList className="bg-opnskin-bg-card/60 border border-opnskin-bg-secondary mb-3 md:mb-4 flex flex-wrap md:flex-nowrap">
             <TabsTrigger value="stats">Profil</TabsTrigger>
             <TabsTrigger value="settings">{t('profile.tab_settings')}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="stats">
-            <Card className="bg-black/40 border-white/5 mb-4 md:mb-6">
+            <Card className="bg-opnskin-bg-card/60 border-opnskin-bg-secondary mb-4 md:mb-6">
               <CardContent className="p-4 md:p-6 flex flex-col items-center">
                 <Avatar className="h-20 w-20 md:h-24 md:w-24 border-2 border-opnskin-violet mb-3 md:mb-4">
                   {user ? (
@@ -205,7 +205,7 @@ export default function Profile() {
 
                 <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-4 mb-3 md:mb-4">
                   <div className="text-center">
-                    <p className="text-white/70 text-xs md:text-sm">{t('profile.member_since')}</p>
+                    <p className="text-opnskin-text-secondary text-xs md:text-sm">{t('profile.member_since')}</p>
                     <p className="font-mono text-sm md:text-base">{
                       user?.createdAt
                         ? new Date(user.createdAt).toLocaleDateString('fr-FR')
@@ -213,7 +213,7 @@ export default function Profile() {
                     }</p>
                   </div>
                   <div className="text-center">
-                    <p className="text-white/70 text-xs md:text-sm">{t('profile.steam_id')}</p>
+                    <p className="text-opnskin-text-secondary text-xs md:text-sm">{t('profile.steam_id')}</p>
                     <p className="font-mono text-xs truncate">{user?.steamId || '...'}</p>
                   </div>
                 </div>
@@ -244,12 +244,12 @@ export default function Profile() {
           </TabsContent>
 
           <TabsContent value="settings">
-            <Card className="bg-black/40 border-white/5 mb-4 md:mb-6">
+            <Card className="bg-opnskin-bg-card/60 border-opnskin-bg-secondary mb-4 md:mb-6">
               <CardContent className="p-4 md:p-6">
                 <h3 className="text-lg md:text-xl font-bold font-rajdhani mb-3 md:mb-4">Lien d'échange Steam</h3>
                 <form onSubmit={handleTradeUrlSubmit} className="flex flex-col gap-3 max-w-lg">
                   <div className="flex items-center justify-between">
-                    <label htmlFor="tradeUrl" className="text-sm text-white/70">Votre Steam Trade URL</label>
+                    <label htmlFor="tradeUrl" className="text-sm text-opnskin-text-secondary">Votre Steam Trade URL</label>
                     <a
                       href="https://steamcommunity.com/my/tradeoffers/privacy#trade_offer_access_url"
                       target="_blank"
@@ -277,11 +277,11 @@ export default function Profile() {
               </CardContent>
             </Card>
 
-            <Card className="bg-black/40 border-white/5 mb-4 md:mb-6">
+            <Card className="bg-opnskin-bg-card/60 border-opnskin-bg-secondary mb-4 md:mb-6">
               <CardContent className="p-4 md:p-6">
                 <h3 className="text-lg md:text-xl font-bold font-rajdhani mb-3 md:mb-4">Adresse Email</h3>
                 <form onSubmit={handleEmailSubmit} className="flex flex-col gap-3 max-w-lg">
-                  <label htmlFor="email" className="text-sm text-white/70">Votre adresse email</label>
+                  <label htmlFor="email" className="text-sm text-opnskin-text-secondary">Votre adresse email</label>
                   <input
                     id="email"
                     type="email"

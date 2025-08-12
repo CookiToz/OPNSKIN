@@ -117,8 +117,8 @@ export default function MarketplacePage() {
 
   if (!selectedGame) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-start bg-[#0e0e10] px-2 md:px-4 pt-6 md:pt-8 pb-4">
-        <h1 className="text-2xl md:text-5xl font-bold text-center mb-6 md:mb-10 text-white font-rajdhani drop-shadow-lg">
+      <div className="min-h-screen flex flex-col items-center justify-start bg-opnskin-bg-primary px-2 md:px-4 pt-6 md:pt-8 pb-4">
+           <h1 className="text-2xl md:text-5xl font-bold text-center mb-6 md:mb-10 text-opnskin-text-primary font-rajdhani drop-shadow-lg">
           {t('marketplace.choose_universe', 'Choisis ton univers')}
           <span className="ml-2 md:ml-4 px-2 md:px-3 py-1 rounded-full bg-white text-[#287CFA] text-sm md:text-base font-semibold align-middle shadow-md">{t('marketplace.badge')}</span>
         </h1>
@@ -127,16 +127,16 @@ export default function MarketplacePage() {
             <button
               key={game.key}
               onClick={() => router.push(`/marketplace/${game.key}`)}
-              className="group relative rounded-2xl overflow-hidden shadow-lg bg-gradient-to-br from-[#101c2c] to-[#0e0e10] border-2 border-transparent hover:border-[#00ffe7] transition-all duration-300 focus:outline-none flex flex-col"
+              className="group relative rounded-2xl overflow-hidden shadow-lg bg-gradient-to-br from-opnskin-bg-card to-opnskin-bg-primary border-2 border-transparent hover:border-opnskin-accent transition-all duration-300 focus:outline-none flex flex-col"
               style={{ width: '100%', maxWidth: 400, height: 400, minHeight: 400 }}
               aria-label={t(`marketplace.game_${game.key}`, game.name)}
             >
               <img
                 src={game.cover}
                 alt={t(`marketplace.game_${game.key}`, game.name)}
-                className="w-full h-full object-cover object-center transition-transform duration-300 group-hover:scale-105 group-hover:brightness-110"
+                className="w-full h-full object-cover object-center transition-transform duration-300 group-hover:scale-105"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#00ffe7]/20 via-transparent to-transparent pointer-events-none group-hover:from-[#00ffe7]/40 transition-all duration-300" />
+              <div className="absolute inset-0 bg-gradient-to-t from-opnskin-accent/10 via-transparent to-transparent pointer-events-none group-hover:from-opnskin-accent/30 transition-all duration-300" />
             </button>
           ))}
         </div>
@@ -151,36 +151,36 @@ export default function MarketplacePage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0e0e10] text-white flex flex-col">
+     <div className="min-h-screen bg-opnskin-bg-primary text-opnskin-text-primary flex flex-col">
       {/* Header sticky */}
-      <div className="sticky top-0 z-20 bg-[#0e0e10]/95 backdrop-blur border-b border-[#1a1a1d] px-2 md:px-4 py-3 md:py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-2 md:gap-4 shadow-lg">
+      <div className="sticky top-0 z-20 bg-opnskin-bg-primary/95 backdrop-blur border-b border-opnskin-bg-secondary px-2 md:px-4 py-3 md:py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-2 md:gap-4 shadow-lg">
         <div className="flex items-center gap-2 md:gap-4 flex-1">
           <button onClick={() => setSelectedGame(null)} className="text-[#00ffe7] font-bold text-lg mr-2 hover:underline">←</button>
           <h2 className="text-lg md:text-2xl font-bold font-rajdhani tracking-tight">{t('marketplace.title')} {t(`marketplace.game_${selectedGame}`)}</h2>
         </div>
         <div className="flex flex-1 gap-2 items-center justify-end">
           {/* Recherche supprimée, gérée par le header global */}
-          <select className="bg-[#18181b] border border-[#222] rounded-lg px-2 md:px-3 py-2 text-white text-sm md:text-base">
+          <select className="bg-opnskin-bg-card border border-opnskin-bg-secondary rounded-lg px-2 md:px-3 py-2 text-opnskin-text-primary text-sm md:text-base">
             <option value="price_asc">{t('marketplace.sort_price_asc')}</option>
             <option value="price_desc">{t('marketplace.sort_price_desc')}</option>
             <option value="float_asc">{t('marketplace.sort_float_asc')}</option>
             <option value="good_deal">{t('marketplace.sort_good_deal')}</option>
           </select>
-          <select className="bg-[#18181b] border border-[#222] rounded-lg px-2 md:px-3 py-2 text-white text-sm md:text-base">
+          <select className="bg-opnskin-bg-card border border-opnskin-bg-secondary rounded-lg px-2 md:px-3 py-2 text-opnskin-text-primary text-sm md:text-base">
             <option value="all">{t('marketplace.filter_all')}</option>
             <option value="online">{t('marketplace.filter_online')}</option>
             <option value="offline">{t('marketplace.filter_offline')}</option>
           </select>
-          <button className="ml-2 px-3 md:px-4 py-2 rounded-lg bg-[#00ffe7] text-black font-bold hover:bg-[#00e6cc] transition text-sm md:text-base">{t('marketplace.reset')}</button>
+          <button className="ml-2 px-3 md:px-4 py-2 rounded-lg bg-opnskin-accent text-opnskin-text-primary font-bold hover:opacity-90 transition text-sm md:text-base">{t('marketplace.reset')}</button>
         </div>
       </div>
       {/* Filtres latéraux ou top bar (à venir) */}
       <div className="flex-1 flex flex-col md:flex-row">
-        <aside className="hidden md:block w-64 bg-[#101c2c]/40 border-r border-[#1a1a1d] p-6">{t('marketplace.filters_coming')}</aside>
+        <aside className="hidden md:block w-64 bg-opnskin-bg-card/60 border-r border-opnskin-bg-secondary p-6">{t('marketplace.filters_coming')}</aside>
         <main className="flex-1 p-3 md:p-6 flex flex-col items-center justify-center">
-          <div className="text-center opacity-60">
-            <p className="text-base md:text-lg">{t('marketplace.grid_coming')}</p>
-            <p className="mt-2 text-xs md:text-sm">{t('marketplace.grid_hint')}</p>
+          <div className="text-center opacity-80">
+            <p className="text-base md:text-lg text-opnskin-text-secondary">{t('marketplace.grid_coming')}</p>
+            <p className="mt-2 text-xs md:text-sm text-opnskin-text-secondary">{t('marketplace.grid_hint')}</p>
           </div>
         </main>
       </div>

@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import I18nProvider from '@/components/I18nProvider'
+import { ThemeProvider } from '@/components/theme-provider'
 import { UserProvider } from '@/components/UserProvider'
 import { FloatProvider } from '@/components/FloatProvider'
 import { InventoryProvider } from '@/components/InventoryProvider'
@@ -124,6 +125,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
       </head>
       <body className={`${inter.className} bg-opnskin-bg-primary text-opnskin-text-primary antialiased`}>
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
         <I18nProvider>
           <UserProvider>
             <UserPresencePinger />
@@ -150,6 +152,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </InventoryProvider>
           </UserProvider>
         </I18nProvider>
+        </ThemeProvider>
       </body>
     </html>
   )

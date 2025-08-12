@@ -136,7 +136,7 @@ export default function Home() {
               </Button>
             </Link>
             <div className="flex justify-center lg:justify-start">
-              <SteamAuthStatus />
+              <SteamAuthStatus iconColor="black" />
             </div>
           </div>
           {/* Animation mobile : SOUS le texte, visible uniquement sur mobile */}
@@ -242,16 +242,16 @@ export default function Home() {
 
       <FeeProgressionChart />
 
-      <section className="py-10 md:py-16 bg-gradient-to-b from-black/50 to-black">
+      <section className="py-10 md:py-16 bg-gradient-to-b from-opnskin-bg-secondary/40 to-opnskin-bg-primary">
         <div className="container px-2 md:px-4">
           <div className="max-w-3xl mx-auto text-center">
-            <Badge variant="neon" className="mb-4 px-4 py-1 text-xs md:text-base">
+            <Badge variant="neon" className="mb-4 px-4 py-1 text-xs md:text-base bg-opnskin-primary/10 text-opnskin-primary border-opnskin-primary/30">
               {t('home.community_badge')}
             </Badge>
-            <h2 className="text-2xl md:text-4xl font-bold mb-4 md:mb-6 font-rajdhani">
+            <h2 className="text-2xl md:text-4xl font-bold mb-4 md:mb-6 font-rajdhani text-opnskin-text-primary">
               {t('home.community_professional_title')}
             </h2>
-            <p className="text-base md:text-lg text-white/70 mb-6 md:mb-8">
+            <p className="text-base md:text-lg text-opnskin-text-secondary mb-6 md:mb-8">
               {t('home.community_subtitle')}
             </p>
             {user?.loggedIn ? (
@@ -260,12 +260,8 @@ export default function Home() {
                 <span className="inline-block w-3 h-3 rounded-full" style={{ background: '#0CE49B', boxShadow: '0 0 8px #0CE49B88' }}></span>
               </div>
             ) : (
-              <Button variant="secondary" size="lg" onClick={() => window.location.href = '/api/auth/steam'} className="flex items-center gap-2">
-                <img
-                  src="/icons8-steam-128.png"
-                  alt="Steam"
-                  className="w-7 h-7 object-contain"
-                />
+              <Button variant="secondary" size="lg" onClick={() => window.location.href = '/api/auth/steam'} className="flex items-center gap-2 bg-white text-opnskin-text-primary border border-opnskin-bg-secondary hover:bg-opnskin-bg-secondary/40 dark:bg-opnskin-blue dark:text-white dark:border-transparent dark:hover:bg-opnskin-blue/80">
+                <img src="/icons8-steam-128-noir.png" alt="Steam" className="w-7 h-7 object-contain" />
                 {t('home.connect_steam_now')}
               </Button>
             )}
@@ -273,12 +269,12 @@ export default function Home() {
         </div>
       </section>
 
-      <footer className="py-8 bg-black border-t border-white/5">
+      <footer className="py-8 bg-opnskin-bg-primary border-t border-opnskin-bg-secondary/30">
         <div className="container px-4">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
               <h3 className="text-xl font-bold mb-4 font-rajdhani">{t('home.footer_opnskin')}</h3>
-              <p className="text-white/70 mb-4">
+              <p className="text-opnskin-text-secondary mb-4">
                 {t('home.footer_desc')}
               </p>
               <div className="flex space-x-4">
@@ -286,7 +282,7 @@ export default function Home() {
                   href="https://x.com/opnskin" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="text-white/70 hover:text-opnskin-accent transition-colors duration-200"
+                  className="text-opnskin-text-secondary hover:text-opnskin-accent transition-colors duration-200"
                   aria-label="Suivez-nous sur X (Twitter)"
                 >
                   <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
@@ -297,7 +293,7 @@ export default function Home() {
                   href="https://discord.gg/g7nqXkJX6w" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="text-white/70 hover:text-opnskin-accent transition-colors duration-200"
+                  className="text-opnskin-text-secondary hover:text-opnskin-accent transition-colors duration-200"
                   aria-label="Rejoignez notre Discord"
                 >
                   <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
@@ -319,27 +315,27 @@ export default function Home() {
               <h3 className="text-lg font-bold mb-4 font-rajdhani">{t('home.footer_quicklinks')}</h3>
               <ul className="space-y-2">
                 <li>
-                  <Link href="/marketplace" className="text-white/70 hover:text-opnskin-accent transition-colors duration-200">
+                  <Link href="/marketplace" className="text-opnskin-text-secondary hover:text-opnskin-accent transition-colors duration-200">
                     {t('home.footer_marketplace')}
                   </Link>
                 </li>
                 <li>
-                  <Link href="/inventory" className="text-white/70 hover:text-opnskin-accent transition-colors duration-200">
+                  <Link href="/inventory" className="text-opnskin-text-secondary hover:text-opnskin-accent transition-colors duration-200">
                     {t('home.footer_inventory')}
                   </Link>
                 </li>
                 <li>
-                  <Link href="/listings" className="text-white/70 hover:text-opnskin-accent transition-colors duration-200">
+                  <Link href="/listings" className="text-opnskin-text-secondary hover:text-opnskin-accent transition-colors duration-200">
                     {t('home.footer_listings')}
                   </Link>
                 </li>
                 <li>
-                  <Link href="/wallet" className="text-white/70 hover:text-opnskin-accent transition-colors duration-200">
+                  <Link href="/wallet" className="text-opnskin-text-secondary hover:text-opnskin-accent transition-colors duration-200">
                     {t('home.footer_wallet')}
                   </Link>
                 </li>
                 <li>
-                  <Link href="/history" className="text-white/70 hover:text-opnskin-accent transition-colors duration-200">
+                  <Link href="/history" className="text-opnskin-text-secondary hover:text-opnskin-accent transition-colors duration-200">
                     {t('home.footer_history')}
                   </Link>
                 </li>
@@ -349,12 +345,12 @@ export default function Home() {
               <h3 className="text-lg font-bold mb-4 font-rajdhani">{t('home.footer_support')}</h3>
               <ul className="space-y-2">
                 <li>
-                  <Link href="/assistance" className="text-white/70 hover:text-opnskin-accent transition-colors duration-200">
+                  <Link href="/assistance" className="text-opnskin-text-secondary hover:text-opnskin-accent transition-colors duration-200">
                     {t('home.footer_helpcenter')}
                   </Link>
                 </li>
                 <li>
-                  <Link href="/assistance" className="text-white/70 hover:text-opnskin-accent transition-colors duration-200">
+                  <Link href="/assistance" className="text-opnskin-text-secondary hover:text-opnskin-accent transition-colors duration-200">
                     {t('home.footer_faq')}
                   </Link>
                 </li>
@@ -364,29 +360,29 @@ export default function Home() {
               <h3 className="text-lg font-bold mb-4 font-rajdhani">{t('home.footer_legal')}</h3>
               <ul className="space-y-2">
                 <li>
-                  <Link href="/privacy" className="text-white/70 hover:text-opnskin-accent transition-colors duration-200">
+                  <Link href="/privacy" className="text-opnskin-text-secondary hover:text-opnskin-accent transition-colors duration-200">
                     {t('home.footer_privacy')}
                   </Link>
                 </li>
                 <li>
-                  <Link href="/terms" className="text-white/70 hover:text-opnskin-accent transition-colors duration-200">
+                  <Link href="/terms" className="text-opnskin-text-secondary hover:text-opnskin-accent transition-colors duration-200">
                     {t('home.footer_terms')}
                   </Link>
                 </li>
                 <li>
-                  <Link href="/mentions" className="text-white/70 hover:text-opnskin-accent transition-colors duration-200">
+                  <Link href="/mentions" className="text-opnskin-text-secondary hover:text-opnskin-accent transition-colors duration-200">
                     {t('home.footer_mentions')}
                   </Link>
                 </li>
                 <li>
-                  <a href="javascript:openAxeptioCookies()" className="text-white/70 hover:text-opnskin-accent transition-colors duration-200">
+                  <a href="javascript:openAxeptioCookies()" className="text-opnskin-text-secondary hover:text-opnskin-accent transition-colors duration-200">
                     {t('home.footer_cookies')}
                   </a>
                 </li>
               </ul>
             </div>
           </div>
-          <div className="mt-8 pt-8 border-t border-white/10 text-center text-white/50 text-sm">
+          <div className="mt-8 pt-8 border-t border-opnskin-bg-secondary/30 text-center text-opnskin-text-secondary text-sm">
             <p>{t('home.footer_copyright')}</p>
           </div>
         </div>

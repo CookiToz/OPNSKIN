@@ -138,14 +138,14 @@ export default function MyListingsTable({
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-2">
         <div className="flex items-center gap-2 w-full md:w-auto">
           <div className="relative w-full md:w-72">
-            <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-white/60" />
-            <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Rechercher un item..." className="pl-8 bg-black/30 border-white/10" />
+            <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-opnskin-text-secondary" />
+            <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Rechercher un item..." className="pl-8 bg-opnskin-bg-card/60 border-opnskin-bg-secondary" />
           </div>
           <Button variant={statusFilter === "ALL" ? "default" : "outline"} onClick={() => setStatusFilter("ALL")}>Tous</Button>
           <Button variant={statusFilter === "AVAILABLE" ? "default" : "outline"} onClick={() => setStatusFilter("AVAILABLE")}>Actives</Button>
           <Button variant={statusFilter === "PENDING_TRADE_OFFER" ? "default" : "outline"} onClick={() => setStatusFilter("PENDING_TRADE_OFFER")}>En échange</Button>
         </div>
-        <div className="flex items-center gap-2 text-sm text-white/70">
+        <div className="flex items-center gap-2 text-sm text-opnskin-text-secondary">
           <span>{filtered.length} annonce(s)</span>
           <span>•</span>
           <span>
@@ -155,7 +155,7 @@ export default function MyListingsTable({
       </div>
 
       {/* Table */}
-      <div className="rounded-xl border border-white/10 bg-black/30 overflow-hidden">
+      <div className="rounded-xl border border-opnskin-bg-secondary bg-opnskin-bg-card/60 overflow-hidden">
         <Table>
           <TableHeader>
             <TableRow className="hover:bg-transparent">
@@ -172,20 +172,20 @@ export default function MyListingsTable({
           </TableHeader>
           <TableBody>
             {filtered.map((row) => (
-              <TableRow key={row.id} className="hover:bg-white/5">
+              <TableRow key={row.id} className="hover:bg-opnskin-bg-secondary/20">
                 <TableCell>
                   <div className="flex items-center gap-2">
                     {row.itemImage && <img src={row.itemImage} alt={row.itemName || row.itemId} className="w-10 h-10 object-contain rounded" />}
                     <div className="flex flex-col">
                       <span className="font-medium">{row.itemName || row.itemId}</span>
-                      <span className="text-xs text-white/60">#{row.itemId}</span>
+                      <span className="text-xs text-opnskin-text-secondary">#{row.itemId}</span>
                     </div>
                   </div>
                 </TableCell>
                 <TableCell>
                   {editingId === row.id ? (
                     <div className="flex items-center gap-2">
-                      <Input type="number" value={editPriceValue} onChange={(e) => setEditPriceValue(e.target.value)} className="w-24 bg-black/20 border-white/10" />
+                      <Input type="number" value={editPriceValue} onChange={(e) => setEditPriceValue(e.target.value)} className="w-24 bg-opnskin-bg-card border-opnskin-bg-secondary" />
                       <Button size="sm" onClick={() => savePrice(row)} disabled={savingId === row.id} className="bg-opnskin-green hover:bg-opnskin-green/80">{savingId === row.id ? "..." : "OK"}</Button>
                       <Button size="sm" variant="outline" onClick={() => setEditingId(null)}>Annuler</Button>
                     </div>
@@ -207,7 +207,7 @@ export default function MyListingsTable({
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" size="icon"><MoreHorizontal className="h-4 w-4" /></Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="bg-opnskin-bg-card border-white/10">
+                    <DropdownMenuContent align="end" className="bg-opnskin-bg-card border-opnskin-bg-secondary">
                       <DropdownMenuLabel>Actions</DropdownMenuLabel>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem onClick={() => window.open(`/marketplace?offerId=${row.id}`, '_blank')} className="cursor-pointer"><ExternalLink className="h-4 w-4 mr-2" />Voir sur la marketplace</DropdownMenuItem>

@@ -34,11 +34,11 @@ export default function InventoryGameSelect({ selectedGame, onSelect, context = 
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-start bg-[#0e0e10] px-4 pt-8 pb-4">
-      <h1 className="text-4xl md:text-5xl font-bold text-center mb-10 text-white font-rajdhani drop-shadow-lg flex items-center justify-center gap-4">
+    <div className="min-h-screen flex flex-col items-center justify-start bg-opnskin-bg-primary px-4 pt-8 pb-4">
+      <h1 className="text-4xl md:text-5xl font-bold text-center mb-10 text-opnskin-text-primary font-rajdhani drop-shadow-lg flex items-center justify-center gap-4">
         <span>{t('inventory.selectGameTitle')}</span>
         {context === 'inventory' && (
-          <span className="px-3 py-1 rounded-full bg-white text-[#287CFA] text-base font-semibold align-middle shadow-md">
+            <span className="px-3 py-1 rounded-full bg-opnskin-bg-card text-opnskin-primary border border-opnskin-primary/30 text-base font-semibold align-middle shadow-md">
             {t('inventory.badge', 'INVENTAIRE')}
           </span>
         )}

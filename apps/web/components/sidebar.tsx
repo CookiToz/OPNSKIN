@@ -304,7 +304,7 @@ function SidebarContent() {
               </div>
             )}
           </div>
-          <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center text-xs text-white bg-black/40 rounded-lg pointer-events-none">
+          <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center text-xs text-opnskin-text-primary bg-opnskin-bg-secondary/40 rounded-lg pointer-events-none">
             {t('sidebar.coming_soon', 'Coming Soon')}
           </div>
         </div>

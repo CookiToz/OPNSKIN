@@ -133,7 +133,7 @@ export function GridLoading({ count = 4 }: { count?: number }) {
 // Composant de chargement non-bloquant
 export function NonBlockingLoading() {
   return (
-    <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center">
+    <div className="fixed inset-0 bg-opnskin-bg-primary/30 backdrop-blur-sm z-50 flex items-center justify-center">
       <div className="bg-opnskin-bg-card border border-opnskin-bg-secondary rounded-lg p-6 shadow-xl">
         <Loading size="md" text="Chargement..." variant="sparkle" />
       </div>

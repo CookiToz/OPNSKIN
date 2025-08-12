@@ -159,12 +159,9 @@ export default function InventoryPage() {
           <Package className="h-14 w-14 md:h-16 md:w-16 text-opnskin-text-secondary/30 mx-auto mb-3 md:mb-4" />
           <h2 className="text-xl md:text-2xl font-bold mb-2 font-satoshi-bold text-opnskin-text-primary">{t('inventory.not_logged_in_title', 'Connecte-toi via Steam pour voir ton inventaire')}</h2>
           <p className="text-opnskin-text-secondary mb-3 md:mb-4 text-base md:text-lg">{t('inventory.not_logged_in_desc', 'Tu dois être connecté via Steam pour accéder à ton inventaire.')}</p>
-          <Button onClick={() => window.location.href = '/api/auth/steam'} className="btn-opnskin flex items-center gap-2 w-full max-w-xs mx-auto text-base md:text-lg">
-            <img
-              src="/icons8-steam-128.png"
-              alt="Steam"
-              className="w-6 h-6 object-contain"
-            />
+          <Button onClick={() => window.location.href = '/api/auth/steam'} className="btn-opnskin flex items-center gap-2 w-full max-w-xs mx-auto text-base md:text-lg bg-white text-opnskin-text-primary border border-opnskin-bg-secondary hover:bg-opnskin-bg-secondary/40 dark:bg-opnskin-blue dark:text-white dark:border-transparent dark:hover:bg-opnskin-blue/80">
+              <img src="/icons8-steam-128-noir.png" alt="Steam" className="w-6 h-6 object-contain block dark:hidden" />
+              <img src="/icons8-steam-128.png" alt="Steam" className="w-6 h-6 object-contain hidden dark:block" />
             {t('inventory.login_button', 'Se connecter via Steam')}
           </Button>
         </div>
