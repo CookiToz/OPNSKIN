@@ -8,6 +8,7 @@ import { Menu, X, Search } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import SteamAuthStatus from '@/components/SteamAuthStatus';
+import { ThemeToggle } from '@/components/theme-toggle';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 import { Input } from '@/components/ui/input';
 import { useSearchStore } from '@/hooks/use-search-store';
@@ -104,6 +105,10 @@ export default function MobileLayout({ children }: { children: React.ReactNode }
               </div>
             </PopoverContent>
           </Popover>
+          {/* Toggle thème (mobile) */}
+          <div className="ml-1">
+            <ThemeToggle />
+          </div>
           {/* Auth Steam */}
           <div className="ml-2">
             <SteamAuthStatus />
@@ -115,8 +120,8 @@ export default function MobileLayout({ children }: { children: React.ReactNode }
                 <Menu className="h-7 w-7" />
               </button>
             </DrawerTrigger>
-            <DrawerContent className="!rounded-t-none !h-full !max-h-none !top-0 !bottom-0 !left-0 !right-0 !fixed !w-4/5">
-              <div className="flex items-center justify-between px-4 py-4 border-b border-opnskin-bg-secondary">
+            <DrawerContent className="!rounded-t-none !h-full !max-h-none !top-0 !bottom-0 !left-0 !right-0 !fixed !w-4/5 overflow-y-auto">
+              <div className="flex items-center justify-between px-4 py-4 border-b border-opnskin-bg-secondary sticky top-0 bg-opnskin-bg-primary z-10">
                 <Link href="/" className="flex items-center gap-2" onClick={() => setOpen(false)}>
                   <OPNSKINLogo className="h-8 w-8 text-opnskin-primary" />
                   <span className="font-satoshi-bold text-lg text-opnskin-text-primary">OPN<span className="text-opnskin-primary">SKIN</span></span>
@@ -125,7 +130,7 @@ export default function MobileLayout({ children }: { children: React.ReactNode }
                   <X className="h-7 w-7" />
                 </button>
               </div>
-              <nav className="flex flex-col gap-2 px-4 py-6">
+              <nav className="flex flex-col gap-2 px-4 py-6 pb-24">
                 {navItems.map(item => (
                   <Link key={item.href} href={item.href} onClick={() => setOpen(false)}
                     className={`py-3 px-3 rounded text-base font-medium ${pathname === item.href ? 'bg-opnskin-primary/10 text-opnskin-primary' : 'text-opnskin-text-primary hover:bg-opnskin-bg-secondary/60'}`}

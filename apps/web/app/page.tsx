@@ -77,8 +77,8 @@ export default function Home() {
   return (
     <div className="relative min-h-screen">
       {/* HERO SECTION avec fond animé */}
-      <section className="relative flex flex-col justify-center items-center h-[60vh] min-h-[400px] w-full overflow-hidden bg-transparent">
-        {/* Fond animé, seulement sur desktop */}
+      <section className="relative flex flex-col justify-center items-center h-[70vh] min-h-[420px] w-full overflow-hidden bg-transparent pt-safe">
+        {/* Fond animé, desktop */}
         <div className="absolute inset-0 w-full h-full pointer-events-none select-none overflow-hidden z-0 hidden md:block">
           <div
             className="skin-bg-container"
@@ -139,20 +139,14 @@ export default function Home() {
               <SteamAuthStatus />
             </div>
           </div>
-          {/* Animation mobile : SOUS le texte, visible uniquement sur mobile */}
-          <div className="block md:hidden w-full flex justify-center mt-6">
-            <div className="skin-bg-container-mobile max-w-xs w-full flex items-center justify-center">
+          {/* Animation mobile: image fluide sous le texte avec parallax léger */}
+          <div className="block md:hidden w-full flex justify-center mt-6 px-2">
+            <div className="relative w-full max-w-sm aspect-[16/9] overflow-visible">
               <img
                 src={skinImages[bgIndex]}
                 alt="Skin background current"
-                className="animated-bg-skin"
-                style={{
-                  width: '100%',
-                  height: 'auto',
-                  aspectRatio: 1.75,
-                  objectFit: 'contain',
-                  background: 'transparent',
-                }}
+                className="w-full h-full object-contain will-change-transform"
+                style={{ transform: 'translateZ(0)' }}
                 draggable="false"
               />
             </div>
@@ -162,7 +156,7 @@ export default function Home() {
         <style jsx global>{`
           @keyframes levitate {
             0% { transform: translateY(0px); }
-            50% { transform: translateY(-28px); }
+            50% { transform: translateY(-20px); }
             100% { transform: translateY(0px); }
           }
           
@@ -170,7 +164,7 @@ export default function Home() {
             object-fit: contain;
             object-position: center;
             will-change: transform, opacity;
-            animation: levitate 7s ease-in-out infinite;
+            animation: levitate 8s ease-in-out infinite;
             transition: opacity 0.8s ease-in-out;
           }
         `}</style>

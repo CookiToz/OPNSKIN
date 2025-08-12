@@ -111,6 +111,7 @@
       radial-gradient(circle at 85% 30%, rgba(12, 228, 155, 0.03) 0%, transparent 25%);
     letter-spacing: 0.5px;
     font-size: 16px;
+    -webkit-tap-highlight-color: transparent;
   }
   @media (min-width: 768px) {
     body { font-size: 17px; }
@@ -164,6 +165,11 @@
     transition-duration: 300ms;
   }
 
+  /* Safe area padding for devices with notches (mobile) */
+  .pt-safe {
+    padding-top: calc(env(safe-area-inset-top, 0px) + 12px);
+  }
+
   /* Navigation styles */
   .nav-item {
     @apply flex items-center gap-3 px-3 py-2 rounded-md transition-all;
@@ -197,7 +203,7 @@
 
   /* Button styles */
   .btn-opnskin {
-    @apply bg-opnskin-primary text-white font-satoshi-bold rounded-md px-4 py-2 transition-all duration-300 hover:bg-opnskin-primary-hover hover:shadow-[0_0_20px_rgba(40,124,250,0.3)] hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-opnskin-primary focus-visible:ring-offset-2;
+    @apply bg-opnskin-primary text-white font-satoshi-bold rounded-md px-4 py-2 transition-all duration-300 hover:bg-opnskin-primary-hover hover:shadow-[0_0_20px_rgba(40,124,250,0.3)] hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-opnskin-primary focus-visible:ring-offset-2 min-h-[44px];
   }
 
   .btn-opnskin-secondary {
@@ -206,7 +212,7 @@
 
   /* Market CTA button (blue across themes) */
   .btn-market {
-    @apply bg-opnskin-primary text-white rounded-md px-4 py-2 transition-colors duration-200 hover:bg-opnskin-primary-hover active:brightness-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-opnskin-primary focus-visible:ring-offset-2;
+    @apply bg-opnskin-primary text-white rounded-md px-4 py-2 transition-colors duration-200 hover:bg-opnskin-primary-hover active:brightness-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-opnskin-primary focus-visible:ring-offset-2 min-h-[44px];
   }
 
   /* Focus styles for accessibility */
