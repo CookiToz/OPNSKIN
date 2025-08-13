@@ -77,7 +77,7 @@ export async function POST(req: NextRequest) {
       sellerId: offer.sellerId,
       escrowAmount: offer.price,
       transactionFee: transactionFee,
-      status: 'WAITING_TRADE',
+      status: 'PENDING',
       startedAt: new Date().toISOString()
     }]).select('*,Offer(*),User:buyerId(id,name,tradeUrl,avatar)').single();
     if (transactionError) {

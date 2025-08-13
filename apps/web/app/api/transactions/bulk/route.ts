@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
         buyerId: buyer.id,
         sellerId: offer.sellerId,
         transactionFee: transactionFee,
-        status: 'WAITING_TRADE',
+        status: 'PENDING',
       }]).select('*').single();
       if (transactionError) {
         results.push({ offerId: offer.id, success: false, error: transactionError.message });
