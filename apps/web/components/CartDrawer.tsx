@@ -28,6 +28,17 @@ export default function CartDrawer({ open, onClose }: { open: boolean; onClose: 
     if (items.length === 0) return;
     setLoading(true);
     try {
+      // Resync avant achat pour éviter les IDs obsolètes
+      await syncWithBackend();
+      if (useCartStore.getState().items.length === 0) {
+        toast({
+          title: "Panier synchronisé",
+          description: "Certaines offres ne sont plus disponibles et ont été retirées.",
+          variant: "destructive",
+        });
+        setLoading(false);
+        return;
+      }
       const offerIds = items.map((skin) => skin.id);
       const res = await fetch("/api/transactions/bulk", {
         method: "POST",
@@ -44,20 +55,33 @@ export default function CartDrawer({ open, onClose }: { open: boolean; onClose: 
         await syncWithBackend();
         onClose();
       } else {
-        if (data.error === 'Insufficient wallet balance') {
+        if (data.error === 'Insufficient wallet balance' || data.error?.includes('Solde insuffisant')) {
           toast({
             title: "Solde insuffisant",
             description: "Votre solde est insuffisant pour cet achat. Veuillez recharger votre compte.",
             variant: "destructive",
           });
+        } else if (Array.isArray(data.results)) {
+          const failures = data.results.filter((r: any) => !r.success);
+          if (failures.length > 0) {
+            const notAvailable = failures.filter((f: any) => (f.error || '').toLowerCase().includes('non disponible'));
+            toast({
+              title: "Certaines offres sont indisponibles",
+              description: `${failures.length} offre(s) n'ont pas pu être achetées${notAvailable.length ? ' (indisponibles ou déjà vendues)' : ''}. Votre panier a été mis à jour.`,
+              variant: "destructive",
+            });
+          } else {
+            toast({ title: "Erreur lors de l'achat", description: data.error || "Certains achats ont échoué.", variant: "destructive" });
+          }
+          await syncWithBackend();
         } else {
           toast({
             title: "Erreur lors de l'achat",
             description: data.error || "Certains achats ont échoué.",
             variant: "destructive",
           });
+          await syncWithBackend();
         }
-        await syncWithBackend();
       }
     } catch (err) {
       toast({
@@ -72,10 +96,10 @@ export default function CartDrawer({ open, onClose }: { open: boolean; onClose: 
 
   return (
     <Drawer open={open} onClose={onClose}>
-      <DrawerContent className="bg-opnskin-bg-card rounded-t-2xl shadow-2xl border-t-4 border-opnskin-violet animate-slide-up">
+      <DrawerContent className="bg-opnskin-bg-card rounded-t-2xl shadow-2xl border-t-4 border-opnskin-blue animate-slide-up">
         <DrawerHeader className="flex items-center justify-between px-6 pt-4 pb-2">
-          <DrawerTitle className="flex items-center gap-2 text-2xl font-bold text-opnskin-accent">
-            <ShoppingCart className="w-7 h-7" />
+          <DrawerTitle className="flex items-center gap-2 text-2xl font-bold text-opnskin-blue">
+            <ShoppingCart className="w-7 h-7 text-opnskin-blue" />
             Mon panier
           </DrawerTitle>
           <DrawerClose asChild>
@@ -87,7 +111,7 @@ export default function CartDrawer({ open, onClose }: { open: boolean; onClose: 
         <div className="px-6 pb-6 pt-2 min-h-[200px] max-h-[60vh] overflow-y-auto">
           {items.length === 0 ? (
             <div className="text-center text-opnskin-text-secondary py-16">
-              <ShoppingCart className="mx-auto mb-4 w-12 h-12 text-opnskin-violet/60" />
+              <ShoppingCart className="mx-auto mb-4 w-12 h-12 text-opnskin-blue/60" />
               <div className="font-bold text-lg">Votre panier est vide.</div>
               <div className="text-sm mt-2">Ajoutez des skins depuis la marketplace !</div>
             </div>
