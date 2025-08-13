@@ -10,6 +10,7 @@ import { Toaster } from '@/components/ui/toaster'
 import NotificationsLive from '@/components/NotificationsLive'
 import UserPresencePinger from '@/components/UserPresencePinger'
 import ScrollToTop from '@/components/ScrollToTop'
+import ViewportFix from '@/components/ViewportFix'
 import { usePingPresence } from './hooks/use-ping-presence';
 import MobileLayout from '@/components/MobileLayout';
 import { Sidebar } from '@/components/sidebar';
@@ -124,10 +125,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
       </head>
-      <body className={`${inter.className} bg-opnskin-bg-primary text-opnskin-text-primary antialiased`}>
+      <body className={`${inter.className} bg-opnskin-bg-primary text-opnskin-text-primary antialiased min-h-app`}>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
         <I18nProvider>
           <UserProvider>
+            <ViewportFix />
             <UserPresencePinger />
             <ScrollToTop />
             <InventoryProvider>

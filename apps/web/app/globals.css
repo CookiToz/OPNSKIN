@@ -113,6 +113,11 @@
     font-size: 16px;
     -webkit-tap-highlight-color: transparent;
   }
+
+  /* Stable viewport height to avoid iOS URL bar shifts */
+  .min-h-app {
+    min-height: var(--app-vh, 100vh);
+  }
   @media (min-width: 768px) {
     body { font-size: 17px; }
   }

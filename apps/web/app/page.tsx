@@ -75,9 +75,9 @@ export default function Home() {
   if (!ready) return null;
   
   return (
-    <div className="relative min-h-screen">
+    <div className="relative min-h-app">
       {/* HERO SECTION avec fond animé */}
-      <section className="relative flex flex-col justify-center items-center h-[70vh] min-h-[420px] w-full overflow-hidden bg-transparent pt-safe">
+      <section className="relative flex flex-col justify-center items-center w-full overflow-hidden bg-transparent pt-safe" style={{ minHeight: 'calc(var(--app-vh, 100vh) * 0.7)' }}>
         {/* Fond animé, desktop */}
         <div className="absolute inset-0 w-full h-full pointer-events-none select-none overflow-hidden z-0 hidden md:block">
           <div
