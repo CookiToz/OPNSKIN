@@ -70,15 +70,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Insufficient wallet balance' }, { status: 400 });
     }
     
-    // Créer la transaction
+    // Créer la transaction (alignée au schéma)
     const { data: transaction, error: transactionError } = await supabaseAdmin.from('Transaction').insert([{
       offerId,
       buyerId: buyer.id,
       sellerId: offer.sellerId,
-      escrowAmount: offer.price,
       transactionFee: transactionFee,
       status: 'PENDING',
-      startedAt: new Date().toISOString()
     }]).select('*,Offer(*),User:buyerId(id,name,tradeUrl,avatar)').single();
     if (transactionError) {
       console.log('ERREUR: transactionError', transactionError);
@@ -114,16 +112,15 @@ export async function GET(req: NextRequest) {
       .from('Transaction')
       .select('*,Offer(*),User:buyerId(id,name,tradeUrl,avatar)')
       .eq('buyerId', user.id)
-      .order('startedAt', { ascending: false });
-    // 2. Transactions où l'utilisateur est vendeur (via offerId.sellerId)
+      .order('createdAt', { ascending: false });
+    // 2. Transactions où l'utilisateur est vendeur (via sellerId)
     const { data: sellerTx, error: sellerTxError } = await supabaseAdmin
       .from('Transaction')
       .select('*,Offer(*),User:buyerId(id,name,tradeUrl,avatar)')
-      .order('startedAt', { ascending: false });
-    // On filtre côté JS pour sellerId
-    const sellerTxFiltered = (sellerTx || []).filter(t => t.Offer?.sellerId === user.id);
+      .eq('sellerId', user.id)
+      .order('createdAt', { ascending: false });
     // On fusionne et on déduplique
-    const allTx = [...(buyerTx || []), ...sellerTxFiltered].filter((tx, idx, arr) =>
+    const allTx = [...(buyerTx || []), ...(sellerTx || [])].filter((tx, idx, arr) =>
       arr.findIndex(t => t.id === tx.id) === idx
     );
     if (buyerTxError || sellerTxError) {
@@ -133,15 +130,12 @@ export async function GET(req: NextRequest) {
       transactions: (allTx || []).map(t => ({
         id: t.id,
         offerId: t.offerId,
-        escrowAmount: t.escrowAmount,
         status: t.status,
-        startedAt: t.startedAt,
-        completedAt: t.completedAt,
-        cancelledAt: t.cancelledAt,
+        startedAt: t.createdAt,
         offer: t.Offer || null, // retourne l'objet complet de l'offre
         buyer: t.User || null, // retourne l'objet complet du buyer
         isBuyer: t.buyerId === user.id,
-        isSeller: t.Offer?.sellerId === user.id
+        isSeller: t.sellerId === user.id
       }))
     });
   } catch (error: any) {

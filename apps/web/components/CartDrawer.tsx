@@ -51,6 +51,8 @@ export default function CartDrawer({ open, onClose }: { open: boolean; onClose: 
           title: "Achat groupé réussi !",
           description: "Tous les skins ont été achetés avec succès.",
         });
+        // Redirection optionnelle vers l'historique pour voir l'avancement
+        setTimeout(() => { window.location.href = '/history'; }, 800);
         clear();
         await syncWithBackend();
         onClose();

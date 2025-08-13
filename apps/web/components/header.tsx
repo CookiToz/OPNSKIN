@@ -29,6 +29,8 @@ export function Header() {
   const [notifications, setNotifications] = useState<any[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [showNotifications, setShowNotifications] = useState(false);
+  // Limite d'aperçu rapide: 3 notifications max
+  const previewNotifications = notifications.slice(0, 3);
   const cartItems = useCartStore((state) => state.items);
   const syncCart = useCartStore((state) => state.syncWithBackend);
   useEffect(() => { syncCart(); }, []);
@@ -125,10 +127,10 @@ export function Header() {
                     <div className="absolute right-0 mt-2 w-80 p-4 rounded-lg bg-opnskin-bg-card/95 border border-opnskin-bg-secondary shadow-xl">
                       <h3 className="font-satoshi-bold mb-3 text-opnskin-text-primary">Notifications</h3>
                       <div className="space-y-3">
-                        {notifications.length === 0 ? (
+                        {previewNotifications.length === 0 ? (
                           <p className="text-sm text-opnskin-text-secondary">Aucune notification</p>
                         ) : (
-                          notifications.map((notification) => (
+                          previewNotifications.map((notification) => (
                             <div
                               key={notification.id}
                               className={cn(
