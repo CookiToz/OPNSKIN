@@ -46,6 +46,7 @@ function WalletPageContent() {
   const { t } = useTranslation('common');
   const currency = useCurrencyStore((state) => state.currency);
   const cryptoRates = useCryptoRatesStore();
+  const rates = cryptoRates as unknown as Record<string, number>;
   const { toast } = useToast();
   const { user, refetch } = useUser();
   const searchParams = useSearchParams();
@@ -137,6 +138,24 @@ function WalletPageContent() {
     return ok;
   };
 
+  const createAccountLink = async () => {
+    if (!requireAuth()) return;
+    setLoading(true);
+    try {
+      const response = await fetch('/api/stripe/connect/create-account-link', { method: 'POST' });
+      const data = await response.json();
+      if (response.ok && data?.url) {
+        window.open(data.url, '_blank');
+      } else {
+        toast({ title: 'Erreur', description: data.error || 'Impossible de générer le lien Stripe', variant: 'destructive' });
+      }
+    } catch (e) {
+      toast({ title: 'Erreur', description: 'Impossible de générer le lien Stripe', variant: 'destructive' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const createDeposit = async () => {
     if (!requireAuth()) return;
     if (!depositAmount || parseFloat(depositAmount) < 5) {
@@ -194,11 +213,11 @@ function WalletPageContent() {
 
   // Méthodes de paiement (fiat/crypto)
   const fiatMethods = [
-    { icon: <CreditCard className="h-6 w-6 text-opnskin-blue" />, label: t('wallet.card_payment', 'Carte bancaire'), desc: 'Visa, Mastercard, AMEX' },
-    { icon: <Landmark className="h-6 w-6 text-opnskin-green" />, label: t('wallet.bank_transfer', 'Virement bancaire'), desc: t('wallet.bank_transfer_desc', 'Dépôt direct depuis votre banque') },
+    { icon: <CreditCard className="h-6 w-6 text-opnskin-blue" />, label: 'Carte bancaire (Stripe)', desc: 'Visa, Mastercard, AMEX' },
+    { icon: <Landmark className="h-6 w-6 text-opnskin-green" />, label: 'Virement bancaire', desc: 'Bientôt disponible' },
   ];
   const cryptoMethods = [
-    { icon: <Bitcoin className="h-6 w-6 text-opnskin-violet" />, label: t('wallet.crypto_wallet', 'Wallet crypto'), desc: t('wallet.crypto_supported', 'ETH, USDT, etc.') },
+    { icon: <Bitcoin className="h-6 w-6" style={{ color: '#F7931A' }} />, label: 'Wallet crypto', desc: 'Bientôt disponible' },
   ];
 
   return (
@@ -224,11 +243,11 @@ function WalletPageContent() {
                     <div>
                       <div className="text-opnskin-text-secondary text-sm md:text-base mb-1">{t('wallet.balance_available')}</div>
                       <div className="flex items-center gap-2">
-                        {cryptoIcons[currency] && <img src={cryptoIcons[currency]!} alt={currency} className="inline w-6 h-6 md:w-7 md:h-7 mr-1 align-middle" />}
+                         {cryptoIcons[currency] && <img src={cryptoIcons[currency]!} alt={currency} className="inline w-6 h-6 md:w-7 md:h-7 mr-1 align-middle" />}
                          <span className="text-2xl md:text-3xl font-bold font-rajdhani text-opnskin-text-primary tracking-tight">
-                          {cryptoRates[currency] ? formatPrice(user?.walletBalance ?? 0, currency, cryptoRates) : <span>...</span>}
+                          {typeof rates[currency] === 'number' ? formatPrice(user?.walletBalance ?? 0, currency, rates as any) : <span>...</span>}
                         </span>
-                        <span className="ml-2 inline text-[#635BFF] font-semibold">Stripe</span>
+                        
                       </div>
                     </div>
                   </div>
@@ -351,7 +370,21 @@ function WalletPageContent() {
                   <div className="flex flex-col gap-2 mb-2">
                     {fiatMethods.map((m, i) => (
                       <Card key={i} className="rounded-xl bg-opnskin-bg-card/60 border-opnskin-bg-secondary flex items-center gap-2 p-2 md:p-3">
-                        <div className="flex items-center gap-2 md:gap-3">{m.icon}<div><div className="font-rajdhani font-bold text-opnskin-text-primary text-sm md:text-base">{m.label}</div><div className="text-opnskin-text-secondary text-xs">{m.desc}</div></div></div>
+                        <div className="flex items-center gap-2 md:gap-3">
+                          {m.icon}
+                          <div>
+                            <div className="font-rajdhani font-bold text-opnskin-text-primary text-sm md:text-base">
+                              {m.label.includes('Stripe') ? (
+                                <>
+                                  Carte bancaire (<span className="text-[#635BFF] font-semibold">Stripe</span>)
+                                </>
+                              ) : (
+                                m.label
+                              )}
+                            </div>
+                            <div className="text-opnskin-text-secondary text-xs">{m.desc}</div>
+                          </div>
+                        </div>
                       </Card>
                     ))}
                   </div>
