@@ -28,18 +28,15 @@ export async function POST(req: NextRequest) {
     if (offersError) {
       return NextResponse.json({ error: offersError.message }, { status: 500 });
     }
-    // Calculer le total avec les frais de transaction (5% par offre)
-    const totalWithFees = offers.reduce((sum, offer) => {
-      const fee = (offer.price || 0) * 0.05;
-      return sum + (offer.price || 0) + fee;
-    }, 0);
-    
-    if (buyer.walletBalance < totalWithFees) {
-      return NextResponse.json({ error: 'Solde insuffisant pour acheter tous les items.' }, { status: 400 });
-    }
-    
+    // Détails d'analyse
+    const offerIdSet = new Set(offerIds);
+    const foundIds = new Set((offers || []).map((o: any) => o.id));
+    const missingIds = offerIds.filter((id: string) => !foundIds.has(id));
+
     // Pour chaque offre, créer la transaction si possible
-    const results = [];
+    const results: any[] = [];
+    let successTotalWithFees = 0;
+    const successIds: string[] = [];
     for (const offer of offers) {
       if (!offer || offer.status !== 'AVAILABLE' || offer.sellerId === buyer.id) {
         results.push({ offerId: offer?.id, success: false, error: 'Offre non disponible ou invalide.' });
@@ -54,10 +51,8 @@ export async function POST(req: NextRequest) {
         offerId: offer.id,
         buyerId: buyer.id,
         sellerId: offer.sellerId,
-        escrowAmount: offer.price,
         transactionFee: transactionFee,
         status: 'WAITING_TRADE',
-        startedAt: new Date().toISOString()
       }]).select('*').single();
       if (transactionError) {
         results.push({ offerId: offer.id, success: false, error: transactionError.message });
@@ -73,19 +68,25 @@ export async function POST(req: NextRequest) {
         message: `Un acheteur a acheté votre skin ${offer.itemName || offer.itemId}. Veuillez procéder à l'échange Steam.`
       }]);
       results.push({ offerId: offer.id, success: true });
+      successIds.push(offer.id);
+      successTotalWithFees += (offer.price || 0) + transactionFee;
     }
-    // Débiter le solde total de l'utilisateur (avec frais)
-    await supabaseAdmin.from('User').update({ walletBalance: buyer.walletBalance - totalWithFees }).eq('id', buyer.id);
-    // Supprimer les items du panier correspondant aux offres achetées
-    await supabaseAdmin.from('CartItem').delete().match({ userId: buyer.id }).in('offerId', offerIds);
+    // Débiter seulement le total des offres validées
+    if (successTotalWithFees > 0) {
+      await supabaseAdmin.from('User').update({ walletBalance: buyer.walletBalance - successTotalWithFees }).eq('id', buyer.id);
+      // Supprimer du panier uniquement les offres achetées
+      await supabaseAdmin.from('CartItem').delete().match({ userId: buyer.id }).in('offerId', successIds);
+    }
     // Notification acheteur (une seule fois)
-    await supabaseAdmin.from('Notification').insert([{
-      userId: buyer.id,
-      type: 'PAYMENT_CONFIRMED',
-      title: 'Paiement validé',
-      message: `Votre paiement a bien été pris en compte. Attendez l'envoi du skin par le vendeur.`
-    }]);
-    return NextResponse.json({ results });
+    if (successIds.length > 0) {
+      await supabaseAdmin.from('Notification').insert([{
+        userId: buyer.id,
+        type: 'PAYMENT_CONFIRMED',
+        title: 'Paiement validé',
+        message: `Votre paiement a bien été pris en compte. Attendez l'envoi du skin par le vendeur.`
+      }]);
+    }
+    return NextResponse.json({ results, successIds, missingIds });
   } catch (error: any) {
     console.error('ERREUR BULK TRANSACTION:', error);
     return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 });
