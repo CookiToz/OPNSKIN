@@ -260,7 +260,7 @@ function WalletPageContent() {
                   )}
 
                   <div className="flex flex-col sm:flex-row gap-2 mt-1">
-                    <div className="flex items-center gap-2 flex-1">
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 flex-1">
                       <input
                         type="number"
                         min={5}
@@ -270,7 +270,7 @@ function WalletPageContent() {
                         onChange={(e) => setDepositAmount(e.target.value)}
                        className="flex-1 bg-opnskin-bg-card border border-opnskin-bg-secondary rounded px-3 py-2 text-sm text-opnskin-text-primary placeholder:text-opnskin-text-secondary"
                       />
-                      <Button className="bg-white text-opnskin-text-primary border border-opnskin-bg-secondary hover:bg-opnskin-bg-secondary/40 text-base md:text-lg py-4 md:py-5 transition-all dark:bg-opnskin-green dark:text-white dark:hover:bg-opnskin-green/80" size="lg" onClick={createDeposit} disabled={loading || !isLoggedIn}>
+                       <Button className="w-full sm:w-auto bg-white text-opnskin-text-primary border border-opnskin-bg-secondary hover:bg-opnskin-bg-secondary/40 text-base md:text-lg py-3 md:py-5 transition-all dark:bg-opnskin-green dark:text-white dark:hover:bg-opnskin-green/80" size="lg" onClick={createDeposit} disabled={loading || !isLoggedIn}>
                         <PlusCircle className="mr-2 h-5 w-5" /> {t('wallet.add_funds')}
                     </Button>
                       <span className="ml-2 hidden sm:inline text-[#635BFF] font-semibold">Stripe</span>
