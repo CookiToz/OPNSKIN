@@ -3,11 +3,13 @@
 import React, { useEffect, useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { History, Store } from "lucide-react"
+import { History, Store, Clock, ShieldCheck, CheckCircle2, XCircle } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { useTranslation } from 'react-i18next'
 import { useCurrencyStore, useCryptoRatesStore } from '@/hooks/use-currency-store';
 import { formatPrice } from '@/lib/utils';
+import { supabase } from '@/lib/supabaseClient'
+import { useUser } from '@/components/UserProvider'
 
 export default function HistoryPage() {
   const { t } = useTranslation('common')
@@ -15,6 +17,7 @@ export default function HistoryPage() {
   const cryptoRates = useCryptoRatesStore();
   const [transactions, setTransactions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const { user } = useUser();
 
   const fetchTransactions = async () => {
     setLoading(true);
@@ -38,38 +41,86 @@ export default function HistoryPage() {
     fetchTransactions();
   }, []);
 
+  // Abonnement temps réel pour acheteur et vendeur
+  useEffect(() => {
+    if (!user || !user.loggedIn || !user.id) return;
+    const channel = supabase
+      .channel(`tx-user-${user.id}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'Transaction', filter: `buyerId=eq.${user.id}` }, () => {
+        fetchTransactions();
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'Transaction', filter: `sellerId=eq.${user.id}` }, () => {
+        fetchTransactions();
+      })
+      .subscribe();
+    return () => {
+      try { supabase.removeChannel(channel); } catch {}
+    };
+  }, [user]);
+
   const getStatusBadge = (status: string) => {
     const statusConfig = {
-      'WAITING_TRADE': { label: 'En attente', color: 'bg-yellow-500' },
-      'DONE': { label: 'Terminée', color: 'bg-green-500' },
-      'REFUSED': { label: 'Refusée', color: 'bg-red-500' },
-      'EXPIRED': { label: 'Expirée', color: 'bg-gray-500' },
-      'REFUNDED_PENALTY': { label: 'Remboursée', color: 'bg-orange-500' },
+      PENDING: { label: 'En attente', color: 'bg-yellow-500/15 text-yellow-400 border-yellow-500/30', Icon: Clock },
+      IN_ESCROW: { label: 'En escrow', color: 'bg-blue-500/15 text-blue-400 border-blue-500/30', Icon: ShieldCheck },
+      RELEASED: { label: 'Terminée', color: 'bg-green-500/15 text-green-400 border-green-500/30', Icon: CheckCircle2 },
+      REFUNDED: { label: 'Remboursée', color: 'bg-orange-500/15 text-orange-400 border-orange-500/30', Icon: XCircle },
+      CANCELLED: { label: 'Annulée', color: 'bg-gray-500/15 text-gray-300 border-gray-500/30', Icon: XCircle },
     };
-    const config = statusConfig[status as keyof typeof statusConfig] || { label: status, color: 'bg-gray-500' };
+    const cfg = statusConfig[status as keyof typeof statusConfig] || { label: status, color: 'bg-gray-500/20 text-gray-300 border-gray-500/30', Icon: Clock } as any;
     return (
-      <span className={`inline-block px-2 py-1 rounded text-xs font-bold text-white ${config.color}`}>{config.label}</span>
+      <span className={`inline-flex items-center gap-1.5 px-2 py-1 rounded border text-xs font-semibold ${cfg.color}`}>
+        <cfg.Icon className="w-3.5 h-3.5" /> {cfg.label}
+      </span>
+    );
+  };
+
+  const renderTimeline = (status: string) => {
+    const steps = [
+      { key: 'PENDING', label: 'En attente' },
+      { key: 'IN_ESCROW', label: 'Escrow' },
+      { key: 'RELEASED', label: 'Terminé' },
+    ] as const;
+    const index = steps.findIndex(s => s.key === status);
+    const activeIdx = index === -1 ? 0 : index;
+    return (
+      <div className="flex items-center gap-2">
+        {steps.map((s, i) => (
+          <div key={s.key} className="flex items-center gap-2">
+            <div className={`w-2.5 h-2.5 rounded-full ${i <= activeIdx ? 'bg-opnskin-primary' : 'bg-opnskin-bg-secondary border border-opnskin-bg-secondary'}`} />
+            <span className={`text-xs ${i <= activeIdx ? 'text-opnskin-text-primary' : 'text-opnskin-text-secondary'}`}>{s.label}</span>
+            {i < steps.length - 1 && (
+              <div className={`w-8 h-[1px] ${i < activeIdx ? 'bg-opnskin-primary' : 'bg-opnskin-bg-secondary'}`} />
+            )}
+          </div>
+        ))}
+      </div>
     );
   };
 
   const getInstructions = (transaction: any) => {
     if (transaction.isBuyer) {
-      if (transaction.status === 'WAITING_TRADE') {
-        return <div className="text-yellow-400 text-xs mt-2">En attente d’envoi du skin par le vendeur. Vous recevrez une notification dès que le skin sera livré.</div>;
+      if (transaction.status === 'PENDING') {
+        return <div className="text-yellow-400 text-xs mt-2">En attente d’envoi du skin par le vendeur. Vous recevrez une notification dès que le skin sera détecté.</div>;
       }
-      if (transaction.status === 'DONE') {
-        return <div className="text-green-400 text-xs mt-2">Transaction terminée. Le skin a été livré et l’argent a été libéré.</div>;
+      if (transaction.status === 'IN_ESCROW') {
+        return <div className="text-blue-400 text-xs mt-2">Le skin a été détecté. Les fonds sont en escrow en attente de libération.</div>;
+      }
+      if (transaction.status === 'RELEASED') {
+        return <div className="text-green-400 text-xs mt-2">Transaction terminée. L’argent a été libéré au vendeur.</div>;
       }
     } else if (transaction.isSeller) {
-      if (transaction.status === 'WAITING_TRADE') {
+      if (transaction.status === 'PENDING') {
         if (transaction.offer && transaction.offer.buyer && transaction.offer.buyer.tradeUrl) {
           return <div className="text-blue-400 text-xs mt-2">Vous devez envoyer le skin à l’acheteur via Steam. Cliquez sur « Lancer l’échange Steam » pour ouvrir son tradelink. L’argent sera libéré automatiquement dès que le skin sera détecté dans l’inventaire de l’acheteur.</div>;
         } else {
           return <div className="text-yellow-400 text-xs mt-2">L’acheteur n’a pas encore renseigné son tradelink Steam. Attendez qu’il le fasse pour pouvoir envoyer le skin.</div>;
         }
       }
-      if (transaction.status === 'DONE') {
-        return <div className="text-green-400 text-xs mt-2">Transaction terminée. Le skin a été livré et l’argent a été libéré.</div>;
+      if (transaction.status === 'IN_ESCROW') {
+        return <div className="text-blue-400 text-xs mt-2">Le skin a été détecté chez l’acheteur. Les fonds seront libérés sous peu.</div>;
+      }
+      if (transaction.status === 'RELEASED') {
+        return <div className="text-green-400 text-xs mt-2">Transaction terminée. Les fonds ont été libérés.</div>;
       }
     }
     return null;
@@ -79,7 +130,7 @@ export default function HistoryPage() {
     all: (tx: any) => true,
     purchases: (tx: any) => tx.isBuyer,
     sales: (tx: any) => tx.isSeller,
-    pending: (tx: any) => tx.status === 'WAITING_TRADE',
+    pending: (tx: any) => tx.status === 'PENDING' || tx.status === 'IN_ESCROW',
   };
 
   const renderTxList = (tab: keyof typeof filterTx) => {
@@ -111,15 +162,18 @@ export default function HistoryPage() {
                     <h3 className="font-bold text-opnskin-text-primary">{tx.offer?.itemName || tx.offer?.itemId}</h3>
                     {getStatusBadge(tx.status)}
                   </div>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm text-opnskin-text-secondary">
+                  <div className="grid grid-cols-2 md:grid-cols-5 gap-2 text-sm text-opnskin-text-secondary">
                     <div>
-                      <span className="font-semibold">Prix:</span> {formatPrice(tx.escrowAmount, currency, cryptoRates)}
+                      <span className="font-semibold">Prix:</span> {formatPrice(tx.offer?.price ?? 0, currency, cryptoRates)}
                     </div>
                     <div>
                       <span className="font-semibold">Date:</span> {new Date(tx.startedAt).toLocaleDateString()}
                     </div>
                     <div>
                       <span className="font-semibold">Rôle:</span> {tx.isBuyer ? 'Acheteur' : 'Vendeur'}
+                    </div>
+                    <div className="col-span-2 md:col-span-2">
+                      {renderTimeline(tx.status)}
                     </div>
                     {tx.isSeller && tx.buyer?.name && (
                       <div>
