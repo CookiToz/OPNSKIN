@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
     }
 
     if (!user.stripeAccountId) {
-      return NextResponse.json({ hasAccount: false, message: 'No Stripe account found' });
+      return NextResponse.json({ hasAccount: false, message: 'No Stripe account found', deposits: [], withdrawals: [] });
     }
 
     const account = await stripe.accounts.retrieve(user.stripeAccountId);
@@ -63,3 +63,5 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: error.message || 'Failed to get account status' }, { status: 500 });
   }
 }
+
+

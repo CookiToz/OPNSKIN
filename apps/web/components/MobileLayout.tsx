@@ -118,7 +118,7 @@ export default function MobileLayout({ children }: { children: React.ReactNode }
                   <X className="h-7 w-7" />
                 </button>
               </div>
-              <nav className="flex flex-col gap-2 px-4 py-6 pb-24">
+              <nav className="flex flex-col gap-2 px-4 py-6 pb-24 overflow-y-auto">
                 {navItems.map(item => (
                   <Link key={item.href} href={item.href} onClick={() => setOpen(false)}
                     className={`py-3 px-3 rounded text-base font-medium ${pathname === item.href ? 'bg-opnskin-primary/10 text-opnskin-primary' : 'text-opnskin-text-primary hover:bg-opnskin-bg-secondary/60'}`}
@@ -126,7 +126,6 @@ export default function MobileLayout({ children }: { children: React.ReactNode }
                     {item.name}
                   </Link>
                 ))}
-                <div className="border-t border-opnskin-bg-secondary my-3" />
                 {accountItems.map(item => (
                   <Link key={item.href} href={item.href} onClick={() => setOpen(false)}
                     className={`py-3 px-3 rounded text-base font-medium ${pathname === item.href ? 'bg-opnskin-primary/10 text-opnskin-primary' : 'text-opnskin-text-primary hover:bg-opnskin-bg-secondary/60'}`}
@@ -135,6 +134,7 @@ export default function MobileLayout({ children }: { children: React.ReactNode }
                   </Link>
                 ))}
                 <div className="border-t border-opnskin-bg-secondary my-3" />
+                {/* Sélecteur de langue (mobile uniquement) */}
                 <div className="flex flex-wrap gap-2">
                   {languages.map(lang => (
                     <button

@@ -62,9 +62,13 @@ function WalletPageContent() {
   const deposits = useMemo(() => stripeAccount?.deposits || [], [stripeAccount]);
   const withdrawals = useMemo(() => stripeAccount?.withdrawals || [], [stripeAccount]);
 
-  // Charger le statut du compte Stripe
+  // Charger le statut du compte Stripe + rafraîchir solde utilisateur
   useEffect(() => {
-    loadStripeAccount();
+    const init = async () => {
+      await loadStripeAccount();
+      await refetch();
+    };
+    init();
     const amt = searchParams.get('amount');
     if (amt) setDepositAmount(amt);
   }, []);
@@ -176,6 +180,8 @@ function WalletPageContent() {
       if (response.ok) {
         window.open(data.url, '_blank');
         setDepositAmount('');
+        // Recheck status shortly after open for faster UI feedback
+        setTimeout(async () => { await loadStripeAccount(); await refetch(); }, 2000);
       } else {
         toast({ title: 'Erreur', description: data.error || 'Erreur lors de la création du dépôt', variant: 'destructive' });
       }

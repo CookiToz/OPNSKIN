@@ -77,7 +77,7 @@ export default function FilterSidebarCS2({
   ];
 
   return (
-    <aside className="w-72 bg-opnskin-bg-secondary rounded-xl p-6 shadow-xl flex flex-col gap-6 sticky top-24">
+    <aside className="w-72 bg-opnskin-bg-secondary rounded-xl p-6 shadow-xl flex flex-col gap-6 sticky top-24 max-h-[calc(100vh-7rem)] overflow-y-auto">
       <div className="flex items-center justify-between mb-2">
         <h2 className="text-xl font-bold text-opnskin-accent">Filtres avancés</h2>
         <Button variant="ghost" size="sm" onClick={() => setFilters(DEFAULT_FILTERS)}>
