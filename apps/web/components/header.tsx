@@ -111,7 +111,7 @@ export function Header() {
             <ThemeToggle />
             <Tooltip>
               <TooltipTrigger asChild>
-                <div className="relative">
+                <div className="relative hidden md:block">
                   <Button
                     variant="ghost"
                     size="icon"
@@ -166,7 +166,7 @@ export function Header() {
             <Tooltip>
               <TooltipTrigger asChild>
                 <button
-                  className="relative"
+                  className="relative hidden md:block"
                   onClick={() => setCartOpen(true)}
                   aria-label="Ouvrir le panier"
                 >
@@ -183,9 +183,9 @@ export function Header() {
               </TooltipContent>
             </Tooltip>
 
-            {/* Solde et bouton recharger - affichés uniquement si Steam est connecté */}
+            {/* Solde et bouton recharger - affichés uniquement si Steam est connecté (desktop uniquement) */}
             {isSteamLinked && (
-              <div className="flex items-center space-x-4 pl-4">
+              <div className="hidden md:flex items-center space-x-4 pl-4">
                 <div className="flex flex-col items-end">
                   <span className="text-sm font-medium text-opnskin-text-secondary">{t('header.balance')}</span>
                   {cryptoIcons[currency] && <img src={cryptoIcons[currency]!} alt={currency} className="inline w-5 h-5 mr-1 align-middle" />}
@@ -207,11 +207,11 @@ export function Header() {
             )}
 
             {userLoading ? (
-              <div className="text-opnskin-primary animate-pulse">Chargement…</div>
+              <div className="hidden md:block text-opnskin-primary animate-pulse">Chargement…</div>
             ) : userError ? (
-              <div className="text-red-500">Erreur de connexion</div>
+              <div className="hidden md:block text-red-500">Erreur de connexion</div>
             ) : user && user.loggedIn ? (
-              <div className="relative flex items-center gap-3">
+              <div className="hidden md:flex relative items-center gap-3">
                 <div className="flex flex-col items-end">
                   <span className="text-sm font-medium text-opnskin-text-primary">{user.name}</span>
                 </div>
@@ -245,7 +245,7 @@ export function Header() {
             ) : (
               <Button
                 onClick={() => (window.location.href = '/api/auth/steam')}
-                className="btn-opnskin flex items-center gap-2"
+                className="hidden md:flex btn-opnskin items-center gap-2"
               >
                   <img src="/icons8-steam-128.png" alt="Steam" className="w-6 h-6 object-contain" />
                 Connecter Steam
