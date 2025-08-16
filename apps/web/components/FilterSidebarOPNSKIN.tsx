@@ -109,21 +109,41 @@ export function MobileFilters({
           )}
         </Button>
       </SheetTrigger>
-      <SheetContent side="left" className="w-80 bg-opnskin-bg-card border-opnskin-bg-secondary">
-        <SheetHeader>
-          <SheetTitle className="text-opnskin-text-primary font-rajdhani">
-            Filtres avancés
-          </SheetTitle>
-        </SheetHeader>
-        <div className="mt-6 space-y-6">
-          <FilterContent 
-            filters={filters} 
-            setFilters={setFilters} 
-            collections={collections} 
-            showFloat={showFloat} 
-            priceMax={priceMax}
-            isMobile={true}
-          />
+      <SheetContent side="left" className="w-80 bg-opnskin-bg-card border-opnskin-bg-secondary p-0">
+        <div className="flex flex-col h-full">
+          {/* Header fixe */}
+          <SheetHeader className="px-6 py-4 border-b border-opnskin-bg-secondary bg-opnskin-bg-card sticky top-0 z-10">
+            <div className="flex items-center justify-between">
+              <SheetTitle className="text-opnskin-text-primary font-rajdhani text-lg">
+                Filtres avancés
+              </SheetTitle>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => {
+                  setFilters(DEFAULT_OPNSKIN_FILTERS);
+                  setIsOpen(false);
+                }}
+                className="text-opnskin-text-secondary hover:text-opnskin-text-primary"
+              >
+                Réinitialiser
+              </Button>
+            </div>
+          </SheetHeader>
+          
+          {/* Contenu scrollable */}
+          <div className="flex-1 overflow-y-auto px-6 py-4">
+            <div className="space-y-6 pb-6">
+              <FilterContent 
+                filters={filters} 
+                setFilters={setFilters} 
+                collections={collections} 
+                showFloat={showFloat} 
+                priceMax={priceMax}
+                isMobile={true}
+              />
+            </div>
+          </div>
         </div>
       </SheetContent>
     </Sheet>
@@ -145,8 +165,9 @@ export function DesktopFilters({
   priceMax?: number;
 }) {
   return (
-    <aside className="hidden lg:block w-80 max-w-full bg-opnskin-bg-card rounded-2xl p-6 shadow-2xl flex flex-col gap-6 sticky top-24 border border-opnskin-bg-secondary">
-      <div className="flex items-center justify-between mb-2">
+    <aside className="hidden lg:block w-80 max-w-full bg-opnskin-bg-card rounded-2xl shadow-2xl flex flex-col sticky top-24 border border-opnskin-bg-secondary max-h-[calc(100vh-8rem)]">
+      {/* Header fixe */}
+      <div className="flex items-center justify-between p-6 border-b border-opnskin-bg-secondary bg-opnskin-bg-card sticky top-0 z-10">
         <h2 className="text-xl font-rajdhani font-bold text-opnskin-text-primary tracking-wide">
           Filtres avancés
         </h2>
@@ -159,14 +180,18 @@ export function DesktopFilters({
           Réinitialiser
         </Button>
       </div>
-      <FilterContent 
-        filters={filters} 
-        setFilters={setFilters} 
-        collections={collections} 
-        showFloat={showFloat} 
-        priceMax={priceMax}
-        isMobile={false}
-      />
+      
+      {/* Contenu scrollable */}
+      <div className="flex-1 overflow-y-auto p-6">
+        <FilterContent 
+          filters={filters} 
+          setFilters={setFilters} 
+          collections={collections} 
+          showFloat={showFloat} 
+          priceMax={priceMax}
+          isMobile={false}
+        />
+      </div>
     </aside>
   );
 }
@@ -374,7 +399,7 @@ function FilterContent({
   const { t } = useTranslation('common');
 
   return (
-    <div className="space-y-6">
+    <div className={`space-y-6 ${isMobile ? 'space-y-8' : ''}`}>
       {/* Barre de recherche */}
       <Collapsible defaultOpen>
         <CollapsibleTrigger className="flex items-center justify-between w-full text-left">
@@ -389,7 +414,10 @@ function FilterContent({
               placeholder="Rechercher un skin..."
               value={filters.search}
               onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-              className="pl-10 bg-opnskin-bg-card border-opnskin-bg-secondary text-opnskin-text-primary placeholder:text-opnskin-text-secondary"
+              className={cn(
+                "pl-10 bg-opnskin-bg-card border-opnskin-bg-secondary text-opnskin-text-primary placeholder:text-opnskin-text-secondary",
+                isMobile && "min-h-[44px] text-base"
+              )}
             />
           </div>
         </CollapsibleContent>
@@ -415,7 +443,10 @@ function FilterContent({
                 let min = Math.max(0, Math.min(Number(e.target.value), filters.price[1]));
                 setFilters({ ...filters, price: [min, filters.price[1]] });
               }}
-              className="w-20 rounded bg-opnskin-bg-card border px-2 py-1 text-sm text-opnskin-text-primary"
+              className={cn(
+                "rounded bg-opnskin-bg-card border px-2 py-1 text-sm text-opnskin-text-primary",
+                isMobile ? "w-24 min-h-[44px] text-base" : "w-20"
+              )}
             />
             <span className="text-opnskin-text-secondary">-</span>
             <input
@@ -427,7 +458,10 @@ function FilterContent({
                 let max = Math.max(filters.price[0], Math.min(Number(e.target.value), priceMax));
                 setFilters({ ...filters, price: [filters.price[0], max] });
               }}
-              className="w-20 rounded bg-opnskin-bg-card border px-2 py-1 text-sm text-opnskin-text-primary"
+              className={cn(
+                "rounded bg-opnskin-bg-card border px-2 py-1 text-sm text-opnskin-text-primary",
+                isMobile ? "w-24 min-h-[44px] text-base" : "w-20"
+              )}
             />
           </div>
           <Slider
@@ -477,6 +511,7 @@ function FilterContent({
                 key={rarity.value}
                 className={cn(
                   "cursor-pointer px-3 py-2 text-xs font-medium border transition-all duration-150 hover:scale-105",
+                  isMobile && "min-h-[44px] px-4 py-3 text-sm",
                   filters.rarity.includes(rarity.value) 
                     ? `${rarity.color} text-white border-opacity-80 shadow-lg shadow-opacity-20` 
                     : "bg-opnskin-bg-card text-opnskin-text-secondary border-opnskin-bg-secondary/60 hover:border-opacity-40 hover:text-opnskin-text-primary"
@@ -508,6 +543,7 @@ function FilterContent({
                 key={wear}
                 className={cn(
                   "cursor-pointer px-3 py-2 text-xs font-medium border transition-all duration-150 hover:scale-105",
+                  isMobile && "min-h-[44px] px-4 py-3 text-sm",
                   filters.wear.includes(wear) 
                     ? "bg-opnskin-primary text-white border-opnskin-primary/80 shadow-lg shadow-opnskin-primary/20" 
                     : "bg-opnskin-bg-card text-opnskin-text-secondary border-opnskin-bg-secondary/60 hover:border-opnskin-primary/40 hover:text-opnskin-text-primary"
@@ -537,6 +573,7 @@ function FilterContent({
             <Badge
               className={cn(
                 "cursor-pointer px-3 py-2 text-xs font-medium border transition-all duration-150 hover:scale-105",
+                isMobile && "min-h-[44px] px-4 py-3 text-sm",
                 filters.stattrak === true
                   ? "bg-opnskin-primary text-white border-opnskin-primary/80 shadow-lg shadow-opnskin-primary/20" 
                   : "bg-opnskin-bg-card text-opnskin-text-secondary border-opnskin-bg-secondary/60 hover:border-opnskin-primary/40 hover:text-opnskin-text-primary"
@@ -560,7 +597,10 @@ function FilterContent({
         </CollapsibleTrigger>
         <CollapsibleContent className="mt-3">
           <select
-            className="w-full rounded bg-opnskin-bg-card border border-opnskin-bg-secondary px-3 py-2 text-opnskin-text-primary"
+            className={cn(
+              "w-full rounded bg-opnskin-bg-card border border-opnskin-bg-secondary px-3 py-2 text-opnskin-text-primary",
+              isMobile && "min-h-[44px] text-base"
+            )}
             value={filters.collection}
             onChange={e => setFilters({ ...filters, collection: e.target.value })}
           >
