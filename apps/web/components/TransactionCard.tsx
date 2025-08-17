@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ChevronDown, ChevronUp, ExternalLink, User, Calendar } from 'lucide-react';
+import { ChevronDown, ChevronUp, ExternalLink, User, Calendar, ExternalLink as ExternalLinkIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { TransactionStepper, TransactionStatus } from './TransactionStepper';
 import { formatPrice } from '@/lib/utils';
@@ -223,6 +223,24 @@ export function TransactionCard({ transaction, currency, cryptoRates }: Transact
                   <User className="w-4 h-4 text-opnskin-text-secondary" />
                   <span className="text-opnskin-text-secondary">Vendeur:</span>
                   <span className="text-opnskin-text-primary">{transaction.seller.name}</span>
+                  {transaction.sellerId && (
+                    <Button
+                      asChild
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 px-2 text-xs text-opnskin-primary hover:text-opnskin-primary/80 hover:bg-opnskin-primary/10"
+                    >
+                      <a
+                        href={`https://steamcommunity.com/profiles/${transaction.sellerId}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1"
+                      >
+                        <ExternalLinkIcon className="w-3 h-3" />
+                        Profil Steam
+                      </a>
+                    </Button>
+                  )}
                 </div>
               )}
 
@@ -231,6 +249,24 @@ export function TransactionCard({ transaction, currency, cryptoRates }: Transact
                   <User className="w-4 h-4 text-opnskin-text-secondary" />
                   <span className="text-opnskin-text-secondary">Acheteur:</span>
                   <span className="text-opnskin-text-primary">{transaction.buyer.name}</span>
+                  {transaction.buyerId && (
+                    <Button
+                      asChild
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 px-2 text-xs text-opnskin-primary hover:text-opnskin-primary/80 hover:bg-opnskin-primary/10"
+                    >
+                      <a
+                        href={`https://steamcommunity.com/profiles/${transaction.buyerId}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1"
+                      >
+                        <ExternalLinkIcon className="w-3 h-3" />
+                        Profil Steam
+                      </a>
+                    </Button>
+                  )}
                 </div>
               )}
             </div>
