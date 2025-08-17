@@ -109,10 +109,10 @@ export function MobileFilters({
           )}
         </Button>
       </SheetTrigger>
-      <SheetContent side="left" className="w-80 bg-opnskin-bg-card border-opnskin-bg-secondary p-0">
+      <SheetContent side="left" className="w-80 bg-opnskin-bg-card border-opnskin-bg-secondary p-0 max-h-[80vh]">
         <div className="flex flex-col h-full">
           {/* Header fixe */}
-          <SheetHeader className="px-6 py-4 border-b border-opnskin-bg-secondary bg-opnskin-bg-card sticky top-0 z-10">
+          <SheetHeader className="px-6 py-4 border-b border-opnskin-bg-secondary bg-opnskin-bg-card sticky top-0 z-10 flex-shrink-0">
             <div className="flex items-center justify-between">
               <SheetTitle className="text-opnskin-text-primary font-rajdhani text-lg">
                 Filtres avancés
@@ -132,7 +132,7 @@ export function MobileFilters({
           </SheetHeader>
           
           {/* Contenu scrollable */}
-          <div className="flex-1 overflow-y-auto px-6 py-4">
+          <div className="flex-1 overflow-y-auto px-6 py-4 min-h-0">
             <div className="space-y-6 pb-6">
               <FilterContent 
                 filters={filters} 
@@ -167,7 +167,7 @@ export function DesktopFilters({
   return (
     <aside className="hidden lg:block w-80 max-w-full bg-opnskin-bg-card rounded-2xl shadow-2xl flex flex-col sticky top-24 border border-opnskin-bg-secondary max-h-[calc(100vh-8rem)]">
       {/* Header fixe */}
-      <div className="flex items-center justify-between p-6 border-b border-opnskin-bg-secondary bg-opnskin-bg-card sticky top-0 z-10">
+      <div className="flex items-center justify-between p-6 border-b border-opnskin-bg-secondary bg-opnskin-bg-card flex-shrink-0">
         <h2 className="text-xl font-rajdhani font-bold text-opnskin-text-primary tracking-wide">
           Filtres avancés
         </h2>
@@ -182,7 +182,7 @@ export function DesktopFilters({
       </div>
       
       {/* Contenu scrollable */}
-      <div className="flex-1 overflow-y-auto p-6">
+      <div className="flex-1 overflow-y-auto p-6 min-h-0">
         <FilterContent 
           filters={filters} 
           setFilters={setFilters} 
