@@ -165,7 +165,7 @@ export function DesktopFilters({
   priceMax?: number;
 }) {
   return (
-    <aside className="hidden lg:block w-80 max-w-full bg-opnskin-bg-card rounded-2xl shadow-2xl flex flex-col border border-opnskin-bg-secondary fixed top-24 left-4 z-40">
+    <aside className="hidden lg:block w-80 max-w-full bg-opnskin-bg-card rounded-2xl shadow-2xl flex flex-col border border-opnskin-bg-secondary sticky top-24 self-start">
       {/* Header fixe */}
       <div className="flex items-center justify-between p-6 border-b border-opnskin-bg-secondary bg-opnskin-bg-card flex-shrink-0">
         <h2 className="text-xl font-rajdhani font-bold text-opnskin-text-primary tracking-wide">
