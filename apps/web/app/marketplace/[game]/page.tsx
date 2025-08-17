@@ -555,7 +555,7 @@ export default function MarketplaceGamePage() {
           )}
           
           {/* Liste des offres */}
-          <div className="flex-1 min-w-0">
+          <div className={`flex-1 min-w-0 ${game === 'cs2' ? 'lg:ml-80' : ''}`}>
             {/* Barre de catégories d'armes pour CS2 */}
             {game === 'cs2' && (
               <div className="mb-6">
