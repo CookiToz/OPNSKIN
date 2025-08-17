@@ -547,14 +547,16 @@ export default function MarketplaceGamePage() {
           </Button>
         </div>
 
-        {/* Liste des offres avec filtres */}
-        <div className="flex flex-col lg:flex-row gap-8">
-          {/* Sidebar filtres pour CS2 */}
+        {/* Layout en 3 colonnes pour desktop */}
+        <div className="flex flex-col lg:flex-row gap-8 h-full">
+          {/* Colonne 1: Sidebar filtres pour CS2 */}
           {game === 'cs2' && (
-            <FilterSidebarOPNSKIN filters={filters} setFilters={setFilters} collections={collections} showFloat={true} priceMax={priceMax} />
+            <div className="lg:w-80 lg:flex-shrink-0">
+              <FilterSidebarOPNSKIN filters={filters} setFilters={setFilters} collections={collections} showFloat={true} priceMax={priceMax} />
+            </div>
           )}
           
-          {/* Liste des offres */}
+          {/* Colonne 2: Liste des offres */}
           <div className="flex-1 min-w-0">
             {/* Barre de catégories d'armes pour CS2 */}
             {game === 'cs2' && (

@@ -165,10 +165,10 @@ export function DesktopFilters({
   priceMax?: number;
 }) {
   return (
-    <aside className="hidden lg:block w-80 max-w-full bg-opnskin-bg-card rounded-2xl shadow-2xl flex flex-col border border-opnskin-bg-secondary sticky top-24 self-start">
+    <aside className="hidden lg:block w-80 bg-opnskin-bg-card rounded-2xl shadow-2xl flex flex-col border border-opnskin-bg-secondary h-full">
       {/* Header fixe */}
-      <div className="flex items-center justify-between p-6 border-b border-opnskin-bg-secondary bg-opnskin-bg-card flex-shrink-0">
-        <h2 className="text-xl font-rajdhani font-bold text-opnskin-text-primary tracking-wide">
+      <div className="flex items-center justify-between p-4 border-b border-opnskin-bg-secondary bg-opnskin-bg-card flex-shrink-0">
+        <h2 className="text-lg font-rajdhani font-bold text-opnskin-text-primary tracking-wide">
           Filtres avancés
         </h2>
         <Button 
@@ -181,8 +181,8 @@ export function DesktopFilters({
         </Button>
       </div>
       
-      {/* Contenu scrollable avec hauteur maximale */}
-      <div className="max-h-[calc(100vh-12rem)] overflow-y-auto p-6">
+      {/* Contenu scrollable */}
+      <div className="flex-1 overflow-y-auto p-4">
         <FilterContent 
           filters={filters} 
           setFilters={setFilters} 
